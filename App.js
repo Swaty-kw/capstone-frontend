@@ -6,6 +6,7 @@ import { NavigationContainer } from "@react-navigation/native";
 const queryClient = new QueryClient();
 import TextField from "./src/components/Textfield";
 import { TextInput } from "react-native";
+import WelcomeButton from "./src/components/WelcomeButton";
 
 const Stack = createNativeStackNavigator();
 export default function App() {
@@ -13,7 +14,7 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <NavigationContainer>
         <Stack.Navigator>
-          <Stack.Screen name="TextField" component={TextField} />
+          <Stack.Screen name="welcome button" component={WelcomeButton} />
         </Stack.Navigator>
       </NavigationContainer>
     </QueryClientProvider>
