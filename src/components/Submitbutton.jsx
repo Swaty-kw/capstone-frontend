@@ -16,11 +16,12 @@ const styles = StyleSheet.create({
     marginTop: 10, // Adjust margin as needed to position under the input
   },
   button: {
-    backgroundColor: "#e67e22", // Button color
+    backgroundColor: "#f26445",
+    // Button color
     padding: 15,
-    borderRadius: 10,
+    borderRadius: 20,
     alignItems: "center",
-    width: "100%",
+    width: "50%",
   },
   buttonText: {
     color: "#fff",

@@ -8,26 +8,33 @@ import {
 import React from "react";
 import Submitbutton from "./Submitbutton";
 
-const TextField = () => {
+const TextField = ({
+  color,
+  backgroundColor,
+  placeholder,
+  secureTextEntry,
+}) => {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>
+    <View style>
+      {/* <Text style={styles.title}>
         Register to start managing your pet's health and happiness in one place.
-      </Text>
-      <View style={styles.inputContainer}>
-        <TextInput style={styles.input} placeholder="Email" />
-        <TextInput style={styles.input} placeholder="Username" />
+      </Text> */}
+      <View style={{ width: "100%", marginBottom: 15 }}>
         <TextInput
-          style={styles.input}
-          placeholder="Password"
-          secureTextEntry
+          secureTextEntry={secureTextEntry}
+          style={{
+            color: color,
+            height: 50,
+            borderColor: "#e0a3a3", // Light red border color
+            borderWidth: 2,
+            borderRadius: 10,
+            paddingHorizontal: 15,
+            backgroundColor: { backgroundColor }, // Light red background for inputs
+            marginBottom: 10,
+          }}
+          placeholder={placeholder}
         />
-        <TextInput
-          style={styles.input}
-          placeholder="Confirm password"
-          secureTextEntry
-        />
-        <Submitbutton />
+        
       </View>
     </View>
   );
@@ -40,7 +47,7 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: "#f26445",
     backgroundOpacity: 66,
-    height: "100%",
+    height: "60",
 
     // Light background color
   },
