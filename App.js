@@ -8,7 +8,7 @@ import Profile from "./src/screens/Profile";
 const queryClient = new QueryClient();
 
 import { TextInput } from "react-native";
-import Register from "./src/screens/Register";
+import WelcomeButton from "./src/components/WelcomeButton";
 
 const Stack = createNativeStackNavigator();
 export default function App() {
@@ -16,8 +16,7 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <NavigationContainer>
         <Stack.Navigator>
-          {<Stack.Screen name="Register" component={Register} />}
-          {/* <Stack.Screen name="Login" component={Login} /> */}
+          <Stack.Screen name="welcome button" component={WelcomeButton} />
         </Stack.Navigator>
       </NavigationContainer>
     </QueryClientProvider>
