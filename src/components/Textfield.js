@@ -1,31 +1,48 @@
-import { View, Text, TextInput, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 import React from "react";
-import { TouchableOpacity } from "react-native";
+import Submitbutton from "./Submitbutton";
 
 const TextField = () => {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Register to start managing your pet's health and happiness in one place.</Text>
+      <Text style={styles.title}>
+        Register to start managing your pet's health and happiness in one place.
+      </Text>
       <View style={styles.inputContainer}>
         <TextInput style={styles.input} placeholder="Email" />
         <TextInput style={styles.input} placeholder="Username" />
-        <TextInput style={styles.input} placeholder="Password" secureTextEntry />
-        <TextInput style={styles.input} placeholder="Confirm password" secureTextEntry />
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
+          secureTextEntry
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Confirm password"
+          secureTextEntry
+        />
+        <Submitbutton />
       </View>
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Register</Text>
-      </TouchableOpacity>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     justifyContent: "center",
     alignItems: "center",
     padding: 20,
-    backgroundColor: "#f0f4f8", // Light background color
+    backgroundColor: "#f26445",
+    backgroundOpacity: 66,
+    height: "100%",
+
+    // Light background color
   },
   title: {
     fontSize: 18,
@@ -40,22 +57,15 @@ const styles = StyleSheet.create({
   input: {
     height: 50,
     borderColor: "#e0a3a3", // Light red border color
-    borderWidth: 1,
+    borderWidth: 2,
     borderRadius: 10,
     paddingHorizontal: 15,
     backgroundColor: "#f8d7da", // Light red background for inputs
     marginBottom: 10,
-  },
-  button: {
-    backgroundColor: "#e67e22", // Button color
-    padding: 15,
-    borderRadius: 10,
-    alignItems: "center",
+    // Additional styles to match the design
+    fontSize: 16,
+    color: "#333", // Dark text color for input
     width: "100%",
-  },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
   },
 });
 

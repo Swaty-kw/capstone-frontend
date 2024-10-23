@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { NavigationContainer } from "@react-navigation/native";
 const queryClient = new QueryClient();
-import TextField from "./src/components/Textfield";
+
 import { TextInput } from "react-native";
 import WelcomeButton from "./src/components/WelcomeButton";
 
