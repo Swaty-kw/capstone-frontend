@@ -12,29 +12,35 @@ const TextField = ({
   color,
   backgroundColor,
   placeholder,
+  placeholderTextColor,
   secureTextEntry,
+  borderColor,
 }) => {
   return (
-    <View style>
+    <View style={{ width: "100%" }}>
       {/* <Text style={styles.title}>
         Register to start managing your pet's health and happiness in one place.
       </Text> */}
       <View style={{ width: "100%", marginBottom: 15 }}>
         <TextInput
           secureTextEntry={secureTextEntry}
+          placeholderTextColor={color}
+          backgroundColor={"white"}
           style={{
             color: color,
             height: 50,
-            borderColor: "#e0a3a3", // Light red border color
+            borderColor: borderColor,
             borderWidth: 2,
-            borderRadius: 10,
+            borderRadius: 25, // Changed from 10 to 25 for more rounded corners
             paddingHorizontal: 15,
-            backgroundColor: { backgroundColor }, // Light red background for inputs
+            backgroundColor: "white",
             marginBottom: 10,
+            alignSelf: "stretch",
+            width: "100%",
+            fontFamily: "TeluguMN",
           }}
           placeholder={placeholder}
         />
-        
       </View>
     </View>
   );
@@ -63,16 +69,27 @@ const styles = StyleSheet.create({
   },
   input: {
     height: 50,
-    borderColor: "#e0a3a3", // Light red border color
+    borderColor: "#e0a3a3",
     borderWidth: 2,
-    borderRadius: 10,
+    borderRadius: 25, // Changed from 10 to 25 for more rounded corners
     paddingHorizontal: 15,
-    backgroundColor: "#f8d7da", // Light red background for inputs
+    backgroundColor: "#f8d7da",
     marginBottom: 10,
     // Additional styles to match the design
     fontSize: 16,
     color: "#333", // Dark text color for input
     width: "100%",
+    fontFamily: "TeluguMN", // Add this line to use the new font
+  },
+  registerButton: {
+    borderColor: 'white',
+    borderWidth: 1,
+    borderRadius: 25,
+  },
+  loginButton: {
+    borderColor: "#f26445",
+    borderWidth: 1,
+    borderRadius: 25,
   },
 });
 
