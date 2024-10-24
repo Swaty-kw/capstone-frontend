@@ -10,6 +10,7 @@ const queryClient = new QueryClient();
 import { TextInput } from "react-native";
 import WelcomeButton from "./src/components/WelcomeButton";
 import PetIdBlock from "./src/components/PetIdBlock";
+import AppointmentCard from "./src/components/AppointmentCard";
 
 const Stack = createNativeStackNavigator();
 export default function App() {
@@ -18,7 +19,7 @@ export default function App() {
       <NavigationContainer>
         <Stack.Navigator>
           {/* <Stack.Screen name="pet Id Blok" component={PetIdBlock} /> */}
-          <Stack.Screen name="Profile" component={Profile} />
+          <Stack.Screen name="Appt Card" component={AppointmentCard} />
         </Stack.Navigator>
       </NavigationContainer>
     </QueryClientProvider>
