@@ -9,6 +9,7 @@ const queryClient = new QueryClient();
 
 import { TextInput } from "react-native";
 import WelcomeButton from "./src/components/WelcomeButton";
+import PetIdBlock from "./src/components/PetIdBlock";
 
 const Stack = createNativeStackNavigator();
 export default function App() {
@@ -16,7 +17,7 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <NavigationContainer>
         <Stack.Navigator>
-          <Stack.Screen name="welcome button" component={WelcomeButton} />
+          <Stack.Screen name="pet Id Blok" component={PetIdBlock} />
         </Stack.Navigator>
       </NavigationContainer>
     </QueryClientProvider>
