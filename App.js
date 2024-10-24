@@ -10,7 +10,6 @@ const queryClient = new QueryClient();
 import { TextInput } from "react-native";
 import WelcomeButton from "./src/components/WelcomeButton";
 import PetIdBlock from "./src/components/PetIdBlock";
-import PetInfoSmallBlock from "./src/components/PetInfoSmallBlock";
 
 const Stack = createNativeStackNavigator();
 export default function App() {
