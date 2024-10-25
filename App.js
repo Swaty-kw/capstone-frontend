@@ -11,6 +11,7 @@ import { TextInput } from "react-native";
 import WelcomeButton from "./src/components/WelcomeButton";
 import PetIdBlock from "./src/components/PetIdBlock";
 import AppointmentCard from "./src/components/AppointmentCard";
+import Register from './src/screens/Register'
 
 const Stack = createNativeStackNavigator();
 export default function App() {
@@ -19,7 +20,7 @@ export default function App() {
       <NavigationContainer>
         <Stack.Navigator>
           {/* <Stack.Screen name="pet Id Blok" component={PetIdBlock} /> */}
-          <Stack.Screen name="Appt Card" component={AppointmentCard} />
+          <Stack.Screen name="Register" component={Register} />
         </Stack.Navigator>
       </NavigationContainer>
     </QueryClientProvider>
