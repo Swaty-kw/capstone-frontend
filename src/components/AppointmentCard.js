@@ -3,6 +3,7 @@ import React, {useState} from 'react'
 import WelcomeButton from './WelcomeButton'
 import { isEnabled } from 'react-native/Libraries/Performance/Systrace'
 
+
 const AppointmentCard = () => {
     const [isEnabled, setIsEnabled] = useState(false);
   const toggleSwitch = () => setIsEnabled(previousState => !previousState);
