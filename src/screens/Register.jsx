@@ -24,10 +24,18 @@ const Register = () => {
       password: password
     }),
     onSuccess: () => {
-      setUser(true);
+    //  setUser(true);
+     // alert("successfuly registerd!");
+      console.log("successfuly registerd!")
        // Direct to main navigation
     }
   });
+
+  const userInfo = {
+    email: email,
+    username: username,
+    password: password
+  }
 
   return (
     <View
@@ -92,7 +100,8 @@ const Register = () => {
 
           onPress={() => {
             /* Handle registration */
-            mutate();
+        //    console.log(userInfo);
+           mutate();
           }}
         />
       </View>
