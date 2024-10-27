@@ -1,16 +1,29 @@
 import { View, Text } from "react-native";
 import React, { useState } from "react";
 import TextField from "../components/Textfield";
-import Submitbutton from "../components/Submitbutton";
 import { StyleSheet } from "react-native";
 import Constants from "expo-constants";
-import { TouchableOpacity } from "react-native";
 import WelcomeButton from "../components/WelcomeButton";
+
 
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [user, setUser] = useContext(UserContext);
+
   const STATUSBAR_HEIGHT = Constants.statusBarHeight;
+
+  const {mutate} = useMutation({
+    mutationKey: ["register"],
+    mutationKey: () => register({
+      username: username,
+      password: password
+    }),
+    onSuccess: () => {
+      setUser(true);
+       // Direct to main navigation
+    }
+  });
 
   return (
     <View
@@ -54,6 +67,7 @@ const Login = () => {
           height="10%"
           onPress={() => {
             /* Handle sign in */
+            mutate();
           }}
         />
       </View>
