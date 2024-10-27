@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -12,10 +12,27 @@ import WelcomeButton from "./src/components/WelcomeButton";
 import PetIdBlock from "./src/components/PetIdBlock";
 import AppointmentCard from "./src/components/AppointmentCard";
 import Register from './src/screens/Register'
+import {getToken} from './src/api/storage'
+import UserContext from "./src/context/UserContext";
 
 const Stack = createNativeStackNavigator();
 export default function App() {
+
+  const [user, setUser] = useState(false );
+
+  const checkToken = async () => {
+    const token = await getToken();
+      if (token){
+        setUser(true);
+      }
+  }
+
+  useEffect(()=>{
+    checkToken();
+  })
+
   return (
+    <UserContext.Provider value={[user, setUser]}>
     <QueryClientProvider client={queryClient}>
       <NavigationContainer>
         <Stack.Navigator>
@@ -24,5 +41,6 @@ export default function App() {
         </Stack.Navigator>
       </NavigationContainer>
     </QueryClientProvider>
+    </UserContext.Provider>
   );
 }

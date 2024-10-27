@@ -1,10 +1,11 @@
-import { View, Text, TextInput, StyleSheet, SafeAreaView } from "react-native";
-import React, { useState } from "react";
-import { TouchableOpacity } from "react-native";
-import Submitbutton from "../components/Submitbutton";
+import { View, Text, StyleSheet, SafeAreaView } from "react-native";
+import React, { useContext, useState } from "react";
 import TextField from "../components/Textfield";
 import Constants from "expo-constants";
 import WelcomeButton from "../components/WelcomeButton";
+import { useMutation } from "@tanstack/react-query";
+import { register } from "../api/Auth";
+import UserContext from "../context/UserContext";
 
 
 const Register = () => {
@@ -13,6 +14,20 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const STATUSBAR_HEIGHT = Constants.statusBarHeight;
+  const [user, setUser] = useContext(UserContext);
+
+  const {mutate} = useMutation({
+    mutationKey: ["register"],
+    mutationKey: () => register({
+      email: email,
+      username: username,
+      password: password
+    }),
+    onSuccess: () => {
+      setUser(true);
+       // Direct to main navigation
+    }
+  });
 
   return (
     <View
@@ -77,6 +92,7 @@ const Register = () => {
 
           onPress={() => {
             /* Handle registration */
+            mutate();
           }}
         />
       </View>
