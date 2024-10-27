@@ -15,6 +15,7 @@ const TextField = ({
   placeholderTextColor,
   secureTextEntry,
   borderColor,
+  onChangeText,
 }) => {
   return (
     <View style={{ width: "100%" }}>
@@ -40,6 +41,7 @@ const TextField = ({
             fontFamily: "TeluguMN",
           }}
           placeholder={placeholder}
+          onChangeText={onChangeText}
         />
       </View>
     </View>
@@ -82,7 +84,7 @@ const styles = StyleSheet.create({
     fontFamily: "TeluguMN", // Add this line to use the new font
   },
   registerButton: {
-    borderColor: 'white',
+    borderColor: "white",
     borderWidth: 1,
     borderRadius: 25,
   },

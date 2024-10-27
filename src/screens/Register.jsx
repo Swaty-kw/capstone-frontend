@@ -7,35 +7,40 @@ import { useMutation } from "@tanstack/react-query";
 import { register } from "../api/Auth";
 import UserContext from "../context/UserContext";
 
-
 const Register = () => {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [phone, setPhone] = useState("");
   const STATUSBAR_HEIGHT = Constants.statusBarHeight;
   const [user, setUser] = useContext(UserContext);
 
-  const {mutate} = useMutation({
+  const { mutate } = useMutation({
     mutationKey: ["register"],
-    mutationKey: () => register({
-      email: email,
-      username: username,
-      password: password
-    }),
+    mutationFn: () =>
+      register({
+        email: email,
+        username: username,
+        password: password,
+        phone: phone,
+      }),
     onSuccess: () => {
-    //  setUser(true);
-     // alert("successfuly registerd!");
-      console.log("successfuly registerd!")
-       // Direct to main navigation
-    }
+      setUser(true);
+      alert("successfuly registerd!");
+
+      // Direct to main navigation
+    },
+    onError: (error) => {
+      console.log("Error fetching data");
+    },
   });
 
   const userInfo = {
     email: email,
     username: username,
-    password: password
-  }
+    password: password,
+    phone: phone,
+  };
 
   return (
     <View
@@ -83,13 +88,13 @@ const Register = () => {
         />
         <TextField
           color="#f26445"
-          placeholder="Confirm password"
+          placeholder="Phone Number"
           placeholderTextColor="white"
           borderColor="#f26445"
           backgroundColor="white"
-          secureTextEntry={true}
-          value={confirmPassword}
-          onChangeText={setConfirmPassword}
+          secureTextEntry={false}
+          value={phone}
+          onChangeText={setPhone}
         />
 
         <WelcomeButton
@@ -97,11 +102,11 @@ const Register = () => {
           color="#f26445"
           width="50%"
           height="10%"
-
           onPress={() => {
+            console.log("Pressed");
             /* Handle registration */
-        //    console.log(userInfo);
-           mutate();
+            //   console.log(userInfo);
+            mutate();
           }}
         />
       </View>
