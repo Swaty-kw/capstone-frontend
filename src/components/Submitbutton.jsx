@@ -1,31 +1,29 @@
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import React from "react";
+import { TouchableOpacity, Text, StyleSheet } from "react-native";
 
-const Submitbutton = () => {
+const Submitbutton = ({ title, color }) => {
   return (
-    <View style={styles.container}>
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Register</Text>
-      </TouchableOpacity>
-    </View>
+    <TouchableOpacity style={[styles.button, { backgroundColor: color }]}>
+      <Text style={styles.buttonText}>{title}</Text>
+    </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    marginTop: 10, // Adjust margin as needed to position under the input
-  },
   button: {
-    backgroundColor: "#f26445",
-    // Button color
-    padding: 15,
-    borderRadius: 20,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 25,
     alignItems: "center",
-    width: "50%",
+    justifyContent: "center",
+    marginTop: 15,
+    alignSelf: "center",
   },
   buttonText: {
-    color: "#fff",
+    color: "white",
+    fontSize: 17,
     fontWeight: "bold",
+    textAlign: "center",
   },
 });
 

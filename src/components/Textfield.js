@@ -30,9 +30,9 @@ const TextField = ({
           style={{
             color: color,
             height: 50,
-            borderColor: borderColor,
-            borderWidth: 2,
-            borderRadius: 25, // Changed from 10 to 25 for more rounded corners
+            borderColor: borderColor, // Light red border color
+            borderWidth: 1,
+            borderRadius: 50,
             paddingHorizontal: 15,
             backgroundColor: "white",
             marginBottom: 10,

@@ -6,6 +6,7 @@ import WelcomeButton from "../components/WelcomeButton";
 import { useMutation } from "@tanstack/react-query";
 import { register } from "../api/Auth";
 import UserContext from "../context/UserContext";
+import Submitbutton from "../components/Submitbutton";
 
 const Register = () => {
   const [email, setEmail] = useState("");
@@ -43,100 +44,97 @@ const Register = () => {
   };
 
   return (
-    <View
-      style={[
-        styles.container,
-        {
-          paddingTop: STATUSBAR_HEIGHT,
-        },
-      ]}
-    >
-      <Text style={styles.headerText}>
-        Register to start managing your pet's health and happiness in one place.
-      </Text>
-
-      <View style={styles.formContainer}>
-        <TextField
-          color="#f26445"
-          placeholder="Email"
-          backgroundColor="white"
-          borderColor="#f26445"
-          placeholderTextColor="white"
-          secureTextEntry={false}
-          value={email}
-          onChangeText={setEmail}
-        />
-        <TextField
-          color="#f26445"
-          placeholder="Username"
-          placeholderTextColor="white"
-          borderColor="#f26445"
-          backgroundColor="white"
-          secureTextEntry={false}
-          value={username}
-          onChangeText={setUsername}
-        />
-        <TextField
-          color="#f26445"
-          placeholder="Password"
-          placeholderTextColor="white"
-          borderColor="#f26445"
-          backgroundColor="white"
-          secureTextEntry={true}
-          value={password}
-          onChangeText={setPassword}
-        />
-        <TextField
-          color="#f26445"
-          placeholder="Phone Number"
-          placeholderTextColor="white"
-          borderColor="#f26445"
-          backgroundColor="white"
-          secureTextEntry={false}
-          value={phone}
-          onChangeText={setPhone}
-        />
-
-        <WelcomeButton
-          text="Register"
-          color="#f26445"
-          width="50%"
-          height="10%"
-          onPress={() => {
-            console.log("Pressed");
-            /* Handle registration */
-            //   console.log(userInfo);
-            mutate();
-          }}
-        />
+    <SafeAreaView style={styles.container}>
+      <View style={styles.orangeBackground} />
+      <View style={styles.whiteOverlay} />
+      <View style={styles.contentContainer}>
+        <Text style={styles.title}>
+          Register to start managing your pet's health and happiness in one
+          place.
+        </Text>
+        <View style={styles.formContainer}>
+          <TextField
+            color="#F37558"
+            backgroundColor="white"
+            placeholder="Email"
+            style={styles.input}
+            borderColor="#F37558"
+          />
+          <TextField
+            color="#F37558"
+            backgroundColor="green"
+            placeholder="Username"
+            style={styles.input}
+            borderColor="#F37558"
+          />
+          <TextField
+            color="#F37558"
+            backgroundColor="white"
+            placeholder="Password"
+            style={styles.input}
+            borderColor="#F37558"
+          />
+          <TextField
+            color="#F37558"
+            backgroundColor="white"
+            placeholder="Confirm password"
+            style={styles.input}
+            borderColor="#F37558"
+          />
+          <Submitbutton title="Register" color="#F37558" />
+        </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f26445",
-    padding: 20,
-    paddingBottom: 0,
-    justifyContent: "center",
-    radius: 0.25,
+    backgroundColor: "white",
   },
-  headerText: {
+  orangeBackground: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    height: "80%",
+    backgroundColor: "#F37558",
+    borderBottomLeftRadius: 50,
+    borderBottomRightRadius: 50,
+  },
+  whiteOverlay: {
+    position: "absolute",
+    top: "27%",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "white",
+    borderTopLeftRadius: 50,
+    borderTopRightRadius: 50,
+  },
+  contentContainer: {
+    flex: 1,
+    justifyContent: "flex-start",
+    padding: 20,
+    zIndex: 2,
+  },
+  formContainer: {
+    backgroundColor: "white",
+    borderRadius: 30,
+    padding: 20,
+    width: "100%",
+    marginTop: 40,
+  },
+  title: {
     fontSize: 24,
     color: "white",
     textAlign: "center",
-    marginBottom: 30,
+    marginBottom: 20,
+    marginTop: 60,
   },
-  formContainer: {
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
-    borderRadius: 30,
-    padding: 30,
-    alignItems: "center",
-    // height: "	100%",
-    flex: 1,
-    // backgroundColor: "white",
+  input: {
+    marginBottom: 15,
   },
 });
 
