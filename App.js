@@ -18,6 +18,7 @@ import CalanderButton from "./src/components/CalanderButton";
 import apointmentCard from "./src/components/AppointmentTimeCard";
 import AppointmentTimeCard from "./src/components/AppointmentTimeCard";
 import BookingAppointment from "./src/components/BookingAppointment";
+import Login from "./src/screens/Login";
 
 const Stack = createNativeStackNavigator();
 export default function App() {
@@ -42,7 +43,7 @@ export default function App() {
             {/* <Stack.Screen name="pet Id Blok" component={PetIdBlock} /> */}
             <Stack.Screen
               name="Register"
-              component={BookingAppointment}
+              component={Login}
               options={{
                 headerTitle: "Book an appointment",
                 headerShadowVisible: false,
