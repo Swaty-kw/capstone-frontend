@@ -13,6 +13,7 @@ const TextField = ({
   backgroundColor,
   placeholder,
   secureTextEntry,
+  borderColor,
 }) => {
   return (
     <View style>
@@ -25,16 +26,15 @@ const TextField = ({
           style={{
             color: color,
             height: 50,
-            borderColor: "#e0a3a3", // Light red border color
-            borderWidth: 2,
-            borderRadius: 10,
+            borderColor: borderColor, // Light red border color
+            borderWidth: 1,
+            borderRadius: 50,
             paddingHorizontal: 15,
             backgroundColor: { backgroundColor }, // Light red background for inputs
             marginBottom: 10,
           }}
           placeholder={placeholder}
         />
-        
       </View>
     </View>
   );
