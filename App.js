@@ -1,30 +1,50 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { SafeAreaProvider } from "react-native-safe-area-context";
 import { NavigationContainer } from "@react-navigation/native";
-import Login from "./src/screens/Login";
-import Profile from "./src/screens/Profile";
-import UserProfile from "./src/screens/UserProfile";
-const queryClient = new QueryClient();
-import Register from "./src/screens/Register";
-import PetDetails from "./src/screens/PetDetails";
-import MyAppointments from "./src/screens/MyAppointments";
-import Review from "./src/screens/Review";
-import { registerCallableModule, TextInput } from "react-native";
-import WelcomeButton from "./src/components/WelcomeButton";
-import PetIdBlock from "./src/components/PetIdBlock";
 
+const queryClient = new QueryClient();
+
+import { Text, View } from "react-native";
+
+import { deleteToken, getToken } from "./src/api/storage";
+import UserContext from "./src/context/UserContext";
+import Login from "./src/screens/Login";
+import Register from "./src/screens/Register";
 const Stack = createNativeStackNavigator();
 export default function App() {
+  const [user, setUser] = useState(false);
+
+  const checkToken = async () => {
+    const token = await getToken();
+    if (token) {
+      setUser(true);
+    }
+  };
+
+  useEffect(() => {
+    checkToken();
+  });
+
   return (
-    <QueryClientProvider client={queryClient}>
-      <NavigationContainer>
-        <Stack.Navigator>
-          {/* <Stack.Screen name="pet Id Blok" component={PetIdBlock} /> */}
-          <Stack.Screen name="Profile" component={UserProfile} />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </QueryClientProvider>
+    <UserContext.Provider value={[user, setUser]}>
+      <QueryClientProvider client={queryClient}>
+        {user ? (
+          <View style={{ flex: 1 }}>
+            <Text>Home Page</Text>
+          </View>
+        ) : (
+          <NavigationContainer>
+            <Stack.Navigator>
+              {/* <Stack.Screen name="pet Id Blok" component={PetIdBlock} /> */}
+
+              <Stack.Screen name="Login" component={Register} />
+
+              <Stack.Screen name="Register" component={Register} />
+            </Stack.Navigator>
+          </NavigationContainer>
+        )}
+      </QueryClientProvider>
+    </UserContext.Provider>
   );
 }

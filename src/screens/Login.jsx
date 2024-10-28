@@ -1,38 +1,84 @@
-import React from "react";
-import { View, Text, StyleSheet, SafeAreaView } from "react-native";
+import { View, Text } from "react-native";
+import React, { useState, useContext } from "react";
 import TextField from "../components/Textfield";
-import Submitbutton from "../components/Submitbutton";
+import { StyleSheet } from "react-native";
+import Constants from "expo-constants";
+import WelcomeButton from "../components/WelcomeButton";
+import { useMutation } from "@tanstack/react-query";
+import { login } from "../api/Auth";
+import UserContext from "../context/UserContext";
 
 const Login = () => {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [user, setUser] = useContext(UserContext);
+
+  const STATUSBAR_HEIGHT = Constants.statusBarHeight;
+
+  const { mutate } = useMutation({
+    mutationKey: ["register"],
+    mutationFn: () =>
+      login({
+        username: username,
+        password: password,
+      }),
+    onSuccess: () => {
+      setUser(true);
+      // Direct to main navigation
+    },
+  });
+
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.greenBackground} />
-      <View style={styles.whiteOverlay} />
-      <View style={styles.contentContainer}>
-        <Text style={styles.title}>
-          Sign in to keep track of your pet's care and well-being.
-        </Text>
-        <View style={styles.formContainer}>
-          <TextField
-            color="#64C5B7"
-            backgroundColor="white"
-            placeholder="Username"
-            style={styles.input}
-            borderRadius={50}
-            borderColor="#64C5B7"
-          />
-          <TextField
-            color="#64C5B7"
-            backgroundColor="white"
-            placeholder="Password"
-            style={styles.input}
-            borderRadius={25}
-            borderColor="#64C5B7"
-          />
-          <Submitbutton title="Sign in" color="#64C5B7" />
-        </View>
+    <View
+      style={[
+        styles.container,
+        {
+          paddingTop: STATUSBAR_HEIGHT,
+        },
+      ]}
+    >
+      <Text style={styles.headerText}>
+        Signin to keep track of your pet's care and well-being
+      </Text>
+
+      <View style={styles.formContainer}>
+        <TextField
+          color="#5CCBAB"
+          placeholder="Username"
+          borderColor="#64C5B7"
+          placeholderTextColor="#5CCBAB"
+          backgroundColor="white"
+          secureTextEntry={false}
+          value={username}
+          onChangeText={setUsername}
+        />
+        <TextField
+          color="#5CCBAB"
+          borderColor="#64C5B7"
+          placeholder="Password"
+          placeholderTextColor="#5CCBAB"
+          backgroundColor="white"
+          secureTextEntry={true}
+          value={password}
+          onChangeText={setPassword}
+        />
+
+        <WelcomeButton
+          text="Sign in"
+          color="#64C5B7"
+          width="50%"
+          height="10%"
+          onPress={() => {
+            /* Handle sign in */
+            console.log({
+              username: username,
+              password: password,
+            });
+            mutate();
+          }}
+        />
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -85,6 +131,25 @@ const styles = StyleSheet.create({
   input: {
     marginBottom: 15,
     height: 50,
+    backgroundColor: "#64C5B7",
+    padding: 20,
+    paddingBottom: 0,
+    justifyContent: "center",
+  },
+  headerText: {
+    fontSize: 15,
+    color: "#64C5B7",
+    textAlign: "center",
+    marginBottom: 30,
+  },
+  formContainer: {
+    backgroundColor: "rrgba(175, 230, 218, 0.8)",
+    borderRadius: 30,
+    padding: 30,
+    alignItems: "center",
+    // height: "	100%",
+    flex: 1,
+    // backgroundColor: "white",
   },
 });
 

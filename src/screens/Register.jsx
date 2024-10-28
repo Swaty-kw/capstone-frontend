@@ -1,9 +1,48 @@
-import React from "react";
 import { View, Text, StyleSheet, SafeAreaView } from "react-native";
+import React, { useContext, useState } from "react";
 import TextField from "../components/Textfield";
+import Constants from "expo-constants";
+import WelcomeButton from "../components/WelcomeButton";
+import { useMutation } from "@tanstack/react-query";
+import { register } from "../api/Auth";
+import UserContext from "../context/UserContext";
 import Submitbutton from "../components/Submitbutton";
 
 const Register = () => {
+  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [phone, setPhone] = useState("");
+  const STATUSBAR_HEIGHT = Constants.statusBarHeight;
+  const [user, setUser] = useContext(UserContext);
+
+  const { mutate } = useMutation({
+    mutationKey: ["register"],
+    mutationFn: () =>
+      register({
+        email: email,
+        username: username,
+        password: password,
+        phone: phone,
+      }),
+    onSuccess: () => {
+      setUser(true);
+      alert("successfuly registerd!");
+
+      // Direct to main navigation
+    },
+    onError: (error) => {
+      console.log("Error fetching data");
+    },
+  });
+
+  const userInfo = {
+    email: email,
+    username: username,
+    password: password,
+    phone: phone,
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.orangeBackground} />
@@ -29,7 +68,7 @@ const Register = () => {
             borderColor="#F37558"
           />
           <TextField
-            color="#64C5B7"
+            color="#F37558"
             backgroundColor="white"
             placeholder="Password"
             style={styles.input}
