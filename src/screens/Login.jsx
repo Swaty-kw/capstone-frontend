@@ -38,7 +38,7 @@ const Login = () => {
       ]}
     >
       <Text style={styles.headerText}>
-        in to keep track of your pet's care and well-being
+        Signin to keep track of your pet's care and well-being
       </Text>
 
       <View style={styles.formContainer}>
@@ -85,14 +85,60 @@ const Login = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "white",
+  },
+  greenBackground: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    height: "80%",
+    backgroundColor: "#64C5B7",
+    borderBottomLeftRadius: 50,
+    borderBottomRightRadius: 50,
+  },
+  whiteOverlay: {
+    position: "absolute",
+    top: "27%",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "white",
+    borderTopLeftRadius: 50,
+    borderTopRightRadius: 50,
+  },
+  contentContainer: {
+    flex: 1,
+    justifyContent: "flex-start",
+    padding: 20,
+    zIndex: 2,
+    paddingTop: 40,
+  },
+  formContainer: {
+    backgroundColor: "white",
+    borderRadius: 30,
+    padding: 20,
+    width: "100%",
+    marginTop: 100,
+  },
+  title: {
+    fontSize: 24,
+    color: "white",
+    textAlign: "center",
+    marginBottom: 20,
+    marginTop: 20,
+  },
+  input: {
+    marginBottom: 15,
+    height: 50,
     backgroundColor: "#64C5B7",
     padding: 20,
     paddingBottom: 0,
     justifyContent: "center",
   },
   headerText: {
-    fontSize: 24,
-    color: "white",
+    fontSize: 15,
+    color: "#64C5B7",
     textAlign: "center",
     marginBottom: 30,
   },

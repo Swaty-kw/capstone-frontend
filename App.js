@@ -1,21 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { SafeAreaProvider } from "react-native-safe-area-context";
 import { NavigationContainer } from "@react-navigation/native";
 
-import Profile from "./src/screens/Profile";
 const queryClient = new QueryClient();
 
-import { Text, TextInput, View } from "react-native";
-import WelcomeButton from "./src/components/WelcomeButton";
-import PetIdBlock from "./src/components/PetIdBlock";
-import AppointmentCard from "./src/components/AppointmentCard";
-import Register from "./src/screens/Register";
+import { Text, View } from "react-native";
+
 import { deleteToken, getToken } from "./src/api/storage";
 import UserContext from "./src/context/UserContext";
 import Login from "./src/screens/Login";
 import PetDetails from "./src/screens/PetDetails";
+import Register from "./src/screens/Register";
 
 const Stack = createNativeStackNavigator();
 export default function App() {
@@ -44,9 +40,13 @@ export default function App() {
             <Stack.Navigator>
               {/* <Stack.Screen name="pet Id Blok" component={PetIdBlock} /> */}
 
+
               <Stack.Screen name="PetDetails" component={PetDetails} />
 
-              {/* <Stack.Screen name="Register" component={Register} /> */}
+              <Stack.Screen name="Login" component={Register} />
+
+
+              <Stack.Screen name="Register" component={Register} />
             </Stack.Navigator>
           </NavigationContainer>
         )}

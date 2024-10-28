@@ -1,3 +1,4 @@
+
 import { View, Text, ScrollView } from "react-native";
 import React from "react";
 import PetIdBlock from "../components/PetIdBlock";
@@ -39,6 +40,7 @@ const PetDetails = () => {
 
       <View style={{ marginHorizontal: 20 }}>
         <MedicationStatus />
+
       </View>
     </ScrollView>
   );
@@ -51,3 +53,4 @@ const PetDetails = () => {
 //             </View>
 
 export default PetDetails;
+
