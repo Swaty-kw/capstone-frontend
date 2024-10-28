@@ -15,6 +15,7 @@ import Register from "./src/screens/Register";
 import { deleteToken, getToken } from "./src/api/storage";
 import UserContext from "./src/context/UserContext";
 import Login from "./src/screens/Login";
+import PetDetails from "./src/screens/PetDetails";
 
 const Stack = createNativeStackNavigator();
 export default function App() {
@@ -43,7 +44,7 @@ export default function App() {
             <Stack.Navigator>
               {/* <Stack.Screen name="pet Id Blok" component={PetIdBlock} /> */}
 
-              <Stack.Screen name="Login" component={Login} />
+              <Stack.Screen name="PetDetails" component={PetDetails} />
 
               {/* <Stack.Screen name="Register" component={Register} /> */}
             </Stack.Navigator>
