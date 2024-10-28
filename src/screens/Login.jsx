@@ -4,8 +4,9 @@ import TextField from "../components/Textfield";
 import { StyleSheet } from "react-native";
 import Constants from "expo-constants";
 import WelcomeButton from "../components/WelcomeButton";
-import UserContext from "../context/UserContext";
 import { useMutation } from "@tanstack/react-query";
+import { login } from "../api/Auth";
+import UserContext from "../context/UserContext";
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -14,16 +15,17 @@ const Login = () => {
 
   const STATUSBAR_HEIGHT = Constants.statusBarHeight;
 
-  const {mutate} = useMutation({
+  const { mutate } = useMutation({
     mutationKey: ["register"],
-    mutationKey: () => register({
-      username: username,
-      password: password
-    }),
+    mutationFn: () =>
+      login({
+        username: username,
+        password: password,
+      }),
     onSuccess: () => {
       setUser(true);
-       // Direct to main navigation
-    }
+      // Direct to main navigation
+    },
   });
 
   return (
@@ -68,6 +70,10 @@ const Login = () => {
           height="10%"
           onPress={() => {
             /* Handle sign in */
+            console.log({
+              username: username,
+              password: password,
+            });
             mutate();
           }}
         />
