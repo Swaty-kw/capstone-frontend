@@ -1,56 +1,184 @@
-
-import { View, Text, ScrollView } from "react-native";
+import { View, Text, Image, StyleSheet, SafeAreaView } from "react-native";
 import React from "react";
-import PetIdBlock from "../components/PetIdBlock";
-import PetInfoBigBlock from "../components/PetInfoBigBlock";
-import PetInfoSmallBlock from "../components/PetInfoSmallBlock";
-import MedicationStatus from "../components/MedicationStatus";
+import { Ionicons } from "@expo/vector-icons"; // Make sure to install expo icons if not already
 
-const PetDetails = () => {
+const PetDetails = ({ route }) => {
+  const { pet } = route.params;
+
   return (
-    <ScrollView>
-      <View style={{ padding: 10 }}>
-        <PetIdBlock />
+    <SafeAreaView style={styles.container}>
+      <View style={styles.content}>
+        {/* Header with image and name */}
+        <View style={styles.header}>
+          <View style={styles.imageContainer}>
+            <Image
+              source={pet.image}
+              style={styles.petImage}
+              resizeMode="cover"
+            />
+          </View>
+          <View style={styles.titleContainer}>
+            <Text style={styles.name}>{pet.name}</Text>
+            <Text style={styles.breed}>{pet.breed}</Text>
+          </View>
+        </View>
+
+        {/* Info Grid */}
+        <View style={styles.infoGrid}>
+          <View style={[styles.infoBox, styles.mintBox]}>
+            <Text style={styles.infoLabel}>Gender</Text>
+            <Text style={styles.infoValue}>Male</Text>
+          </View>
+
+          <View style={[styles.infoBox, styles.mintBox, styles.wideBox]}>
+            <Text style={styles.infoLabel}>Vaccination for {pet.name}</Text>
+            <Text style={styles.infoSubtext}>Zoo Care Veterinary Clinic</Text>
+            <Text style={styles.infoDate}>{pet.nextVaccination}</Text>
+          </View>
+
+          <View style={[styles.infoBox, styles.grayBox]}>
+            <Text style={styles.infoLabel}>Age</Text>
+            <Text style={styles.infoValue}>16 Months</Text>
+          </View>
+
+          <View style={[styles.infoBox, styles.grayBox]}>
+            <Text style={styles.infoLabel}>Weight</Text>
+            <Text style={styles.infoValue}>4 oz</Text>
+          </View>
+
+          <View style={[styles.infoBox, styles.grayBox, styles.wideBox]}>
+            <Text style={styles.infoLabel}>Beak and nails care</Text>
+            <Text style={styles.infoSubtext}>Pet zone</Text>
+            <Text style={styles.infoDate}>{pet.nextAppointment}</Text>
+          </View>
+        </View>
+
+        {/* Medications Section */}
+        <View style={styles.medicationBox}>
+          <Text style={styles.medicationTitle}>Current medications</Text>
+          <Text style={styles.medicationText}>
+            {pet.medications || "No current medications"}
+          </Text>
+        </View>
+
+        {/* Bottom Navigation */}
+        <View style={styles.bottomNav}>
+          <Ionicons name="home-outline" size={24} color="#64C5B7" />
+          <Ionicons name="calendar-outline" size={24} color="#64C5B7" />
+          <Ionicons name="person-outline" size={24} color="#64C5B7" />
+        </View>
       </View>
-
-      <PetInfoBigBlock
-        color={"black"}
-        backgroundColor={"#bddade"}
-        width={"100%"}
-        height={200}
-        vaccinationFor={"Vaccination for Hussain"}
-        location={"Zoo care clinic"}
-        date={"4 Feb 2025"}
-      />
-      <PetInfoBigBlock
-        color={"black"}
-        backgroundColor={"#bddade"}
-        width={"100%"}
-        height={200}
-        vaccinationFor={"Beak and nails care"}
-        location={"Pet zone"}
-        date={"24 Feb 2025"}
-      />
-
-      <View style={{ flexDirection: "row", gap: 10, justifyContent: "center" }}>
-        <PetInfoSmallBlock label={"Gender"} value={"Male"} />
-        <PetInfoSmallBlock label={"Age"} value={"16 Months"} />
-        <PetInfoSmallBlock label={"Weight"} value={"4 oz"} />
-      </View>
-
-      <View style={{ marginHorizontal: 20 }}>
-        <MedicationStatus />
-
-      </View>
-    </ScrollView>
+    </SafeAreaView>
   );
 };
 
-// <View style={{flexDirection:'row', gap:5}}>
-//               <QuickInfo color={"#64C5B7"} backgroundColor={"orange"} upcomingEvent={"Vaccination:"} date={"4 Feb 2025"}/>
-//               <QuickInfo color={"#F26445"} backgroundColor={"orange"} upcomingEvent={"Medication:"} date={"No Medication"}/>
-//               <QuickInfo color={"#91ACBF"} backgroundColor={"orange"} upcomingEvent={"Appointment:"} date={"20 Jan 2025"}/>
-//             </View>
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#F8F8F8",
+  },
+  content: {
+    flex: 1,
+    padding: 20,
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 30,
+  },
+  imageContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    overflow: "hidden",
+    backgroundColor: "#E8F6F5",
+  },
+  petImage: {
+    width: "100%",
+    height: "100%",
+  },
+  titleContainer: {
+    marginLeft: 15,
+  },
+  name: {
+    fontSize: 32,
+    color: "#64C5B7",
+    fontWeight: "500",
+  },
+  breed: {
+    fontSize: 20,
+    color: "#A8D3CF",
+  },
+  infoGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 15,
+    marginBottom: 20,
+  },
+  infoBox: {
+    borderRadius: 20,
+    padding: 15,
+    minWidth: "45%",
+  },
+  wideBox: {
+    width: "100%",
+  },
+  mintBox: {
+    backgroundColor: "#E8F6F5",
+  },
+  grayBox: {
+    backgroundColor: "#E8EFF1",
+  },
+  infoLabel: {
+    fontSize: 16,
+    color: "#64C5B7",
+    marginBottom: 5,
+  },
+  infoValue: {
+    fontSize: 24,
+    color: "#64C5B7",
+    fontWeight: "500",
+  },
+  infoSubtext: {
+    fontSize: 14,
+    color: "#64C5B7",
+    marginBottom: 5,
+  },
+  infoDate: {
+    fontSize: 16,
+    color: "#64C5B7",
+    fontWeight: "500",
+    position: "absolute",
+    right: 15,
+    bottom: 15,
+  },
+  medicationBox: {
+    backgroundColor: "#FFE8E8",
+    borderRadius: 20,
+    padding: 20,
+    marginTop: 10,
+  },
+  medicationTitle: {
+    fontSize: 20,
+    color: "#F26445",
+    marginBottom: 10,
+  },
+  medicationText: {
+    fontSize: 18,
+    color: "#F26445",
+  },
+  bottomNav: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    backgroundColor: "#64C5B7",
+    borderRadius: 30,
+    padding: 15,
+    position: "absolute",
+    bottom: 20,
+    left: 20,
+    right: 20,
+  },
+});
 
 export default PetDetails;
-

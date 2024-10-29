@@ -1,22 +1,64 @@
-import { View, Text, ScrollView } from 'react-native'
-import React from 'react'
-import PetCard from '../components/PetCard'
+import { View, ScrollView, StyleSheet } from "react-native";
+import React from "react";
+import PetCard from "../components/PetCard";
+
 const Home = () => {
-    // 
+  const samplePets = [
+    {
+      name: "Grace",
+      breed: "Rainbow Lorikeet parrot",
+      medications: null,
+      nextVaccination: "4 Feb 2026",
+      nextAppointment: "24 Feb 2026",
+      image: require("../../assets/icon.png"),
+    },
+    {
+      name: "Alex",
+      breed: "Maine Coon cat",
+      medications: "FelineRx\nTwice daily",
+      nextVaccination: "4 Feb 2026",
+      nextAppointment: "24 Feb 2026",
+      image: require("../../assets/icon.png"),
+    },
+    {
+      name: "Luna",
+      breed: "Persian cat",
+      medications: null,
+      nextVaccination: "4 Feb 2026",
+      nextAppointment: "24 Feb 2026",
+      image: require("../../assets/icon.png"),
+    },
+    {
+      name: "Max",
+      breed: "Siberian Husky",
+      medications: null,
+      nextVaccination: "4 Feb 2026",
+      nextAppointment: "24 Feb 2026",
+      image: require("../../assets/icon.png"),
+    },
+  ];
+
+  console.log("Sample pets data:", samplePets);
+
   return (
-    <View>
-        <ScrollView>
-            <PetCard/>
-            <PetCard/>
-            <PetCard/>
-            <PetCard/>
-            <PetCard/>
-            
-
-        
-        </ScrollView>
+    <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        {samplePets.map((pet, index) => (
+          <PetCard key={index} pet={pet} />
+        ))}
+      </ScrollView>
     </View>
-  )
-}
+  );
+};
 
-export default Home
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#F8F8F8",
+  },
+  scrollContent: {
+    padding: 10,
+  },
+});
+
+export default Home;

@@ -6,8 +6,11 @@ import {
   StyleSheet,
   Animated,
   Switch,
+  SafeAreaView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import NAVIGATION from "../navigation/index";
 
 const AppointmentCard = ({ date, clinic }) => {
   const [isEnabled, setIsEnabled] = useState(true);
@@ -21,7 +24,7 @@ const AppointmentCard = ({ date, clinic }) => {
           <View style={styles.reminderContainer}>
             <Switch
               trackColor={{ false: "#E0E0E0", true: "#E3EAFF" }}
-              thumbColor={isEnabled ? "#2F5FE3" : "#f4f3f4"}
+              thumbColor={isEnabled ? "#64C5B7" : "#f4f3f4"}
               ios_backgroundColor="#E0E0E0"
               onValueChange={toggleSwitch}
               value={isEnabled}
@@ -43,6 +46,7 @@ const AppointmentCard = ({ date, clinic }) => {
 };
 
 const MyAppointments = () => {
+  const navigation = useNavigation();
   const [activeTab, setActiveTab] = useState("upcoming");
   const [underlineAnim] = useState(new Animated.Value(0));
 
@@ -59,17 +63,27 @@ const MyAppointments = () => {
     animateUnderline(tab === "upcoming" ? 0 : 1);
   };
 
+  const handleBookAppointment = () => {
+    navigation.navigate(NAVIGATION.SERVICE.BOOK_APPOINTMENT);
+  };
+
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton}>
-          <Ionicons name="chevron-back" size={24} color="#000" />
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Ionicons name="chevron-back" size={24} color="#91ACBF" />
         </TouchableOpacity>
-        <Text style={styles.title}>My appointments</Text>
-        <TouchableOpacity style={styles.addButton}>
-          <Ionicons name="add" size={24} color="#2F5FE3" />
+        <TouchableOpacity
+          style={styles.addButton}
+          onPress={handleBookAppointment}
+        >
+          <Ionicons name="add" size={24} color="#64C5B7" />
         </TouchableOpacity>
       </View>
+
       <View style={styles.tabContainer}>
         <TouchableOpacity
           style={styles.tabButton}
@@ -105,140 +119,127 @@ const MyAppointments = () => {
           ]}
         />
       </View>
+
       <View style={styles.appointmentsList}>
-        <AppointmentCard
-          date="October 20, 2024, 10:30 AP"
-          clinic="City Pet Clinic"
-        />
-        <AppointmentCard
-          date="October 20, 2024, 10:30 AP"
-          clinic="City Pet Clinic"
-        />
-        <AppointmentCard
-          date="October 20, 2024, 10:30 AP"
-          clinic="City Pet Clinic"
-        />
-        <AppointmentCard
-          date="October 20, 2024, 10:30 AP"
-          clinic="City Pet Clinic"
-        />
+        {[1, 2, 3, 4].map((_, index) => (
+          <AppointmentCard
+            key={index}
+            date="October 20, 2024, 10:30 AP"
+            clinic="City Pet Clinic"
+          />
+        ))}
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF", // Changed from #F5F5F5 to white
+    backgroundColor: "#FFFFFF",
   },
   header: {
     flexDirection: "row",
-    alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingTop: 40,
-    paddingBottom: 16,
-    backgroundColor: "#FFFFFF",
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingTop: 10,
+    paddingBottom: 10,
   },
   backButton: {
     padding: 8,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#333333",
   },
   addButton: {
     padding: 8,
   },
   tabContainer: {
     flexDirection: "row",
-    justifyContent: "space-around",
-    paddingTop: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#E0E0E0",
     position: "relative",
+    marginBottom: 20,
+    marginTop: 0,
   },
   tabButton: {
-    paddingBottom: 16,
-    width: "50%",
+    flex: 1,
     alignItems: "center",
+    paddingVertical: 15,
   },
   tabActive: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#2F5FE3", // Changed to blue
+    fontSize: 18,
+    color: "#91ACBF",
+    fontWeight: "500",
   },
   tabInactive: {
-    fontSize: 16,
-    color: "#757575",
+    fontSize: 18,
+    color: "#64C5B7",
+    fontWeight: "400",
   },
   underline: {
     position: "absolute",
     bottom: 0,
     width: "50%",
     height: 2,
-    backgroundColor: "#2F5FE3", // Changed to blue
+    backgroundColor: "#91ACBF",
   },
   appointmentsList: {
-    padding: 16,
+    padding: 20,
   },
   appointmentCard: {
+    backgroundColor: "#F0F8F8",
+    borderRadius: 20,
+    padding: 15,
+    marginBottom: 15,
     flexDirection: "row",
-    backgroundColor: "#F5F8FF", // Changed to light blue
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    alignItems: "flex-start", // Changed from 'center' to 'flex-start'
   },
   leftColumn: {
-    flex: 1,
+    width: "40%",
   },
   appointmentImage: {
     width: 60,
     height: 60,
-    backgroundColor: "#F0F0F0",
-    borderRadius: 8,
-    marginTop: -8, // Added negative margin to lift it up
+    backgroundColor: "#E8EFF1",
+    borderRadius: 12,
+    marginBottom: 10,
   },
   bottomRow: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
-    marginTop: 8,
-    width: "100%",
+    justifyContent: "space-between",
   },
   reminderContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginLeft: -4, // Changed from -8 to -4 to shift right
   },
   reminderSwitch: {
-    transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }],
-    marginRight: -4,
+    transform: [{ scale: 0.8 }],
   },
   reminderText: {
-    fontSize: 14,
-    color: "#757575",
+    fontSize: 12,
+    color: "#91ACBF",
+    marginLeft: 5,
   },
   rescheduleButton: {
-    backgroundColor: "#E3EAFF", // Changed to light blue
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
+    backgroundColor: "#E8F6F5",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 15,
   },
   rescheduleText: {
-    color: "#2F5FE3", // Changed to blue
-    fontSize: 14,
+    color: "#64C5B7",
+    fontSize: 12,
   },
   appointmentDetails: {
-    marginLeft: 12,
-    position: "absolute",
-    left: 88, // Adjust based on image width + padding
-    top: 16,
+    flex: 1,
+    marginLeft: 15,
+  },
+  appointmentDate: {
+    fontSize: 16,
+    color: "#91ACBF",
+    marginBottom: 5,
+  },
+  clinicName: {
+    fontSize: 14,
+    color: "#91ACBF",
+    opacity: 0.8,
   },
 });
 

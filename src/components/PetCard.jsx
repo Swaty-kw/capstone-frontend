@@ -1,16 +1,7 @@
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import React from "react";
-import { useNavigation } from "@react-navigation/native"; // Add this import
-import NAVIGATION from "../navigation/index"; // Import navigation constants
 
 const PetCard = ({ pet }) => {
-  const navigation = useNavigation(); // Add this hook
-
-  // Add this function to handle navigation
-  const handleMorePress = () => {
-    navigation.navigate(NAVIGATION.HOME.PET_DETAILS, { pet }); // Simplified navigation call
-  };
-
   return (
     <View style={styles.card}>
       <View style={styles.header}>
@@ -54,7 +45,7 @@ const PetCard = ({ pet }) => {
         </View>
       </View>
 
-      <TouchableOpacity style={styles.moreButton} onPress={handleMorePress}>
+      <TouchableOpacity style={styles.moreButton}>
         <Text style={styles.moreButtonText}>More</Text>
       </TouchableOpacity>
     </View>
@@ -64,8 +55,8 @@ const PetCard = ({ pet }) => {
 const styles = StyleSheet.create({
   card: {
     backgroundColor: "#F0F8F8",
-    borderRadius: 25,
-    padding: 15,
+    borderRadius: 30,
+    padding: 20,
     margin: 10,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
@@ -76,12 +67,12 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 15,
+    marginBottom: 20,
   },
   imageContainer: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 65,
+    height: 65,
+    borderRadius: 32.5,
     overflow: "hidden",
     backgroundColor: "#E8F6F5",
   },
@@ -90,29 +81,30 @@ const styles = StyleSheet.create({
     height: "100%",
   },
   titleContainer: {
-    marginLeft: 12,
+    marginLeft: 15,
   },
   name: {
-    fontSize: 24,
+    fontSize: 28,
     color: "#64C5B7",
-    fontWeight: "600",
+    fontWeight: "500",
+    marginBottom: 4,
   },
   breed: {
-    fontSize: 16,
+    fontSize: 18,
     color: "#A8D3CF",
   },
   infoContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    gap: 8,
+    gap: 10,
     marginBottom: 15,
   },
   infoBox: {
     flex: 1,
     backgroundColor: "#E8EFF1",
-    padding: 12,
-    borderRadius: 15,
-    height: 85,
+    padding: 15,
+    borderRadius: 20,
+    minHeight: 90,
     justifyContent: "center",
   },
   vaccineBox: {
@@ -125,21 +117,21 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#91ACBF",
     textAlign: "center",
-    lineHeight: 20,
+    lineHeight: 22,
   },
   vaccineText: {
     fontSize: 12,
     color: "#64C5B7",
     textAlign: "center",
-    lineHeight: 20,
-    marginBottom: 4,
+    lineHeight: 22,
+    marginBottom: 6,
   },
   appointmentText: {
     fontSize: 12,
     color: "#F26445",
     textAlign: "center",
-    lineHeight: 20,
-    marginBottom: 4,
+    lineHeight: 22,
+    marginBottom: 6,
   },
   dateText: {
     fontSize: 12,
@@ -155,16 +147,16 @@ const styles = StyleSheet.create({
   },
   moreButton: {
     backgroundColor: "#64C5B7",
-    paddingVertical: 8,
-    paddingHorizontal: 20,
-    borderRadius: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 30,
+    borderRadius: 25,
     alignItems: "center",
-    width: "30%",
+    width: "35%",
     alignSelf: "center",
   },
   moreButtonText: {
     color: "white",
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "500",
   },
 });
