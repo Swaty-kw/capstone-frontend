@@ -1,12 +1,32 @@
-import { View, Text } from 'react-native'
-import React from 'react'
+import { View, Text } from "react-native";
+import React from "react";
+import NAVIGATION from ".";
+import HomeNavigation from "./HomeNavigation/HomeNavigation";
+import ServiceNavigation from "./ServiceNavigation/ServiceNavigation";
+import ProfileNavigation from "./ProfileNavigation/ProfileNavigation";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
-const mainnavigation = () => {
+
+const Tab = createBottomTabNavigator();
+const MainNavigation = () => {
   return (
-    <View>
-      <Text>mainnavigation</Text>
-    </View>
-  )
-}
+    <Tab.Navigator
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
+      <Tab.Screen name={NAVIGATION.HOME.INDEX} component={HomeNavigation} />
+      <Tab.Screen
+        name={NAVIGATION.SERVICE.INDEX}
+        component={ServiceNavigation}
+  
+      />
+      <Tab.Screen
+        name={NAVIGATION.PROFILE.INDEX}
+        component={ProfileNavigation}
+      />
+    </Tab.Navigator>
+  );
+};
 
-export default mainnavigation
+export default MainNavigation;
