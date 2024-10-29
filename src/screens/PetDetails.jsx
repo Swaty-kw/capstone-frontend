@@ -60,13 +60,6 @@ const PetDetails = ({ route }) => {
             {pet.medications || "No current medications"}
           </Text>
         </View>
-
-        {/* Bottom Navigation */}
-        <View style={styles.bottomNav}>
-          <Ionicons name="home-outline" size={24} color="#64C5B7" />
-          <Ionicons name="calendar-outline" size={24} color="#64C5B7" />
-          <Ionicons name="person-outline" size={24} color="#64C5B7" />
-        </View>
       </View>
     </SafeAreaView>
   );

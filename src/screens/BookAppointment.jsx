@@ -36,10 +36,16 @@ const BookAppointment = () => {
   const generateDatesForMonth = (month) => {
     const days = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
     const dates = [];
-    const firstDay = new Date(month.getFullYear(), month.getMonth(), 1);
+    const today = new Date();
+
+    // If selected month is current month, start from today
+    // Otherwise, start from the 1st of the month
+    const startDate =
+      month.getMonth() === today.getMonth() ? today.getDate() : 1;
+
     const lastDay = new Date(month.getFullYear(), month.getMonth() + 1, 0);
 
-    for (let i = 1; i <= lastDay.getDate(); i++) {
+    for (let i = startDate; i <= lastDay.getDate(); i++) {
       const date = new Date(month.getFullYear(), month.getMonth(), i);
       dates.push({
         day: days[date.getDay()],
