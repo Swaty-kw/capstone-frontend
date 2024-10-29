@@ -61,12 +61,12 @@ const Login = () => {
         />
         <View style={{ flexDirection: "row", justifyContent: "center" }}>
           <Text style={{ paddingBottom: 10, color: "#64C5B7" }}>
-            Dont have an Account ?
+            Dont have an Account?{" "}
           </Text>
           <TouchableOpacity
             onPress={() => navigation.navigate(NAVIGATION.AUTH.REGISTER)}
           >
-            <Text style={{ color: "#64C5B7" }}> Sign up</Text>
+            <Text style={styles.signUpText}>Sign up</Text>
           </TouchableOpacity>
         </View>
         <WelcomeButton
@@ -146,6 +146,11 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 20,
     fontWeight: "300",
+  },
+  signUpText: {
+    color: "#64C5B7",
+    fontWeight: "bold",
+    textDecorationLine: "underline",
   },
 });
 
