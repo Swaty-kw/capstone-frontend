@@ -13,8 +13,17 @@ const MainNavigation = () => {
   return (
     <Tab.Navigator
       screenOptions={{
-        tabBarActiveTintColor: "#64C5B7",
+        // tabBarActiveTintColor: "#64C5B7",
+        tabBarInactiveTintColor: "#FFFFFF",
+        tabBarActiveTintColor: "#FFFFFF",
         headerShown: false,
+        tabBarStyle: {
+          backgroundColor: "#64C5B7",
+          borderRadius: 50,
+          margin: 20,
+          alignContent: "center",
+          // backgroundColor: "#FFFFFF",
+        },
       }}
     >
       <Tab.Screen
