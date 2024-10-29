@@ -87,8 +87,10 @@ const UserProfile = () => {
         <UpcomingEvents />
         <PersonalInfo />
         <PetInfo />
+        <TouchableOpacity>
+          <Text>Logout</Text>
+        </TouchableOpacity>
       </ScrollView>
-      <BottomNavigation />
     </View>
   );
 };

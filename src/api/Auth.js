@@ -13,6 +13,7 @@ const register = async (userData) => {
 
 const login = async (credentials) => {
   try {
+    console.log("data");
     const { data } = await instance.post("/owners/signin", credentials);
     storeToken(data.token);
     return data;

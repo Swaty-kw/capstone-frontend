@@ -13,6 +13,7 @@ const Profile = () => {
         <View style={{ alignItems: "flex-start", margin: 10, gap: 20 }}>
           <Text>Pet details</Text>
           <View />
+          <Text>hzgzh</Text>
         </View>
       </View>
     </SafeAreaView>

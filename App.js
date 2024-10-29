@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { NavigationContainer } from "@react-navigation/native";
-import { getToken } from "./src/api/storage";
+import { deleteToken, getToken, logout } from "./src/api/storage";
 import UserContext from "./src/context/UserContext";
 import MainNavigation from "./src/navigation/MainNavigation";
-
+import AuthNavigation from "./src/navigation/AuthNavigation/AuthNavigation";
 const queryClient = new QueryClient();
 
 export default function App() {
@@ -13,6 +13,7 @@ export default function App() {
   const checkToken = async () => {
     const token = await getToken();
     if (token) {
+      console.log(token);
       setUser(true);
     }
   };
@@ -25,7 +26,7 @@ export default function App() {
     <UserContext.Provider value={[user, setUser]}>
       <QueryClientProvider client={queryClient}>
         <NavigationContainer>
-          <MainNavigation />
+          {user ? <MainNavigation /> : <AuthNavigation />}
         </NavigationContainer>
       </QueryClientProvider>
     </UserContext.Provider>
