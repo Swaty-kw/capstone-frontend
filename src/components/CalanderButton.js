@@ -2,11 +2,11 @@ import { View, Text } from "react-native";
 import React from "react";
 import { TouchableOpacity } from "react-native";
 
-const CalanderButton = () => {
+const CalanderButton = ({ color = 'white' }) => {
   return (
     <TouchableOpacity
       style={{
-        backgroundColor: "red",
+        backgroundColor: color,
         borderRadius: 35,
         padding: 10,
         height: 100,

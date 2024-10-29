@@ -1,6 +1,7 @@
 import { View, Text } from "react-native";
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 const BookingAppointment = () => {
   return (
@@ -59,13 +60,13 @@ const BookingAppointment = () => {
             marginTop: 15,
           }}
         >
-          <Text style={{ fontSize: 25 }}>4.3 (4200 reviews) | {"<>"}15 KM</Text>
+          <Text style={{ fontSize: 25 }}>4.3 (4200 reviews) | <Icon name="map-marker" size={23} color="#000" /> 15 KM</Text>
         </View>
       </View>
       <View
         style={{
           flex: 3,
-          backgroundColor: "green",
+          backgroundColor: "#7AC74F",
           borderTopEndRadius: 50,
           borderTopStartRadius: 50,
         }}
