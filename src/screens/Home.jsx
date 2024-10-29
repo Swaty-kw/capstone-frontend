@@ -1,8 +1,18 @@
 import { View, ScrollView, StyleSheet } from "react-native";
 import React from "react";
 import PetCard from "../components/PetCard";
-
+import { useQuery } from "@tanstack/react-query";
+import { getUserPets } from "../api/pets";
 const Home = () => {
+
+
+  const {data} = useQuery({
+    queryKey: ["getUserPets"],
+    queryFn: getUserPets
+  })
+
+console.log(data);
+
   const samplePets = [
     {
       name: "Grace",
