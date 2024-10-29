@@ -1,23 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { SafeAreaProvider } from "react-native-safe-area-context";
 import { NavigationContainer } from "@react-navigation/native";
 
-import Profile from "./src/screens/Profile";
 const queryClient = new QueryClient();
 
-import { TextInput } from "react-native";
-import WelcomeButton from "./src/components/WelcomeButton";
-import PetIdBlock from "./src/components/PetIdBlock";
-import AppointmentCard from "./src/components/AppointmentCard";
-import Register from "./src/screens/Register";
-import { getToken } from "./src/api/storage";
+import { Text, View } from "react-native";
+
+import { deleteToken, getToken } from "./src/api/storage";
 import UserContext from "./src/context/UserContext";
-import CalanderButton from "./src/components/CalanderButton";
-import apointmentCard from "./src/components/AppointmentTimeCard";
-import AppointmentTimeCard from "./src/components/AppointmentTimeCard";
-import BookingAppointment from "./src/components/BookingAppointment";
 import Login from "./src/screens/Login";
 import Home from "./src/screens/Home";
 import QuickInfo from "./src/components/QuickInfo";

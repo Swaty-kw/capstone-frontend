@@ -7,24 +7,13 @@ import PetInfoBigBlock from "../components/PetInfoBigBlock";
 
 const Profile = () => {
   return (
-    <SafeAreaView style={{backgroundColor:111,height:"100%",}}>
-      
+    <SafeAreaView style={{ backgroundColor: 111, height: "100%" }}>
       <View style={{}}>
-        <PetIdBlock/>
-        <View style={{alignItems: "flex-start",margin:10,gap:20}}>
-        <PetInfoSmallBlock/>
-        <PetInfoSmallBlock/>
-        <PetInfoSmallBlock/>
-        <PetInfoBigBlock/>
-          <View/>
-
-        
-
+        <PetIdBlock />
+        <View style={{ alignItems: "flex-start", margin: 10, gap: 20 }}>
+          <Text>Pet details</Text>
+          <View />
         </View>
-        
-        
-        
-
       </View>
     </SafeAreaView>
   );
