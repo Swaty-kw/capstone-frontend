@@ -10,8 +10,8 @@ import { Text, View } from "react-native";
 import { deleteToken, getToken } from "./src/api/storage";
 import UserContext from "./src/context/UserContext";
 import Login from "./src/screens/Login";
-import PetDetails from "./src/screens/PetDetails";
-import Register from "./src/screens/Register";
+import Home from "./src/screens/Home";
+import QuickInfo from "./src/components/QuickInfo";
 
 const Stack = createNativeStackNavigator();
 export default function App() {
@@ -31,25 +31,19 @@ export default function App() {
   return (
     <UserContext.Provider value={[user, setUser]}>
       <QueryClientProvider client={queryClient}>
-        {user ? (
-          <View style={{ flex: 1 }}>
-            <Text>Home Page</Text>
-          </View>
-        ) : (
-          <NavigationContainer>
-            <Stack.Navigator>
-              {/* <Stack.Screen name="pet Id Blok" component={PetIdBlock} /> */}
-
-
-              <Stack.Screen name="PetDetails" component={PetDetails} />
-
-              <Stack.Screen name="Login" component={Register} />
-
-
-              <Stack.Screen name="Register" component={Register} />
-            </Stack.Navigator>
-          </NavigationContainer>
-        )}
+        <NavigationContainer>
+          <Stack.Navigator>
+            {/* <Stack.Screen name="pet Id Blok" component={PetIdBlock} /> */}
+            <Stack.Screen
+              name="Register"
+              component={Home}
+              options={{
+                headerTitle: "Book an appointment",
+                headerShadowVisible: false,
+              }}
+            />
+          </Stack.Navigator>
+        </NavigationContainer>
       </QueryClientProvider>
     </UserContext.Provider>
   );

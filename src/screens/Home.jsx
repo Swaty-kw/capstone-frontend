@@ -1,10 +1,20 @@
-import { View, Text } from 'react-native'
+import { View, Text, ScrollView } from 'react-native'
 import React from 'react'
-
+import PetCard from '../components/PetCard'
 const Home = () => {
+    // 
   return (
     <View>
-      <Text>Home</Text>
+        <ScrollView>
+            <PetCard/>
+            <PetCard/>
+            <PetCard/>
+            <PetCard/>
+            <PetCard/>
+            
+
+        
+        </ScrollView>
     </View>
   )
 }
