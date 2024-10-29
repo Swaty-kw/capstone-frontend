@@ -1,4 +1,4 @@
-import { View, Text } from "react-native";
+import { View, Text, SafeAreaView } from "react-native";
 import React, { useContext } from "react";
 import Login from "../../screens/Login";
 import Register from "../../screens/Register";
@@ -15,10 +15,12 @@ const AuthNavigation = () => {
     navigator.navigate(NAVIGATION.MAIN.HOME);
   }
   return (
-    <Stack.Navigator>
-      <Stack.Screen name={NAVIGATION.AUTH.LOGIN} component={Login} />
-      <Stack.Screen name={NAVIGATION.AUTH.REGISTER} component={Register} />
-    </Stack.Navigator>
+    <SafeAreaView style={{ flex: 1 }}>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name={NAVIGATION.AUTH.LOGIN} component={Login} />
+        <Stack.Screen name={NAVIGATION.AUTH.REGISTER} component={Register} />
+      </Stack.Navigator>
+    </SafeAreaView>
   );
 };
 
