@@ -1,66 +1,76 @@
-import { View, Text, Image, StyleSheet, SafeAreaView } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  SafeAreaView,
+  ScrollView,
+} from "react-native";
 import React from "react";
 import { Ionicons } from "@expo/vector-icons"; // Make sure to install expo icons if not already
+import { BASE_URL } from "../api";
 
 const PetDetails = ({ route }) => {
   const { pet } = route.params;
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
-        {/* Header with image and name */}
-        <View style={styles.header}>
-          <View style={styles.imageContainer}>
-            <Image
-              source={pet.image}
-              style={styles.petImage}
-              resizeMode="cover"
-            />
+      <ScrollView>
+        <View style={styles.content}>
+          {/* Header with image and name */}
+          <View style={styles.header}>
+            <View style={styles.imageContainer}>
+              <Image
+                source={{ uri: BASE_URL + pet.image }}
+                style={styles.petImage}
+                resizeMode="cover"
+              />
+            </View>
+            <View style={styles.titleContainer}>
+              <Text style={styles.name}>{pet.name}</Text>
+              <Text style={styles.breed}>{pet.breed}</Text>
+            </View>
           </View>
-          <View style={styles.titleContainer}>
-            <Text style={styles.name}>{pet.name}</Text>
-            <Text style={styles.breed}>{pet.breed}</Text>
+
+          {/* Info Grid */}
+          <View style={styles.infoGrid}>
+            <View style={[styles.infoBox, styles.mintBox]}>
+              <Text style={styles.infoLabel}>Gender</Text>
+              <Text style={styles.infoValue}>Male</Text>
+            </View>
+
+            <View style={[styles.infoBox, styles.mintBox, styles.wideBox]}>
+              <Text style={styles.infoLabel}>Vaccination for {pet.name}</Text>
+              <Text style={styles.infoSubtext}>//add data</Text>
+              <Text style={styles.infoDate}>{pet.nextVaccination}</Text>
+            </View>
+
+            <View style={[styles.infoBox, styles.grayBox]}>
+              <Text style={styles.infoLabel}>Birth date</Text>
+              <Text style={styles.infoValue}>{pet.birthdate.slice(0, 10)}</Text>
+            </View>
+
+            <View style={[styles.infoBox, styles.grayBox]}>
+              <Text style={styles.infoLabel}>Weight</Text>
+              <Text style={styles.infoValue}>{pet.weight}</Text>
+            </View>
+
+            <View style={[styles.infoBox, styles.grayBox, styles.wideBox]}>
+              <Text style={styles.infoLabel}>Allergies</Text>
+              <Text style={styles.infoSubtext}>{pet.allergies}</Text>
+              <Text style={styles.infoDate}>{pet.nextAppointment}</Text>
+            </View>
+          </View>
+
+          {/* Medications Section */}
+          <View style={styles.medicationBox}>
+            <Text style={styles.medicationTitle}>Current medications</Text>
+            <Text style={styles.medicationText}>
+              {pet.medication || "No current medications"}
+            </Text>
           </View>
         </View>
-
-        {/* Info Grid */}
-        <View style={styles.infoGrid}>
-          <View style={[styles.infoBox, styles.mintBox]}>
-            <Text style={styles.infoLabel}>Gender</Text>
-            <Text style={styles.infoValue}>Male</Text>
-          </View>
-
-          <View style={[styles.infoBox, styles.mintBox, styles.wideBox]}>
-            <Text style={styles.infoLabel}>Vaccination for {pet.name}</Text>
-            <Text style={styles.infoSubtext}>Zoo Care Veterinary Clinic</Text>
-            <Text style={styles.infoDate}>{pet.nextVaccination}</Text>
-          </View>
-
-          <View style={[styles.infoBox, styles.grayBox]}>
-            <Text style={styles.infoLabel}>Age</Text>
-            <Text style={styles.infoValue}>16 Months</Text>
-          </View>
-
-          <View style={[styles.infoBox, styles.grayBox]}>
-            <Text style={styles.infoLabel}>Weight</Text>
-            <Text style={styles.infoValue}>4 oz</Text>
-          </View>
-
-          <View style={[styles.infoBox, styles.grayBox, styles.wideBox]}>
-            <Text style={styles.infoLabel}>Beak and nails care</Text>
-            <Text style={styles.infoSubtext}>Pet zone</Text>
-            <Text style={styles.infoDate}>{pet.nextAppointment}</Text>
-          </View>
-        </View>
-
-        {/* Medications Section */}
-        <View style={styles.medicationBox}>
-          <Text style={styles.medicationTitle}>Current medications</Text>
-          <Text style={styles.medicationText}>
-            {pet.medications || "No current medications"}
-          </Text>
-        </View>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };
