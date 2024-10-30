@@ -5,10 +5,12 @@ import { deleteToken, getToken, logout } from "./src/api/storage";
 import UserContext from "./src/context/UserContext";
 import MainNavigation from "./src/navigation/MainNavigation";
 import AuthNavigation from "./src/navigation/AuthNavigation/AuthNavigation";
+<<<<<<< HEAD
 import { createStackNavigator } from "@react-navigation/stack";
 
+=======
+>>>>>>> fff62fa441bd2b6f8c9f3cfe3199fc21a98d1d27
 const queryClient = new QueryClient();
-const Stack = createStackNavigator();
 
 export default function App() {
   const [user, setUser] = useState(false);

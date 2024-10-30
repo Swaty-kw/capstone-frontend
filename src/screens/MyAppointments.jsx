@@ -7,6 +7,7 @@ import {
   Animated,
   Switch,
   SafeAreaView,
+  ScrollView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
@@ -121,15 +122,55 @@ const MyAppointments = () => {
         />
       </View>
 
-      <View style={styles.appointmentsList}>
-        {[1, 2, 3, 4].map((_, index) => (
+      <ScrollView style={styles.appointmentsList}>
+        {activeTab === "upcoming" ? [
+          {
+            date: "November 15, 2024, 2:30 PM",
+            clinic: "City Pet Clinic"
+          },
+          {
+            date: "December 3, 2024, 10:00 AM",
+            clinic: "City Pet Clinic"
+          },
+          {
+            date: "January 8, 2025, 3:30 PM",
+            clinic: "City Pet Clinic"
+          },
+          {
+            date: "February 12, 2025, 11:00 AM",
+            clinic: "City Pet Clinic"
+          }
+        ].map((appointment, index) => (
           <AppointmentCard
             key={index}
-            date="October 20, 2024, 10:30 AP"
-            clinic="City Pet Clinic"
+            date={appointment.date}
+            clinic={appointment.clinic}
+          />
+        )) : [
+          {
+            date: "October 5, 2024, 9:30 AM",
+            clinic: "City Pet Clinic"
+          },
+          {
+            date: "August 22, 2024, 2:30 PM",
+            clinic: "City Pet Clinic"
+          },
+          {
+            date: "June 15, 2024, 11:30 AM",
+            clinic: "City Pet Clinic"
+          },
+          {
+            date: "March 3, 2024, 3:00 PM",
+            clinic: "City Pet Clinic"
+          }
+        ].map((appointment, index) => (
+          <AppointmentCard
+            key={index}
+            date={appointment.date}
+            clinic={appointment.clinic}
           />
         ))}
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -241,6 +282,16 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#91ACBF",
     opacity: 0.8,
+  },
+  emptyStateContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 40,
+  },
+  emptyStateText: {
+    fontSize: 16,
+    color: '#91ACBF',
   },
 });
 

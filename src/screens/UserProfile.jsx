@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import {
   StyleSheet,
   Text,
@@ -7,6 +7,10 @@ import {
   ScrollView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { deleteToken } from "../api/storage";
+import { useNavigation } from "@react-navigation/native";
+import NAVIGATION from "../navigation";
+import UserContext from "../context/UserContext";
 
 const Greeting = ({ name }) => (
   <Text style={styles.greeting}>Hey, {name}!</Text>
@@ -80,6 +84,21 @@ const BottomNavigation = () => (
 );
 
 const UserProfile = () => {
+  const navigation = useNavigation();
+  const [user, setUser] = useContext(UserContext);
+  console.log(user);
+  if (!user) {
+    navigation.navigate(NAVIGATION.AUTH.LOGIN);
+  }
+  const handleLogout = async () => {
+    try {
+      await deleteToken();
+      setUser(false);
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <ScrollView style={styles.content}>
@@ -87,8 +106,8 @@ const UserProfile = () => {
         <UpcomingEvents />
         <PersonalInfo />
         <PetInfo />
-        <TouchableOpacity>
-          <Text>Logout</Text>
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <Text style={styles.logoutText}>Logout</Text>
         </TouchableOpacity>
       </ScrollView>
     </View>
@@ -208,6 +227,21 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#F26445", // Changed text color to #F26445
     marginBottom: 10,
+  },
+  logoutButton: {
+    backgroundColor: "#F26445",
+    paddingVertical: 15,
+    paddingHorizontal: 30,
+    borderRadius: 25,
+    alignSelf: "center",
+    marginTop: 20,
+    marginBottom: 30,
+  },
+  logoutText: {
+    color: "#FFFFFF",
+    fontSize: 18,
+    fontWeight: "400",
+    fontFamily: "Telugu MN",
   },
 });
 

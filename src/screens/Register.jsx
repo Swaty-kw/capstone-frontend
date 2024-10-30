@@ -1,4 +1,10 @@
-import { View, Text, StyleSheet, SafeAreaView } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  SafeAreaView,
+  TouchableOpacity,
+} from "react-native";
 import React, { useContext, useState } from "react";
 import TextField from "../components/Textfield";
 import Constants from "expo-constants";
@@ -7,8 +13,12 @@ import { useMutation } from "@tanstack/react-query";
 import { register } from "../api/Auth";
 import UserContext from "../context/UserContext";
 import Submitbutton from "../components/Submitbutton";
+import { useNavigation } from "@react-navigation/native";
+import NAVIGATION from "../navigation";
 
 const Register = () => {
+  const navigation = useNavigation();
+
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -81,6 +91,14 @@ const Register = () => {
             style={styles.input}
             borderColor="#F37558"
           />
+          <View style={{ flexDirection: "row", justifyContent: "center" }}>
+            <Text style={{ color: "#F37558" }}>Already have an account ?</Text>
+            <TouchableOpacity
+              onPress={() => navigation.navigate(NAVIGATION.AUTH.LOGIN)}
+            >
+              <Text style={styles.signInText}> Sign in</Text>
+            </TouchableOpacity>
+          </View>
           <Submitbutton title="Register" color="#F37558" />
         </View>
       </View>
@@ -135,6 +153,11 @@ const styles = StyleSheet.create({
   },
   input: {
     marginBottom: 15,
+  },
+  signInText: {
+    color: "#F37558",
+    fontWeight: "bold",
+    textDecorationLine: "underline",
   },
 });
 
