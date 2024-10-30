@@ -5,14 +5,12 @@ import { useQuery } from "@tanstack/react-query";
 import { getUserPets } from "../api/pets";
 import AddButton from "../components/AddButton";
 const Home = () => {
-
-
-  const {data} = useQuery({
+  const { data } = useQuery({
     queryKey: ["getUserPets"],
-    queryFn: getUserPets
-  })
+    queryFn: getUserPets,
+  });
 
-console.log(data);
+ // console.log("AUAAA", data);
 
   const samplePets = [
     {
@@ -49,17 +47,16 @@ console.log(data);
     },
   ];
 
-  console.log("Sample pets data:", samplePets);
+  // console.log("Sample pets data:", samplePets);
 
   return (
     <View style={styles.container}>
-      
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {samplePets.map((pet, index) => (
+        {data?.pets?.map((pet, index) => (
           <PetCard key={index} pet={pet} />
         ))}
-        <View style={{width:'auto'}}>
-        <AddButton/>
+        <View style={{ width: "auto" }}>
+          <AddButton />
         </View>
       </ScrollView>
     </View>

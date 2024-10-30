@@ -1,13 +1,17 @@
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import React from "react";
+import { BASE_URL } from "../api";
 
 const PetCard = ({ pet }) => {
+  console.log("IMAGES", pet?.image);
   return (
     <View style={styles.card}>
       <View style={styles.header}>
         <View style={styles.imageContainer}>
           <Image
-            source={pet.image}
+            source={{
+              uri: BASE_URL + pet.image.replace("//", "\\"),
+            }}
             style={styles.petImage}
             resizeMode="cover"
           />
