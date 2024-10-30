@@ -2,6 +2,7 @@ import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import React from "react";
 import { useNavigation } from "@react-navigation/native"; // Add this import
 import NAVIGATION from "../navigation/index"; // Import navigation constants
+import { BASE_URL } from "../api";
 
 const PetCard = ({ pet }) => {
   const navigation = useNavigation(); // Add this hook
@@ -11,14 +12,15 @@ const PetCard = ({ pet }) => {
     navigation.navigate(NAVIGATION.HOME.PET_DETAILS, { pet }); // Simplified navigation call
   };
 
+  console.log("IMAGEEEE", pet?.image?.replace("\\", "/"));
   return (
     <View style={styles.card}>
       <View style={styles.header}>
         <View style={styles.imageContainer}>
           <Image
-            source={pet.image}
+            source={{ uri: BASE_URL + pet.image }}
             style={styles.petImage}
-            resizeMode="cover"
+            // resizeMode="cover"
           />
         </View>
         <View style={styles.titleContainer}>

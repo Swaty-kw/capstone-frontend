@@ -3,6 +3,7 @@ import React, { useState } from "react";
 
 const ChooseService = () => {
   const [selectedService, setSelectedService] = useState("Doctor");
+  
 
   const appointments = [
     { date: "October 20, 2024, 10:30 AM", location: "City Pet Clinic" },
