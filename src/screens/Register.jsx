@@ -80,14 +80,15 @@ const Register = () => {
           <TextField
             color="#F37558"
             backgroundColor="white"
-            placeholder="Password"
+            placeholder="Phone Number"
             style={styles.input}
             borderColor="#F37558"
           />
           <TextField
             color="#F37558"
             backgroundColor="white"
-            placeholder="Confirm password"
+            placeholder="Password"
+            secureTextEntry={true}
             style={styles.input}
             borderColor="#F37558"
           />
@@ -99,7 +100,23 @@ const Register = () => {
               <Text style={styles.signInText}> Sign in</Text>
             </TouchableOpacity>
           </View>
-          <Submitbutton title="Register" color="#F37558" />
+          <View style={styles.buttonContainer}>
+            <WelcomeButton
+              text="Register"
+              color="#F37558"
+              textColor="white"
+              style={styles.registerButton}
+              onPress={() => {
+                console.log({
+                  email: email,
+                  username: username,
+                  password: password,
+                  phone: phone,
+                });
+                mutate();
+              }}
+            />
+          </View>
         </View>
       </View>
     </SafeAreaView>
@@ -158,6 +175,25 @@ const styles = StyleSheet.create({
     color: "#F37558",
     fontWeight: "bold",
     textDecorationLine: "underline",
+  },
+  buttonContainer: {
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 30,
+  },
+  registerButton: {
+    backgroundColor: "#F37558",
+    paddingVertical: 12,
+    paddingHorizontal: 40,
+    borderRadius: 25,
+    width: "auto", // Let it adjust to content
+    height: "auto", // Let it adjust to content
+  },
+  registerButtonText: {
+    color: "white",
+    fontSize: 18,
+    fontWeight: "500",
   },
 });
 
