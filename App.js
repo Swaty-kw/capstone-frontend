@@ -5,11 +5,9 @@ import { deleteToken, getToken, logout } from "./src/api/storage";
 import UserContext from "./src/context/UserContext";
 import MainNavigation from "./src/navigation/MainNavigation";
 import AuthNavigation from "./src/navigation/AuthNavigation/AuthNavigation";
-<<<<<<< HEAD
 import { createStackNavigator } from "@react-navigation/stack";
+import Login from "./src/screens/Login";
 
-=======
->>>>>>> fff62fa441bd2b6f8c9f3cfe3199fc21a98d1d27
 const queryClient = new QueryClient();
 
 export default function App() {
@@ -30,8 +28,9 @@ export default function App() {
   return (
     <UserContext.Provider value={[user, setUser]}>
       <QueryClientProvider client={queryClient}>
-        <NavigationContainer>
+        <NavigationContainer >
           {user ? <MainNavigation /> : <AuthNavigation />}
+          {/* <Login /> */}
         </NavigationContainer>
       </QueryClientProvider>
     </UserContext.Provider>

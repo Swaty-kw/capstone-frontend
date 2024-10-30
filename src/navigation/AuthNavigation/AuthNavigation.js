@@ -15,12 +15,10 @@ const AuthNavigation = () => {
     navigator.navigate(NAVIGATION.MAIN.HOME);
   }
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name={NAVIGATION.AUTH.LOGIN} component={Login} />
-        <Stack.Screen name={NAVIGATION.AUTH.REGISTER} component={Register} />
-      </Stack.Navigator>
-    </SafeAreaView>
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name={NAVIGATION.AUTH.LOGIN} component={Login} />
+      <Stack.Screen name={NAVIGATION.AUTH.REGISTER} component={Register} />
+    </Stack.Navigator>
   );
 };
 

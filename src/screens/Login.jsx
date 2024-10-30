@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, StatusBar } from "react-native";
 import React, { useState, useContext } from "react";
 import TextField from "../components/Textfield";
 import { StyleSheet } from "react-native";
@@ -9,15 +9,13 @@ import { login } from "../api/Auth";
 import UserContext from "../context/UserContext";
 import { useNavigation } from "@react-navigation/native";
 import NAVIGATION from "../navigation";
-
+import { SafeAreaView } from "react-native-safe-area-context";
 const Login = () => {
   const navigation = useNavigation();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useContext(UserContext);
-
-  const STATUSBAR_HEIGHT = Constants.statusBarHeight;
 
   const { mutate } = useMutation({
     mutationKey: ["register"],
@@ -33,62 +31,75 @@ const Login = () => {
   });
 
   return (
-    <View style={styles.container}>
-      <View style={styles.tealBackground} />
-      <Text style={styles.headerText}>
-        Signin to keep track of your pet's care and well-being
-      </Text>
-
-      <View style={styles.formContainer}>
-        <TextField
-          placeholder="Username"
-          value={username}
-          onChangeText={setUsername}
-          style={styles.input}
-          placeholderTextColor="#64C5B7"
-          color="#64C5B7"
-          borderColor="#64C5B7"
-        />
-        <TextField
-          placeholder="Password"
-          value={password}
-          onChangeText={setPassword}
-          style={styles.input}
-          secureTextEntry
-          placeholderTextColor="#64C5B7"
-          color="#64C5B7"
-          borderColor="#64C5B7"
-        />
-        <View style={{ flexDirection: "row", justifyContent: "center" }}>
-          <Text style={{ paddingBottom: 10, color: "#64C5B7" }}>
-            Dont have an Account?{" "}
+    <>
+      <StatusBar barStyle="light-content" />
+      <SafeAreaView
+        edges={["top"]}
+        style={{ flex: 0, backgroundColor: "#64C5B7" }}
+      />
+      <SafeAreaView edges={["left", "right"]} style={styles.safeArea}>
+        <View style={styles.container}>
+          <View style={styles.tealBackground} />
+          <Text style={styles.headerText}>
+            Sign in to keep track of your pet's care and well-being
           </Text>
-          <TouchableOpacity
-            onPress={() => navigation.navigate(NAVIGATION.AUTH.REGISTER)}
-          >
-            <Text style={styles.signUpText}>Sign up</Text>
-          </TouchableOpacity>
+
+          <View style={styles.formContainer}>
+            <TextField
+              placeholder="Username"
+              value={username}
+              onChangeText={setUsername}
+              style={styles.input}
+              placeholderTextColor="#64C5B7"
+              color="#64C5B7"
+              borderColor="#64C5B7"
+            />
+            <TextField
+              placeholder="Password"
+              value={password}
+              onChangeText={setPassword}
+              style={styles.input}
+              secureTextEntry
+              placeholderTextColor="#64C5B7"
+              color="#64C5B7"
+              borderColor="#64C5B7"
+            />
+            <View style={{ flexDirection: "row", justifyContent: "center" }}>
+              <Text style={{ paddingBottom: 10, color: "#64C5B7" }}>
+                Don't have an Account?{" "}
+              </Text>
+              <TouchableOpacity
+                onPress={() => navigation.navigate(NAVIGATION.AUTH.REGISTER)}
+              >
+                <Text style={styles.signUpText}>Sign up</Text>
+              </TouchableOpacity>
+            </View>
+            <WelcomeButton
+              text="Sign in"
+              color="#64C5B7"
+              width="50%"
+              height="10%"
+              onPress={() => {
+                /* Handle sign in */
+                console.log({
+                  username: username,
+                  password: password,
+                });
+                mutate();
+              }}
+            />
+          </View>
         </View>
-        <WelcomeButton
-          text="Sign in"
-          color="#64C5B7"
-          width="50%"
-          height="10%"
-          onPress={() => {
-            /* Handle sign in */
-            console.log({
-              username: username,
-              password: password,
-            });
-            mutate();
-          }}
-        />
-      </View>
-    </View>
+      </SafeAreaView>
+    </>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#64C5B7",
+  },
   container: {
     flex: 1,
     backgroundColor: "white",
