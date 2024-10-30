@@ -28,7 +28,7 @@ export default function App() {
   return (
     <UserContext.Provider value={[user, setUser]}>
       <QueryClientProvider client={queryClient}>
-        <NavigationContainer >
+        <NavigationContainer>
           {user ? <MainNavigation /> : <AuthNavigation />}
           {/* <Login /> */}
         </NavigationContainer>
