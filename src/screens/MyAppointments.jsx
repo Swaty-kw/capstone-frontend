@@ -13,6 +13,7 @@ import { useNavigation } from "@react-navigation/native";
 import NAVIGATION from "../navigation/index";
 
 const AppointmentCard = ({ date, clinic }) => {
+  const navigation = useNavigation();
   const [isEnabled, setIsEnabled] = useState(true);
   const toggleSwitch = () => setIsEnabled((previousState) => !previousState);
 
@@ -64,7 +65,7 @@ const MyAppointments = () => {
   };
 
   const handleBookAppointment = () => {
-    navigation.navigate(NAVIGATION.SERVICE.BOOK_APPOINTMENT);
+    navigation.navigate(NAVIGATION.SERVICE.CHOOSE_SERVICE);
   };
 
   return (

@@ -10,7 +10,7 @@ import UserContext from "../../context/UserContext";
 const Stack = createNativeStackNavigator();
 const AuthNavigation = () => {
   const navigator = useNavigation();
-  const { user } = useContext(UserContext);
+  const [user] = useContext(UserContext);
   if (user) {
     navigator.navigate(NAVIGATION.MAIN.HOME);
   }

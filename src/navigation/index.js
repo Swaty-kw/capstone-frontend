@@ -18,6 +18,7 @@ const NAVIGATION = {
     MY_APPOINTMENTS: "My Appointments",
     BOOK_APPOINTMENT: "Book Appointment",
     REVIEW: "Review",
+    CHOOSE_SERVICE: "Choose Service",
   },
 };
 

@@ -5,6 +5,7 @@ import MyAppointments from "../../screens/MyAppointments";
 import BookAppointment from "../../screens/BookAppointment";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import NAVIGATION from "../index";
+import ChooseService from "../../screens/ChooseService";
 const Stack = createNativeStackNavigator();
 
 const ServiceNavigation = () => {
@@ -13,6 +14,10 @@ const ServiceNavigation = () => {
       <Stack.Screen
         name={NAVIGATION.SERVICE.MY_APPOINTMENTS}
         component={MyAppointments}
+      />
+      <Stack.Screen
+        name={NAVIGATION.SERVICE.CHOOSE_SERVICE}
+        component={ChooseService}
       />
       <Stack.Screen
         name={NAVIGATION.SERVICE.BOOK_APPOINTMENT}

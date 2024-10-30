@@ -1,7 +1,7 @@
 import { View, ScrollView, StyleSheet } from "react-native";
 import React from "react";
 import PetCard from "../components/PetCard";
-
+import { createService } from "../api/Services";
 const Home = () => {
   const samplePets = [
     {
@@ -39,6 +39,8 @@ const Home = () => {
   ];
 
   console.log("Sample pets data:", samplePets);
+
+  // Call createService to test its functionality
 
   return (
     <View style={styles.container}>
