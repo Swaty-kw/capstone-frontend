@@ -11,7 +11,8 @@ import React, { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 
-const BookAppointment = () => {
+const BookAppointment = ({ route }) => {
+  const { clinicName, clinicLocation, clinicRating } = route.params;
   const navigation = useNavigation();
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);
@@ -127,17 +128,16 @@ const BookAppointment = () => {
       <View style={styles.clinicContainer}>
         <View style={styles.clinicImage} />
         <View style={styles.clinicInfo}>
-          <Text style={styles.clinicName}>City Pet Clinic</Text>
-          <Text style={styles.clinicAddress}>
-            next to city centre,{"\n"}Shuwaikh Industrial, infront of Al,
-            Ghazali St
-          </Text>
+          <Text style={styles.clinicName}>{clinicName}</Text>
+          <Text style={styles.clinicAddress}>{clinicLocation}</Text>
         </View>
       </View>
 
       {/* Rating and Distance */}
       <View style={styles.ratingContainer}>
-        <Text style={styles.ratingText}>4.2 (4200 reviews)</Text>
+        <Text style={styles.ratingText}>
+          {clinicRating} ({Math.round(clinicRating * 1000)} reviews)
+        </Text>
         <Text style={styles.ratingText}> | </Text>
         <View style={styles.distanceContainer}>
           <Ionicons name="location" size={20} color="#64C5B7" />
