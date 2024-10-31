@@ -1,21 +1,203 @@
 import React from "react";
-import { View, Text, StyleSheet, Image, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  ScrollView,
+  TouchableOpacity,
+  Linking,
+  Platform,
+} from "react-native";
 import StarRating from "../components/StarRating"; // You'll need to create this component
 import BottomNavBar from "../components/BottomNavBar"; // You'll need to create this component
+import Ionicons from "react-native-vector-icons/Ionicons";
 
-const Review = () => {
-  const clinicInfo = {
-    name: "City Pet Clinic",
-    address:
-      "next to city centre, Shuwaikh Industrial, infront of Al, Ghazali St",
-    rating: 4.2,
-    totalReviews: 28,
-    ratingDistribution: [5, 4, 3, 2, 1],
+const Review = ({ route }) => {
+  const { clinicName, clinicLocation, clinicRating } = route.params;
+
+  // Add coordinates for each location
+  const locationCoordinates = {
+    "City Pet Clinic": {
+      lat: 29.3399,
+      lng: 47.9337,
+      address: "Block 1, Street 2, Shuwaikh Industrial, Kuwait",
+    },
+    "Pet Care Center": {
+      lat: 29.3317,
+      lng: 48.0258,
+      address: "Salem Al Mubarak Street, Salmiya, Kuwait",
+    },
+    "Animal Care Hospital": {
+      lat: 29.3267,
+      lng: 48.0163,
+      address: "Block 12, Street 103, Jabriya, Kuwait",
+    },
+    "Paws & Claws Clinic": {
+      lat: 29.3378,
+      lng: 47.9755,
+      address: "Tunis Street, Block 4, Hawally, Kuwait",
+    },
+    "Pets Grooming Center": {
+      lat: 29.3317,
+      lng: 48.0258,
+      address: "Block 10, Salem Al Mubarak Street, Salmiya, Kuwait",
+    },
+    "Pampered Paws": {
+      lat: 29.3267,
+      lng: 48.0163,
+      address: "Block 8, Street 105, Jabriya, Kuwait",
+    },
+    "Furry Friends Salon": {
+      lat: 29.3378,
+      lng: 47.9755,
+      address: "Block 2, Ibn Khaldoun Street, Hawally, Kuwait",
+    },
   };
 
-  const ReviewCard = () => (
+  const openMaps = () => {
+    const location = locationCoordinates[clinicName];
+    if (location) {
+      const { lat, lng, address } = location;
+      const scheme = Platform.select({
+        ios: "maps:0,0?q=",
+        android: "geo:0,0?q=",
+      });
+      const latLng = `${lat},${lng}`;
+      const label = clinicName;
+      const url = Platform.select({
+        ios: `${scheme}${label}@${latLng}`,
+        android: `${scheme}${latLng}(${label})`,
+      });
+
+      Linking.openURL(url).catch((err) =>
+        console.error("An error occurred", err)
+      );
+    }
+  };
+
+  // Reviews database
+  const reviewsDatabase = {
+    // Vet Clinics Reviews
+    "City Pet Clinic": {
+      totalReviews: 156,
+      ratingDistribution: [85, 45, 15, 8, 3], // 5 star to 1 star
+      reviews: [
+        {
+          userName: "Sarah M.",
+          rating: 5,
+          date: "March 15, 2024",
+          review:
+            "Dr. Ahmad was amazing with my anxious cat. Very patient and professional staff.",
+          helpful: 24,
+        },
+        {
+          userName: "Mohammed K.",
+          rating: 5,
+          date: "March 10, 2024",
+          review:
+            "Best veterinary clinic in Kuwait. They took great care of my dog during surgery.",
+          helpful: 18,
+        },
+        {
+          userName: "Fatima A.",
+          rating: 4,
+          date: "March 5, 2024",
+          review:
+            "Very clean facility and friendly staff. Slightly expensive but worth it.",
+          helpful: 15,
+        },
+      ],
+    },
+    "Pet Care Center": {
+      totalReviews: 124,
+      ratingDistribution: [70, 35, 12, 5, 2],
+      reviews: [
+        {
+          userName: "Abdullah H.",
+          rating: 5,
+          date: "March 12, 2024",
+          review: "Excellent emergency service. They saved my puppy at 2 AM!",
+          helpful: 31,
+        },
+        {
+          userName: "Lisa R.",
+          rating: 4,
+          date: "March 8, 2024",
+          review: "Good service but sometimes the wait time is long.",
+          helpful: 12,
+        },
+      ],
+    },
+
+    // Grooming Services Reviews
+    "Pets Grooming Center": {
+      totalReviews: 198,
+      ratingDistribution: [95, 65, 25, 8, 5],
+      reviews: [
+        {
+          userName: "Noura S.",
+          rating: 5,
+          date: "March 14, 2024",
+          review:
+            "They did an amazing job with my Persian cat. Very gentle and professional.",
+          helpful: 28,
+        },
+        {
+          userName: "James L.",
+          rating: 5,
+          date: "March 11, 2024",
+          review:
+            "Best grooming service in Kuwait! My dog looks fantastic every time.",
+          helpful: 22,
+        },
+      ],
+    },
+    "Pampered Paws": {
+      totalReviews: 145,
+      ratingDistribution: [75, 45, 15, 7, 3],
+      reviews: [
+        {
+          userName: "Dana K.",
+          rating: 5,
+          date: "March 13, 2024",
+          review:
+            "Love how they handle nervous pets. My cat actually enjoys going there now!",
+          helpful: 19,
+        },
+        {
+          userName: "Ahmed M.",
+          rating: 4,
+          date: "March 9, 2024",
+          review:
+            "Great service but booking can be difficult due to high demand.",
+          helpful: 15,
+        },
+      ],
+    },
+  };
+
+  // Get the specific service reviews
+  const serviceReviews = reviewsDatabase[clinicName] || {
+    totalReviews: 0,
+    ratingDistribution: [0, 0, 0, 0, 0],
+    reviews: [],
+  };
+
+  const ReviewCard = ({ review }) => (
     <View style={styles.reviewCard}>
-      <StarRating rating={4} size={20} style={styles.reviewStars} />
+      <View style={styles.reviewHeader}>
+        <Text style={styles.reviewerName}>{review.userName}</Text>
+        <Text style={styles.reviewDate}>{review.date}</Text>
+      </View>
+      <StarRating rating={review.rating} size={20} style={styles.reviewStars} />
+      <Text style={styles.reviewText}>{review.review}</Text>
+      <View style={styles.helpfulContainer}>
+        <Ionicons name="thumbs-up-outline" size={16} color="#436B9B" />
+        <Text style={styles.helpfulText}>
+          {review.helpful} found this helpful
+        </Text>
+      </View>
     </View>
   );
 
@@ -23,11 +205,15 @@ const Review = () => {
     <View style={styles.container}>
       {/* Clinic Info Section */}
       <View style={styles.clinicSection}>
-        {/* Replace the Image component with this */}
         <View style={[styles.clinicImage, { backgroundColor: "#F0F0F0" }]} />
         <View style={styles.clinicInfo}>
-          <Text style={styles.clinicName}>{clinicInfo.name}</Text>
-          <Text style={styles.clinicAddress}>{clinicInfo.address}</Text>
+          <Text style={styles.clinicName}>{clinicName}</Text>
+          <TouchableOpacity onPress={openMaps} style={styles.locationButton}>
+            <Ionicons name="location" size={16} color="#64C5B7" />
+            <Text style={styles.clinicAddress}>
+              {locationCoordinates[clinicName]?.address || clinicLocation}
+            </Text>
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -35,21 +221,31 @@ const Review = () => {
       <View style={styles.ratingSection}>
         <View style={styles.ratingHeader}>
           <View style={styles.ratingLeft}>
-            <Text style={styles.ratingNumber}>{clinicInfo.rating}</Text>
-            <StarRating rating={clinicInfo.rating} size={24} />
+            <Text style={styles.ratingNumber}>{clinicRating}</Text>
+            <StarRating rating={parseFloat(clinicRating)} size={24} />
             <Text style={styles.reviewCount}>
-              {clinicInfo.totalReviews} reviews
+              {serviceReviews.totalReviews} reviews
             </Text>
           </View>
 
           {/* Rating Distribution Bars */}
           <View style={styles.ratingBars}>
-            {clinicInfo.ratingDistribution.map((_, index) => (
+            {serviceReviews.ratingDistribution.map((count, index) => (
               <View key={5 - index} style={styles.ratingBar}>
                 <Text style={styles.ratingLabel}>{5 - index}</Text>
                 <View style={styles.barContainer}>
-                  <View style={[styles.bar, { width: "80%" }]} />
+                  <View
+                    style={[
+                      styles.bar,
+                      {
+                        width: `${
+                          (count / serviceReviews.totalReviews) * 100
+                        }%`,
+                      },
+                    ]}
+                  />
                 </View>
+                <Text style={styles.ratingCount}>{count}</Text>
               </View>
             ))}
           </View>
@@ -58,13 +254,10 @@ const Review = () => {
 
       {/* Reviews List */}
       <ScrollView style={styles.reviewsList}>
-        {[...Array(6)].map((_, index) => (
-          <ReviewCard key={index} />
+        {serviceReviews.reviews.map((review, index) => (
+          <ReviewCard key={index} review={review} />
         ))}
       </ScrollView>
-
-      {/* Bottom Navigation */}
-      <BottomNavBar />
     </View>
   );
 };
@@ -95,9 +288,9 @@ const styles = StyleSheet.create({
   },
   clinicAddress: {
     fontSize: 14,
-    color: "#436B9B",
-    opacity: 0.8,
-    marginTop: 4,
+    color: "#64C5B7",
+    flex: 1,
+    textDecorationLine: "underline",
   },
   ratingSection: {
     padding: 16,
@@ -168,6 +361,51 @@ const styles = StyleSheet.create({
   },
   reviewStars: {
     marginBottom: 8,
+  },
+  reviewHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 8,
+  },
+  reviewerName: {
+    fontSize: 16,
+    fontWeight: "500",
+    color: "#436B9B",
+  },
+  reviewDate: {
+    fontSize: 14,
+    color: "#436B9B",
+    opacity: 0.7,
+  },
+  reviewText: {
+    fontSize: 14,
+    color: "#436B9B",
+    lineHeight: 20,
+    marginTop: 8,
+  },
+  helpfulContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 12,
+    gap: 8,
+  },
+  helpfulText: {
+    fontSize: 12,
+    color: "#436B9B",
+    opacity: 0.7,
+  },
+  ratingCount: {
+    fontSize: 14,
+    color: "#436B9B",
+    marginLeft: 8,
+    width: 30,
+  },
+  locationButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    marginTop: 4,
+    padding: 4, // Add some padding for better touch area
   },
 });
 

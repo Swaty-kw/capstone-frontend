@@ -1,5 +1,3 @@
-import React, { useState } from "react";
-
 import {
   View,
   Text,
@@ -7,34 +5,17 @@ import {
   StyleSheet,
   Animated,
 } from "react-native";
+import React, { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
-
-import { getAllServices } from "../api/Services";
+import { useNavigation } from "@react-navigation/native";
+import NAVIGATION from "../navigation/index";
 import { useQuery } from "@tanstack/react-query";
-const ServiceCard = ({ name, price, duration }) => {
-  return (
-    <View style={styles.serviceCard}>
-      <View style={styles.leftColumn}>
-        <View style={styles.serviceImage} />
-        <View style={styles.bottomRow}>
-          <Text style={styles.duration}>{duration}</Text>
-          <TouchableOpacity style={styles.bookButton}>
-            <Text style={styles.bookText}>Book Now</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-      <View style={styles.serviceDetails}>
-        <Text style={styles.serviceName}>${name}</Text>
-        <Text style={styles.servicePrice}>${price}</Text>
-      </View>
-    </View>
-  );
-};
+import { getAllServices } from "../api/Services";
 
-export default function Services() {
-  const [activeTab, setActiveTab] = useState("all");
+export default ChooseService = () => {
+  const navigation = useNavigation();
+  const [selectedService, setSelectedService] = useState("VetClinic");
   const [underlineAnim] = useState(new Animated.Value(0));
-
   const Services = [
     {
       type: String,
@@ -46,11 +27,7 @@ export default function Services() {
       averageRating: Number,
     },
   ];
-  const filterServices = (type) => {
-    return Services.filter((service) => service.type === type);
-  };
 
-  const vetServices = filterServices("Veterinary");
   const animateUnderline = (toValue) => {
     Animated.timing(underlineAnim, {
       toValue,
@@ -60,9 +37,15 @@ export default function Services() {
   };
 
   const handleTabPress = (tab) => {
-    setActiveTab(tab);
-    animateUnderline(tab === "all" ? 0 : 1);
+    setSelectedService(tab);
+    animateUnderline(tab === "VetClinic" ? 0 : 1);
   };
+
+  const filterServices = (type) => {
+    return Services.filter((service) => service.type === type);
+  };
+
+  const vetServices = filterServices("Veterinary");
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["AllServices"],
@@ -77,39 +60,47 @@ export default function Services() {
     return <Text>Error fetching services</Text>;
   }
 
-  const filteredServices =
-    activeTab === "all" ? data : filterServices(activeTab);
+  // const filteredServices =
+  //   activeTab === "all" ? data : filterServices("activeTab");
 
+  console.log({ data: data.map((d) => d.location) });
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton}>
-          <Ionicons name="chevron-back" size={24} color="#000" />
+      {/* Header */}
+      {/* <View style={styles.header}>
+        <TouchableOpacity>
+          <Ionicons name="chevron-back" size={24} color="#91ACBF" />
         </TouchableOpacity>
-        <Text style={styles.title}>Services</Text>
-        <View style={styles.placeholder} />
-      </View>
+        <Text style={styles.headerTitle}>Pet Services</Text>
+        <View style={{ width: 24 }} />
+      </View> */}
+
+      {/* Navigation Tabs */}
       <View style={styles.tabContainer}>
         <TouchableOpacity
           style={styles.tabButton}
-          onPress={() => handleTabPress("all")}
+          onPress={() => handleTabPress("VetClinic")}
         >
           <Text
-            style={activeTab === "all" ? styles.tabActive : styles.tabInactive}
+            style={[
+              styles.tabText,
+              selectedService === "VetClinic" && styles.activeTab,
+            ]}
           >
-            All Services
+            Vet Clinic
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.tabButton}
-          onPress={() => handleTabPress("Veterinary")}
+          onPress={() => handleTabPress("Grooming")}
         >
           <Text
-            style={
-              activeTab === "Veterinary" ? styles.tabActive : styles.tabInactive
-            }
+            style={[
+              styles.tabText,
+              selectedService === "Grooming" && styles.activeTab,
+            ]}
           >
-            Popular
+            Grooming
           </Text>
         </TouchableOpacity>
         <Animated.View
@@ -124,133 +115,211 @@ export default function Services() {
           ]}
         />
       </View>
-      <View style={styles.servicesList}>
-        {filteredServices.map((service) => (
-          <ServiceCard
-            key={service.id}
-            name={service.name}
-            reviews={service.reviews}
-            averageRating={service.averageRating}
-          />
-        ))}
+
+      {/* Services List */}
+      <View style={styles.servicesContainer}>
+        {selectedService === "VetClinic"
+          ? data
+              .filter((d) => d.serviceType == "Vet Clinic")
+              .map((clinic, index) => (
+                <View key={index} style={styles.serviceCard}>
+                  <View style={styles.imageContainer} />
+                  <View style={styles.serviceInfo}>
+                    <Text style={styles.serviceName}>{clinic.name}</Text>
+                    <Text style={styles.locationText}>{clinic.location?.address}</Text>
+                    <View style={styles.ratingContainer}>
+                      <Ionicons name="star" size={16} color="#64C5B7" />
+                      <Text style={styles.ratingText}>
+                        {clinic.averageRating}
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={styles.buttonsContainer}>
+                    <TouchableOpacity
+                      style={styles.bookButton}
+                      onPress={() => {
+                        navigation.navigate(
+                          NAVIGATION.SERVICE.BOOK_APPOINTMENT,
+                          {
+                            clinicName: clinic.name,
+                            clinicLocation: clinic.location?.address,
+                            clinicRating: clinic.averageRating,
+                          }
+                        );
+                      }}
+                    >
+                      <Text style={styles.bookText}>Book</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.bookButton, styles.reviewsButton]}
+                      onPress={() =>
+                        navigation.navigate("Review", {
+                          clinicName: clinic.name,
+                          clinicLocation: clinic.location?.address,
+                          clinicRating: clinic.averageRating,
+                        })
+                      }
+                    >
+                      <Text style={styles.bookText}>Reviews</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              ))
+          : data
+              .filter((d) => d.serviceType == "Grooming Service")
+              .map((service, index) => (
+                <View key={index} style={styles.serviceCard}>
+                  <View style={styles.imageContainer} />
+                  <View style={styles.serviceInfo}>
+                    <Text style={styles.serviceName}>{service.name}</Text>
+                    <Text style={styles.locationText}>
+                      {service.location?.address}
+                    </Text>
+                    <View style={styles.ratingContainer}>
+                      <Ionicons name="star" size={16} color="#64C5B7" />
+                      <Text style={styles.ratingText}>
+                        {service.averageRating}
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={styles.buttonsContainer}>
+                    <TouchableOpacity
+                      style={styles.bookButton}
+                      onPress={() => {
+                        navigation.navigate(
+                          NAVIGATION.SERVICE.BOOK_APPOINTMENT,
+                          {
+                            clinicName: service.name,
+                            clinicLocation: service.location?.address,
+                            clinicRating: service.averageRating,
+                          }
+                        );
+                      }}
+                    >
+                      <Text style={styles.bookText}>Book</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.bookButton, styles.reviewsButton]}
+                      onPress={() =>
+                        navigation.navigate("Review", {
+                          clinicName: service.name,
+                          clinicLocation: service.location?.address,
+                          clinicRating: service.averageRating,
+                        })
+                      }
+                    >
+                      <Text style={styles.bookText}>Reviews</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              ))}
       </View>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "white",
+    padding: 20,
   },
   header: {
     flexDirection: "row",
-    alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingTop: 40,
-    paddingBottom: 16,
-    backgroundColor: "#FFFFFF",
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
+    alignItems: "center",
+    marginBottom: 30,
   },
-  backButton: {
-    padding: 8,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#333333",
-  },
-  placeholder: {
-    width: 40,
+  headerTitle: {
+    fontSize: 24,
+    color: "#91ACBF",
+    fontWeight: "500",
   },
   tabContainer: {
     flexDirection: "row",
-    justifyContent: "space-around",
-    paddingTop: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#E0E0E0",
     position: "relative",
+    marginBottom: 20,
+    marginTop: 0,
   },
   tabButton: {
-    paddingBottom: 16,
-    width: "50%",
+    flex: 1,
     alignItems: "center",
+    paddingVertical: 15,
   },
-  tabActive: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#2F5FE3",
+  tabText: {
+    fontSize: 18,
+    color: "#64C5B7",
+    fontWeight: "400",
   },
-  tabInactive: {
-    fontSize: 16,
-    color: "#757575",
+  activeTab: {
+    color: "#91ACBF",
+    fontWeight: "500",
   },
   underline: {
     position: "absolute",
     bottom: 0,
     width: "50%",
     height: 2,
-    backgroundColor: "#2F5FE3",
+    backgroundColor: "#91ACBF",
   },
-  servicesList: {
-    padding: 16,
+  servicesContainer: {
+    flex: 1,
+    gap: 15,
   },
   serviceCard: {
+    backgroundColor: "#F8FAFB",
+    padding: 15,
+    borderRadius: 20,
     flexDirection: "row",
-    backgroundColor: "#F5F8FF",
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    alignItems: "flex-start",
+    gap: 15,
+    alignItems: "center",
   },
-  leftColumn: {
-    flex: 1,
-  },
-  serviceImage: {
+  imageContainer: {
     width: 60,
     height: 60,
-    backgroundColor: "#F0F0F0",
-    borderRadius: 8,
-    marginTop: -8,
+    backgroundColor: "#E8EEF1",
+    borderRadius: 15,
   },
-  bottomRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginTop: 8,
-    width: "100%",
-  },
-  duration: {
-    fontSize: 14,
-    color: "#757575",
-  },
-  bookButton: {
-    backgroundColor: "#E3EAFF",
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-  },
-  bookText: {
-    color: "#2F5FE3",
-    fontSize: 14,
-  },
-  serviceDetails: {
-    marginLeft: 12,
-    position: "absolute",
-    left: 88,
-    top: 16,
+  serviceInfo: {
+    flex: 1,
+    gap: 5,
   },
   serviceName: {
     fontSize: 16,
-    fontWeight: "bold",
-    color: "#333333",
-    marginBottom: 4,
+    color: "#91ACBF",
+    fontWeight: "500",
   },
-  servicePrice: {
-    fontSize: 16,
-    color: "#2F5FE3",
-    fontWeight: "bold",
+  locationText: {
+    fontSize: 14,
+    color: "#91ACBF",
+  },
+  ratingContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  ratingText: {
+    fontSize: 14,
+    color: "#91ACBF",
+    fontWeight: "500",
+  },
+  buttonsContainer: {
+    alignItems: "center",
+    gap: 8,
+  },
+  bookButton: {
+    backgroundColor: "#64C5B7",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    width: 100,
+    alignItems: "center",
+  },
+  reviewsButton: {
+    backgroundColor: "#91ACBF",
+  },
+  bookText: {
+    color: "white",
+    fontSize: 14,
   },
 });
