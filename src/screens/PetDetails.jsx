@@ -21,7 +21,7 @@ const PetDetails = ({ route }) => {
           <View style={styles.header}>
             <View style={styles.imageContainer}>
               <Image
-                source={{ uri: BASE_URL + pet.image }}
+                source={{ uri: `${BASE_URL}/${pet.image}` }}
                 style={styles.petImage}
                 resizeMode="cover"
               />
