@@ -1,49 +1,191 @@
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Animated,
+} from "react-native";
 import React, { useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import NAVIGATION from "../navigation/index";
 
 const ChooseService = () => {
-  const [selectedService, setSelectedService] = useState("Doctor");
-  
+  const navigation = useNavigation();
+  const [selectedService, setSelectedService] = useState("VetClinic");
+  const [underlineAnim] = useState(new Animated.Value(0));
 
-  const appointments = [
-    { date: "October 20, 2024, 10:30 AM", location: "City Pet Clinic" },
-    { date: "October 21, 2024, 11:00 AM", location: "City Pet Clinic" },
-    // Add more appointments as needed
+  const animateUnderline = (toValue) => {
+    Animated.timing(underlineAnim, {
+      toValue,
+      duration: 300,
+      useNativeDriver: false,
+    }).start();
+  };
+
+  const handleTabPress = (tab) => {
+    setSelectedService(tab);
+    animateUnderline(tab === "VetClinic" ? 0 : 1);
+  };
+
+  const vetClinics = [
+    {
+      name: "City Pet Clinic",
+      location: "Shuwaikh Industrial, Kuwait",
+      rating: "4.8",
+    },
+    { name: "Pet Care Center", location: "Salmiya, Kuwait", rating: "4.5" },
+    {
+      name: "Animal Care Hospital",
+      location: "Jabriya, Kuwait",
+      rating: "4.7",
+    },
+    { name: "Paws & Claws Clinic", location: "Hawally, Kuwait", rating: "4.6" },
+  ];
+
+  const groomingServices = [
+    {
+      name: "Pets Grooming Center",
+      location: "Salmiya, Kuwait",
+      rating: "4.9",
+    },
+    { name: "Pampered Paws", location: "Jabriya, Kuwait", rating: "4.7" },
+    { name: "Furry Friends Salon", location: "Hawally, Kuwait", rating: "4.8" },
   ];
 
   return (
     <View style={styles.container}>
-      <View style={styles.navbar}>
-        <TouchableOpacity onPress={() => setSelectedService("Doctor Vet")}>
+      {/* Header */}
+      {/* <View style={styles.header}>
+        <TouchableOpacity>
+          <Ionicons name="chevron-back" size={24} color="#91ACBF" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Pet Services</Text>
+        <View style={{ width: 24 }} />
+      </View> */}
+
+      {/* Navigation Tabs */}
+      <View style={styles.tabContainer}>
+        <TouchableOpacity
+          style={styles.tabButton}
+          onPress={() => handleTabPress("VetClinic")}
+        >
           <Text
-            style={
-              selectedService === "Doctor Vet" ? styles.active : styles.inactive
-            }
+            style={[
+              styles.tabText,
+              selectedService === "VetClinic" && styles.activeTab,
+            ]}
           >
-            Doctor Vet
+            Vet Clinic
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => setSelectedService("Pet Store")}>
+        <TouchableOpacity
+          style={styles.tabButton}
+          onPress={() => handleTabPress("Grooming")}
+        >
           <Text
-            style={
-              selectedService === "Pet Store" ? styles.active : styles.inactive
-            }
+            style={[
+              styles.tabText,
+              selectedService === "Grooming" && styles.activeTab,
+            ]}
           >
-            Pet Store
+            Grooming
           </Text>
         </TouchableOpacity>
+        <Animated.View
+          style={[
+            styles.underline,
+            {
+              left: underlineAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: ["0%", "50%"],
+              }),
+            },
+          ]}
+        />
       </View>
-      <View style={styles.appointmentsContainer}>
-        {appointments.map((appointment, index) => (
-          <View key={index} style={styles.appointmentCard}>
-            <Text>{appointment.date}</Text>
-            <Text>{appointment.location}</Text>
-            <Text>30 min before</Text>
-            <TouchableOpacity>
-              <Text style={styles.reschedule}>Reschedule</Text>
-            </TouchableOpacity>
-          </View>
-        ))}
+
+      {/* Services List */}
+      <View style={styles.servicesContainer}>
+        {selectedService === "VetClinic"
+          ? vetClinics.map((clinic, index) => (
+              <View key={index} style={styles.serviceCard}>
+                <View style={styles.imageContainer} />
+                <View style={styles.serviceInfo}>
+                  <Text style={styles.serviceName}>{clinic.name}</Text>
+                  <Text style={styles.locationText}>{clinic.location}</Text>
+                  <View style={styles.ratingContainer}>
+                    <Ionicons name="star" size={16} color="#64C5B7" />
+                    <Text style={styles.ratingText}>{clinic.rating}</Text>
+                  </View>
+                </View>
+                <View style={styles.buttonsContainer}>
+                  <TouchableOpacity
+                    style={styles.bookButton}
+                    onPress={() => {
+                      navigation.navigate(NAVIGATION.SERVICE.BOOK_APPOINTMENT, {
+                        clinicName: clinic.name,
+                        clinicLocation: clinic.location,
+                        clinicRating: clinic.rating,
+                      });
+                    }}
+                  >
+                    <Text style={styles.bookText}>Book</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.bookButton, styles.reviewsButton]}
+                    onPress={() =>
+                      navigation.navigate("Review", {
+                        clinicName: clinic.name,
+                        clinicLocation: clinic.location,
+                        clinicRating: clinic.rating,
+                      })
+                    }
+                  >
+                    <Text style={styles.bookText}>Reviews</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            ))
+          : groomingServices.map((service, index) => (
+              <View key={index} style={styles.serviceCard}>
+                <View style={styles.imageContainer} />
+                <View style={styles.serviceInfo}>
+                  <Text style={styles.serviceName}>{service.name}</Text>
+                  <Text style={styles.locationText}>{service.location}</Text>
+                  <View style={styles.ratingContainer}>
+                    <Ionicons name="star" size={16} color="#64C5B7" />
+                    <Text style={styles.ratingText}>{service.rating}</Text>
+                  </View>
+                </View>
+                <View style={styles.buttonsContainer}>
+                  <TouchableOpacity
+                    style={styles.bookButton}
+                    onPress={() => {
+                      navigation.navigate(NAVIGATION.SERVICE.BOOK_APPOINTMENT, {
+                        clinicName: service.name,
+                        clinicLocation: service.location,
+                        clinicRating: service.rating,
+                      });
+                    }}
+                  >
+                    <Text style={styles.bookText}>Book</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.bookButton, styles.reviewsButton]}
+                    onPress={() =>
+                      navigation.navigate("Review", {
+                        clinicName: service.name,
+                        clinicLocation: service.location,
+                        clinicRating: service.rating,
+                      })
+                    }
+                  >
+                    <Text style={styles.bookText}>Reviews</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            ))}
       </View>
     </View>
   );
@@ -52,31 +194,106 @@ const ChooseService = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "white",
     padding: 20,
   },
-  navbar: {
+  header: {
     flexDirection: "row",
-    justifyContent: "space-around",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 30,
+  },
+  headerTitle: {
+    fontSize: 24,
+    color: "#91ACBF",
+    fontWeight: "500",
+  },
+  tabContainer: {
+    flexDirection: "row",
+    position: "relative",
     marginBottom: 20,
+    marginTop: 0,
   },
-  active: {
-    fontWeight: "bold",
-    color: "blue",
-  },
-  inactive: {
-    color: "gray",
-  },
-  appointmentsContainer: {
+  tabButton: {
     flex: 1,
+    alignItems: "center",
+    paddingVertical: 15,
   },
-  appointmentCard: {
-    backgroundColor: "#f0f0f0",
+  tabText: {
+    fontSize: 18,
+    color: "#64C5B7",
+    fontWeight: "400",
+  },
+  activeTab: {
+    color: "#91ACBF",
+    fontWeight: "500",
+  },
+  underline: {
+    position: "absolute",
+    bottom: 0,
+    width: "50%",
+    height: 2,
+    backgroundColor: "#91ACBF",
+  },
+  servicesContainer: {
+    flex: 1,
+    gap: 15,
+  },
+  serviceCard: {
+    backgroundColor: "#F8FAFB",
     padding: 15,
-    marginVertical: 10,
-    borderRadius: 8,
+    borderRadius: 20,
+    flexDirection: "row",
+    gap: 15,
+    alignItems: "center",
   },
-  reschedule: {
-    color: "green",
+  imageContainer: {
+    width: 60,
+    height: 60,
+    backgroundColor: "#E8EEF1",
+    borderRadius: 15,
+  },
+  serviceInfo: {
+    flex: 1,
+    gap: 5,
+  },
+  serviceName: {
+    fontSize: 16,
+    color: "#91ACBF",
+    fontWeight: "500",
+  },
+  locationText: {
+    fontSize: 14,
+    color: "#91ACBF",
+  },
+  ratingContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  ratingText: {
+    fontSize: 14,
+    color: "#91ACBF",
+    fontWeight: "500",
+  },
+  buttonsContainer: {
+    alignItems: "center",
+    gap: 8,
+  },
+  bookButton: {
+    backgroundColor: "#64C5B7",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    width: 100,
+    alignItems: "center",
+  },
+  reviewsButton: {
+    backgroundColor: "#91ACBF",
+  },
+  bookText: {
+    color: "white",
+    fontSize: 14,
   },
 });
 

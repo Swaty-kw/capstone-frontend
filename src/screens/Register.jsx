@@ -2,8 +2,8 @@ import {
   View,
   Text,
   StyleSheet,
+  SafeAreaView,
   TouchableOpacity,
-  StatusBar,
 } from "react-native";
 import React, { useContext, useState } from "react";
 import TextField from "../components/Textfield";
@@ -15,7 +15,7 @@ import UserContext from "../context/UserContext";
 import Submitbutton from "../components/Submitbutton";
 import { useNavigation } from "@react-navigation/native";
 import NAVIGATION from "../navigation";
-import { SafeAreaView } from "react-native-safe-area-context";
+
 const Register = () => {
   const navigation = useNavigation();
 
@@ -54,70 +54,55 @@ const Register = () => {
   };
 
   return (
-    <>
-      <StatusBar barStyle="light-content" />
-      <SafeAreaView
-        edges={["top"]}
-        style={{ flex: 0, backgroundColor: "#F37558" }}
-      />
-      <SafeAreaView
-        edges={["left", "right"]}
-        style={{
-          flex: 1,
-          backgroundColor: "#64C5B7",
-        }}
-      >
-        <View style={styles.orangeBackground} />
-        <View style={styles.whiteOverlay} />
-        <View style={styles.contentContainer}>
-          <Text style={styles.title}>
-            Register to start managing your pet's health and happiness in one
-            place.
-          </Text>
-          <View style={styles.formContainer}>
-            <TextField
-              color="#F37558"
-              backgroundColor="white"
-              placeholder="Email"
-              style={styles.input}
-              borderColor="#F37558"
-            />
-            <TextField
-              color="#F37558"
-              backgroundColor="green"
-              placeholder="Username"
-              style={styles.input}
-              borderColor="#F37558"
-            />
-            <TextField
-              color="#F37558"
-              backgroundColor="white"
-              placeholder="Password"
-              style={styles.input}
-              borderColor="#F37558"
-            />
-            <TextField
-              color="#F37558"
-              backgroundColor="white"
-              placeholder="Confirm password"
-              style={styles.input}
-              borderColor="#F37558"
-            />
-            <View style={{ flexDirection: "row", justifyContent: "center" }}>
-              <Text style={{ color: "#F37558" }}>
-                Already have an account ?
-              </Text>
-              <TouchableOpacity
-                onPress={() => navigation.navigate(NAVIGATION.AUTH.LOGIN)}
-              >
-                <Text style={styles.signInText}> Sign in</Text>
-              </TouchableOpacity>
-            </View>
-            <Submitbutton title="Register" color="#F37558" />
+    <SafeAreaView style={styles.container}>
+      <View style={styles.orangeBackground} />
+      <View style={styles.whiteOverlay} />
+      <View style={styles.contentContainer}>
+        <Text style={styles.title}>
+          Register to start managing your pet's health and happiness in one
+          place.
+        </Text>
+        <View style={styles.formContainer}>
+          <TextField
+            color="#F37558"
+            backgroundColor="white"
+            placeholder="Email"
+            style={styles.input}
+            borderColor="#F37558"
+          />
+          <TextField
+            color="#F37558"
+            backgroundColor="green"
+            placeholder="Username"
+            style={styles.input}
+            borderColor="#F37558"
+          />
+          <TextField
+            color="#F37558"
+            backgroundColor="white"
+            placeholder="Password"
+            style={styles.input}
+            borderColor="#F37558"
+          />
+          <TextField
+            color="#F37558"
+            backgroundColor="white"
+            placeholder="Confirm password"
+            style={styles.input}
+            borderColor="#F37558"
+          />
+          <View style={{ flexDirection: "row", justifyContent: "center" }}>
+            <Text style={{ color: "#F37558" }}>Already have an account ?</Text>
+            <TouchableOpacity
+              onPress={() => navigation.navigate(NAVIGATION.AUTH.LOGIN)}
+            >
+              <Text style={styles.signInText}> Sign in</Text>
+            </TouchableOpacity>
           </View>
+          <Submitbutton title="Register" color="#F37558" />
         </View>
-      </SafeAreaView>
-    </>
+      </View>
+    </SafeAreaView>
   );
 };
 
