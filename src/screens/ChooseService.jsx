@@ -9,11 +9,24 @@ import React, { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import NAVIGATION from "../navigation/index";
+import { useQuery } from "@tanstack/react-query";
+import { getAllServices } from "../api/Services";
 
-const ChooseService = () => {
+export default ChooseService = () => {
   const navigation = useNavigation();
   const [selectedService, setSelectedService] = useState("VetClinic");
   const [underlineAnim] = useState(new Animated.Value(0));
+  const Services = [
+    {
+      type: String,
+      name: String,
+      image: String,
+      Location: String,
+      // Appts: mongoose.Schema.Types.ObjectId,
+      // reviews: [mongoose.Schema.Types.ObjectId],
+      averageRating: Number,
+    },
+  ];
 
   const animateUnderline = (toValue) => {
     Animated.timing(underlineAnim, {
@@ -28,31 +41,29 @@ const ChooseService = () => {
     animateUnderline(tab === "VetClinic" ? 0 : 1);
   };
 
-  const vetClinics = [
-    {
-      name: "City Pet Clinic",
-      location: "Shuwaikh Industrial, Kuwait",
-      rating: "4.8",
-    },
-    { name: "Pet Care Center", location: "Salmiya, Kuwait", rating: "4.5" },
-    {
-      name: "Animal Care Hospital",
-      location: "Jabriya, Kuwait",
-      rating: "4.7",
-    },
-    { name: "Paws & Claws Clinic", location: "Hawally, Kuwait", rating: "4.6" },
-  ];
+  const filterServices = (type) => {
+    return Services.filter((service) => service.type === type);
+  };
 
-  const groomingServices = [
-    {
-      name: "Pets Grooming Center",
-      location: "Salmiya, Kuwait",
-      rating: "4.9",
-    },
-    { name: "Pampered Paws", location: "Jabriya, Kuwait", rating: "4.7" },
-    { name: "Furry Friends Salon", location: "Hawally, Kuwait", rating: "4.8" },
-  ];
+  const vetServices = filterServices("Veterinary");
 
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["AllServices"],
+    queryFn: getAllServices,
+  });
+
+  if (isLoading) {
+    return <Text>Loading...</Text>;
+  }
+
+  if (error) {
+    return <Text>Error fetching services</Text>;
+  }
+
+  // const filteredServices =
+  //   activeTab === "all" ? data : filterServices("activeTab");
+
+  console.log({ data: data.map((d) => d.location) });
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -108,84 +119,100 @@ const ChooseService = () => {
       {/* Services List */}
       <View style={styles.servicesContainer}>
         {selectedService === "VetClinic"
-          ? vetClinics.map((clinic, index) => (
-              <View key={index} style={styles.serviceCard}>
-                <View style={styles.imageContainer} />
-                <View style={styles.serviceInfo}>
-                  <Text style={styles.serviceName}>{clinic.name}</Text>
-                  <Text style={styles.locationText}>{clinic.location}</Text>
-                  <View style={styles.ratingContainer}>
-                    <Ionicons name="star" size={16} color="#64C5B7" />
-                    <Text style={styles.ratingText}>{clinic.rating}</Text>
+          ? data
+              .filter((d) => d.serviceType == "Vet Clinic")
+              .map((clinic, index) => (
+                <View key={index} style={styles.serviceCard}>
+                  <View style={styles.imageContainer} />
+                  <View style={styles.serviceInfo}>
+                    <Text style={styles.serviceName}>{clinic.name}</Text>
+                    <Text style={styles.locationText}>{clinic.location?.address}</Text>
+                    <View style={styles.ratingContainer}>
+                      <Ionicons name="star" size={16} color="#64C5B7" />
+                      <Text style={styles.ratingText}>
+                        {clinic.averageRating}
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={styles.buttonsContainer}>
+                    <TouchableOpacity
+                      style={styles.bookButton}
+                      onPress={() => {
+                        navigation.navigate(
+                          NAVIGATION.SERVICE.BOOK_APPOINTMENT,
+                          {
+                            clinicName: clinic.name,
+                            clinicLocation: clinic.location?.address,
+                            clinicRating: clinic.averageRating,
+                          }
+                        );
+                      }}
+                    >
+                      <Text style={styles.bookText}>Book</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.bookButton, styles.reviewsButton]}
+                      onPress={() =>
+                        navigation.navigate("Review", {
+                          clinicName: clinic.name,
+                          clinicLocation: clinic.location?.address,
+                          clinicRating: clinic.averageRating,
+                        })
+                      }
+                    >
+                      <Text style={styles.bookText}>Reviews</Text>
+                    </TouchableOpacity>
                   </View>
                 </View>
-                <View style={styles.buttonsContainer}>
-                  <TouchableOpacity
-                    style={styles.bookButton}
-                    onPress={() => {
-                      navigation.navigate(NAVIGATION.SERVICE.BOOK_APPOINTMENT, {
-                        clinicName: clinic.name,
-                        clinicLocation: clinic.location,
-                        clinicRating: clinic.rating,
-                      });
-                    }}
-                  >
-                    <Text style={styles.bookText}>Book</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={[styles.bookButton, styles.reviewsButton]}
-                    onPress={() =>
-                      navigation.navigate("Review", {
-                        clinicName: clinic.name,
-                        clinicLocation: clinic.location,
-                        clinicRating: clinic.rating,
-                      })
-                    }
-                  >
-                    <Text style={styles.bookText}>Reviews</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            ))
-          : groomingServices.map((service, index) => (
-              <View key={index} style={styles.serviceCard}>
-                <View style={styles.imageContainer} />
-                <View style={styles.serviceInfo}>
-                  <Text style={styles.serviceName}>{service.name}</Text>
-                  <Text style={styles.locationText}>{service.location}</Text>
-                  <View style={styles.ratingContainer}>
-                    <Ionicons name="star" size={16} color="#64C5B7" />
-                    <Text style={styles.ratingText}>{service.rating}</Text>
+              ))
+          : data
+              .filter((d) => d.serviceType == "Grooming Service")
+              .map((service, index) => (
+                <View key={index} style={styles.serviceCard}>
+                  <View style={styles.imageContainer} />
+                  <View style={styles.serviceInfo}>
+                    <Text style={styles.serviceName}>{service.name}</Text>
+                    <Text style={styles.locationText}>
+                      {service.location?.address}
+                    </Text>
+                    <View style={styles.ratingContainer}>
+                      <Ionicons name="star" size={16} color="#64C5B7" />
+                      <Text style={styles.ratingText}>
+                        {service.averageRating}
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={styles.buttonsContainer}>
+                    <TouchableOpacity
+                      style={styles.bookButton}
+                      onPress={() => {
+                        navigation.navigate(
+                          NAVIGATION.SERVICE.BOOK_APPOINTMENT,
+                          {
+                            clinicName: service.name,
+                            clinicLocation: service.location?.address,
+                            clinicRating: service.averageRating,
+                          }
+                        );
+                      }}
+                    >
+                      <Text style={styles.bookText}>Book</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.bookButton, styles.reviewsButton]}
+                      onPress={() =>
+                        navigation.navigate("Review", {
+                          clinicName: service.name,
+                          clinicLocation: service.location?.address,
+                          clinicRating: service.averageRating,
+                        })
+                      }
+                    >
+                      <Text style={styles.bookText}>Reviews</Text>
+                    </TouchableOpacity>
                   </View>
                 </View>
-                <View style={styles.buttonsContainer}>
-                  <TouchableOpacity
-                    style={styles.bookButton}
-                    onPress={() => {
-                      navigation.navigate(NAVIGATION.SERVICE.BOOK_APPOINTMENT, {
-                        clinicName: service.name,
-                        clinicLocation: service.location,
-                        clinicRating: service.rating,
-                      });
-                    }}
-                  >
-                    <Text style={styles.bookText}>Book</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={[styles.bookButton, styles.reviewsButton]}
-                    onPress={() =>
-                      navigation.navigate("Review", {
-                        clinicName: service.name,
-                        clinicLocation: service.location,
-                        clinicRating: service.rating,
-                      })
-                    }
-                  >
-                    <Text style={styles.bookText}>Reviews</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            ))}
+              ))}
       </View>
     </View>
   );
@@ -296,5 +323,3 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
 });
-
-export default ChooseService;
