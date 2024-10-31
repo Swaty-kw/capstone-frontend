@@ -1,10 +1,14 @@
 import {TouchableOpacity, View, Text } from 'react-native'
 import React from 'react'
-
+import { useNavigation } from '@react-navigation/native'
+import NAVIGATION from '../navigation/index'
 const AddButton = () => {
 
+  const navigation = useNavigation();
+
     const handleButton = () => {
-        console.log("Add button clicked")
+      navigation.navigate(NAVIGATION.HOME.ADD_PET);
+        console.log("Add button clicked");
     }
 
   return (
