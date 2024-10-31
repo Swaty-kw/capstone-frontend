@@ -2,33 +2,58 @@ import axios from "./index";
 import instance from "./index";
 
 const getServices = async () => {
-  const response = await instance.get("/api/services");
-  return response.data;
+  try {
+    const response = await instance.get("/api/services");
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 const createService = async (service) => {
-  const response = await instance.post("/api/services", service);
-  return response.data;
+  try {
+    const response = await instance.post("/api/services", service);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 const getAllServices = async () => {
-  const response = await instance.get("/api/services");
-  return response.data;
+  try {
+    const response = await instance.get("/services");
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 const getServiceById = async (id) => {
-  const response = await instance.get(`/api/services/${id}`);
-  return response.data;
+  try {
+    const response = await instance.get(`/api/services/${id}`);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 const updateService = async (id, service) => {
-  const response = await instance.put(`/api/services/${id}`, service);
-  return response.data;
+  try {
+    const response = await instance.put(`/api/services/${id}`, service);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 const deleteService = async (id) => {
-  const response = await instance.delete(`/api/services/${id}`);
-  return response.data;
+  try {
+    const response = await instance.delete(`/api/services/${id}`);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 export {
