@@ -12,4 +12,23 @@ const getUserPets = async () => {
   }
 };
 
-export { getUserPets };
+const addPet = async (petInfo) => {
+  try {
+    const formData = new FormData();
+    for (key in petInfo) {
+      if (key != "image") formData.append(key, petInfo[key]);
+    }
+    formData.append("image", {
+      name: "image.jpg",
+      type: "image/jpeg",
+      uri: petInfo.image,
+    });
+
+    const { data } = await instance.post("petdetails", formData);
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export { getUserPets, addPet };

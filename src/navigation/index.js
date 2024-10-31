@@ -3,18 +3,19 @@ const NAVIGATION = {
     INDEX: "HomeIndex",
     HOME: "Home",
     PET_DETAILS: "Pet Details",
+    ADD_PET: "Add Pet"
   },
   AUTH: {
-    INDEX: "AuthIndex",
+    INDEX: "Auth",
     LOGIN: "Login",
     REGISTER: "Register",
   },
   PROFILE: {
-    INDEX: "ProfileIndex",
+    INDEX: "Profile",
     PROFILE: "Profile",
   },
   SERVICE: {
-    INDEX: "ServiceIndex",
+    INDEX: "Service",
     MY_APPOINTMENTS: "My Appointments",
     BOOK_APPOINTMENT: "Book Appointment",
     REVIEW: "Review",
