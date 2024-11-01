@@ -4,13 +4,16 @@ import {
   TouchableOpacity,
   StyleSheet,
   Animated,
+  Image,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import NAVIGATION from "../navigation/index";
 import { useQuery } from "@tanstack/react-query";
 import { getAllServices } from "../api/Services";
+import { BASE_URL } from "../api/index";
+import { GOOGLE_PLACES_API_KEY } from "../api/config";
 
 export default ChooseService = () => {
   const navigation = useNavigation();
@@ -27,6 +30,7 @@ export default ChooseService = () => {
       averageRating: Number,
     },
   ];
+  const [googleRatings, setGoogleRatings] = useState({});
 
   const animateUnderline = (toValue) => {
     Animated.timing(underlineAnim, {
@@ -51,6 +55,52 @@ export default ChooseService = () => {
     queryKey: ["AllServices"],
     queryFn: getAllServices,
   });
+
+  const fetchGoogleReviews = async (clinicName) => {
+    try {
+      // Hardcoded Place IDs for the problematic clinics
+      const placeIds = {
+        "Companion Clinic": "ChIJXXXXXXXXXXXXXXXXXX", // Replace with actual Place ID
+        "Al-Dohama": "ChIJXXXXXXXXXXXXXXXXXX", // Replace with actual Place ID
+      };
+
+      if (placeIds[clinicName]) {
+        const detailsResponse = await fetch(
+          `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeIds[clinicName]}&fields=name,rating,reviews&key=${GOOGLE_PLACES_API_KEY}`
+        );
+        const detailsData = await detailsResponse.json();
+
+        if (detailsData.result) {
+          console.log("✅ Found details for:", clinicName);
+          return detailsData.result;
+        }
+      }
+
+      console.log("❌ No results found for:", clinicName);
+      return null;
+    } catch (error) {
+      console.error("Error fetching reviews for", clinicName, ":", error);
+      return null;
+    }
+  };
+
+  useEffect(() => {
+    const fetchAllRatings = async () => {
+      if (data) {
+        for (const service of data) {
+          const result = await fetchGoogleReviews(service.name);
+          if (result) {
+            setGoogleRatings((prev) => ({
+              ...prev,
+              [service.name]: result.rating,
+            }));
+          }
+        }
+      }
+    };
+
+    fetchAllRatings();
+  }, [data]);
 
   if (isLoading) {
     return <Text>Loading...</Text>;
@@ -123,14 +173,24 @@ export default ChooseService = () => {
               .filter((d) => d.serviceType == "Vet Clinic")
               .map((clinic, index) => (
                 <View key={index} style={styles.serviceCard}>
-                  <View style={styles.imageContainer} />
+                  <View style={styles.imageContainer}>
+                    <Image
+                      source={{
+                        uri: `${BASE_URL}/${clinic.image.replace(/\\/g, "/")}`,
+                      }}
+                      style={styles.image}
+                      resizeMode="cover"
+                    />
+                  </View>
                   <View style={styles.serviceInfo}>
                     <Text style={styles.serviceName}>{clinic.name}</Text>
-                    <Text style={styles.locationText}>{clinic.location?.address}</Text>
+                    <Text style={styles.locationText}>
+                      {clinic.location?.address}
+                    </Text>
                     <View style={styles.ratingContainer}>
                       <Ionicons name="star" size={16} color="#64C5B7" />
                       <Text style={styles.ratingText}>
-                        {clinic.averageRating}
+                        {googleRatings[clinic.name]?.toFixed(1) || "N/A"}
                       </Text>
                     </View>
                   </View>
@@ -143,7 +203,9 @@ export default ChooseService = () => {
                           {
                             clinicName: clinic.name,
                             clinicLocation: clinic.location?.address,
-                            clinicRating: clinic.averageRating,
+                            clinicRating:
+                              googleRatings[clinic.name]?.rating?.toFixed(1) ||
+                              "N/A",
                           }
                         );
                       }}
@@ -152,13 +214,23 @@ export default ChooseService = () => {
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={[styles.bookButton, styles.reviewsButton]}
-                      onPress={() =>
+                      onPress={() => {
+                        console.log("Clinic Data:", {
+                          name: clinic.name,
+                          location: clinic.location,
+                          image: clinic.image,
+                          rating:
+                            clinic.googleReviews?.rating?.toFixed(1) || "N/A",
+                        });
                         navigation.navigate("Review", {
                           clinicName: clinic.name,
                           clinicLocation: clinic.location?.address,
-                          clinicRating: clinic.averageRating,
-                        })
-                      }
+                          clinicRating:
+                            clinic.googleReviews?.rating?.toFixed(1) || "N/A",
+                          coordinates: clinic.location?.coordinates,
+                          clinicImage: clinic.image,
+                        });
+                      }}
                     >
                       <Text style={styles.bookText}>Reviews</Text>
                     </TouchableOpacity>
@@ -169,7 +241,15 @@ export default ChooseService = () => {
               .filter((d) => d.serviceType == "Grooming Service")
               .map((service, index) => (
                 <View key={index} style={styles.serviceCard}>
-                  <View style={styles.imageContainer} />
+                  <View style={styles.imageContainer}>
+                    <Image
+                      source={{
+                        uri: `${BASE_URL}/${service.image.replace(/\\/g, "/")}`,
+                      }}
+                      style={styles.image}
+                      resizeMode="cover"
+                    />
+                  </View>
                   <View style={styles.serviceInfo}>
                     <Text style={styles.serviceName}>{service.name}</Text>
                     <Text style={styles.locationText}>
@@ -178,7 +258,7 @@ export default ChooseService = () => {
                     <View style={styles.ratingContainer}>
                       <Ionicons name="star" size={16} color="#64C5B7" />
                       <Text style={styles.ratingText}>
-                        {service.averageRating}
+                        {googleRatings[service.name]?.toFixed(1) || "N/A"}
                       </Text>
                     </View>
                   </View>
@@ -191,7 +271,9 @@ export default ChooseService = () => {
                           {
                             clinicName: service.name,
                             clinicLocation: service.location?.address,
-                            clinicRating: service.averageRating,
+                            clinicRating:
+                              service.googleReviews?.rating?.toFixed(1) ||
+                              "N/A",
                           }
                         );
                       }}
@@ -200,13 +282,23 @@ export default ChooseService = () => {
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={[styles.bookButton, styles.reviewsButton]}
-                      onPress={() =>
+                      onPress={() => {
+                        console.log("Clinic Data:", {
+                          name: service.name,
+                          location: service.location,
+                          image: service.image,
+                          rating:
+                            service.googleReviews?.rating?.toFixed(1) || "N/A",
+                        });
                         navigation.navigate("Review", {
                           clinicName: service.name,
                           clinicLocation: service.location?.address,
-                          clinicRating: service.averageRating,
-                        })
-                      }
+                          clinicRating:
+                            service.googleReviews?.rating?.toFixed(1) || "N/A",
+                          coordinates: service.location?.coordinates,
+                          clinicImage: service.image,
+                        });
+                      }}
                     >
                       <Text style={styles.bookText}>Reviews</Text>
                     </TouchableOpacity>
@@ -321,5 +413,10 @@ const styles = StyleSheet.create({
   bookText: {
     color: "white",
     fontSize: 14,
+  },
+  image: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 15,
   },
 });
