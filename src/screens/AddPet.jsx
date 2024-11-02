@@ -1,45 +1,37 @@
+import React, { useState } from "react";
 import {
   View,
   Text,
-  ScrollView,
-  Switch,
+  TextInput,
   Button,
-  StyleSheet,
+  Switch,
+  TouchableOpacity,
+  ScrollView,
 } from "react-native";
-import React, { useState } from "react";
-import TextField from "../components/Textfield";
-import { TouchableOpacity } from "react-native";
 import { useMutation } from "@tanstack/react-query";
 import { addPet } from "../api/pets";
 import * as ImagePicker from "expo-image-picker";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
 
 const AddPet = () => {
-  const [isEnabled, setIsEnabled] = useState(false);
   const [petName, setPetName] = useState("");
   const [petSpecies, setPetSpecies] = useState("");
   const [petBreed, setPetBreed] = useState("");
   const [petAllergies, setPetAllergies] = useState("");
+  const [petMedication, setPetMedication] = useState("");
+  const [petGender, setPetGender] = useState(false);
   const [weight, setWeight] = useState(0.0);
   const [selectedImage, setSelectedImage] = useState("");
-  const [petGender, setPetGender] = useState(false);
-  const [petMedication, setPetMedication] = useState("");
   const [date, setDate] = useState(new Date());
   const [showDateTimePicker, setShowDateTimePicker] = useState(false);
-  const toggleSwitch = () => setIsEnabled((previousState) => !previousState);
 
-  const increaseWeight = () => {
-    setWeight(weight + 1);
-  };
-  const decreaseWeight = () => {
-    setWeight(weight - 1);
-    if (weight < 1) {
-      setWeight(weight + 1);
-    }
-  };
+  const toggleGenderSwitch = () =>
+    setPetGender((previousState) => !previousState);
+
+  const increaseWeight = () => setWeight(weight + 1);
+  const decreaseWeight = () => setWeight(weight > 0 ? weight - 1 : 0);
 
   const pickImage = async () => {
-    // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
@@ -47,14 +39,12 @@ const AddPet = () => {
       quality: 1,
     });
 
-    console.log(result);
-
     if (!result.canceled) {
       setSelectedImage(result.assets[0].uri);
     }
   };
 
-  const { data } = useMutation({
+  const { mutate } = useMutation({
     mutationKey: ["AddPet"],
     mutationFn: () =>
       addPet({
@@ -66,62 +56,141 @@ const AddPet = () => {
         allergies: petAllergies,
         weight: weight,
         medication: petMedication,
+        birthDate: date,
       }),
   });
 
+  const handleAddPet = () => {
+    mutate();
+  };
+
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.title}>Add a New Pet</Text>
-
-      <TextField label="Pet Name" onChangeText={setPetName} />
-      <TextField label="Species" onChangeText={setPetSpecies} />
-      <TextField label="Breed" onChangeText={setPetBreed} />
-      <TextField label="Allergies" onChangeText={setPetAllergies} />
-      <TextField label="Medication" onChangeText={setPetMedication} />
-
-      <View style={styles.genderContainer}>
-        <Text style={styles.label}>Gender:</Text>
-        <Text>Female</Text>
-        <Switch
-          trackColor={{ false: "blue", true: "pink" }}
-          thumbColor={isEnabled ? "#64C5B7" : "#64C5B7"}
-          onValueChange={toggleSwitch}
-          value={isEnabled}
-        />
-        <Text>Male</Text>
-      </View>
-
-      <View style={styles.weightContainer}>
-        <TouchableOpacity style={styles.weightButton} onPress={increaseWeight}>
-          <Text style={styles.buttonText}>+</Text>
-        </TouchableOpacity>
-
-        <View style={styles.weightDisplay}>
-          <Text style={styles.weightText}>{weight}.0 Kg</Text>
-        </View>
-
-        <TouchableOpacity style={styles.weightButton} onPress={decreaseWeight}>
-          <Text style={styles.buttonText}>-</Text>
-        </TouchableOpacity>
-      </View>
-
-      <Button title="Pick An Image" onPress={pickImage} />
-      <Button
-        title="Add Birth Date"
-        onPress={() => setShowDateTimePicker(true)}
-      />
-
-      {showDateTimePicker && (
-        <RNDateTimePicker
-          mode="date"
-          value={date}
-          onChange={(event, selectedDate) => {
-            setDate(selectedDate);
-            setShowDateTimePicker(false);
+    <View style={{ flex: 1, padding: 20, backgroundColor: "#f0f0f0" }}>
+      <Text style={{ fontSize: 24, fontWeight: "bold", marginBottom: 20 }}>
+        Add Pet
+      </Text>
+      <ScrollView>
+        <TextInput
+          style={{
+            marginBottom: 10,
+            padding: 10,
+            borderColor: "#ccc",
+            borderWidth: 1,
+            borderRadius: 5,
           }}
+          placeholder="Name"
+          onChangeText={setPetName}
         />
-      )}
-    </ScrollView>
+        <TextInput
+          style={{
+            marginBottom: 10,
+            padding: 10,
+            borderColor: "#ccc",
+            borderWidth: 1,
+            borderRadius: 5,
+          }}
+          placeholder="Species"
+          onChangeText={setPetSpecies}
+        />
+        <TextInput
+          style={{
+            marginBottom: 10,
+            padding: 10,
+            borderColor: "#ccc",
+            borderWidth: 1,
+            borderRadius: 5,
+          }}
+          placeholder="Breed"
+          onChangeText={setPetBreed}
+        />
+        <TextInput
+          style={{
+            marginBottom: 10,
+            padding: 10,
+            borderColor: "#ccc",
+            borderWidth: 1,
+            borderRadius: 5,
+          }}
+          placeholder="Allergies"
+          onChangeText={setPetAllergies}
+        />
+        <TextInput
+          style={{
+            marginBottom: 10,
+            padding: 10,
+            borderColor: "#ccc",
+            borderWidth: 1,
+            borderRadius: 5,
+          }}
+          placeholder="Medication"
+          onChangeText={setPetMedication}
+        />
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            marginBottom: 10,
+          }}
+        >
+          <Text>Female</Text>
+          <Switch
+            trackColor={{ false: "blue", true: "pink" }}
+            thumbColor={petGender ? "#64C5B7" : "#64C5B7"}
+            ios_backgroundColor="#3e3e3e"
+            onValueChange={toggleGenderSwitch}
+            value={petGender}
+          />
+          <Text>Male</Text>
+        </View>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            marginBottom: 10,
+          }}
+        >
+          <TouchableOpacity
+            style={{
+              backgroundColor: "#007BFF",
+              padding: 10,
+              borderRadius: 5,
+              marginRight: 10,
+            }}
+            onPress={decreaseWeight}
+          >
+            <Text style={{ color: "#fff", fontWeight: "bold" }}>-</Text>
+          </TouchableOpacity>
+          <Text>{weight} Kg</Text>
+          <TouchableOpacity
+            style={{
+              backgroundColor: "#007BFF",
+              padding: 10,
+              borderRadius: 5,
+              marginLeft: 10,
+            }}
+            onPress={increaseWeight}
+          >
+            <Text style={{ color: "#fff", fontWeight: "bold" }}>+</Text>
+          </TouchableOpacity>
+        </View>
+        <Button title="Pick An Image" onPress={pickImage} />
+        <Button
+          title="Select Birth Date"
+          onPress={() => setShowDateTimePicker(true)}
+        />
+        {showDateTimePicker && (
+          <RNDateTimePicker
+            mode="date"
+            value={date}
+            onChange={(event, selectedDate) => {
+              setDate(selectedDate || date);
+              setShowDateTimePicker(false);
+            }}
+          />
+        )}
+        <Button title="Add Pet" onPress={handleAddPet} />
+      </ScrollView>
+    </View>
   );
 };
 

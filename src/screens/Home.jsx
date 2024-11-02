@@ -1,61 +1,75 @@
-import { View, ScrollView, StyleSheet } from "react-native";
-import React from "react";
+import {
+  View,
+  ScrollView,
+  StyleSheet,
+  ActivityIndicator,
+  RefreshControl,
+} from "react-native";
+import React, { useState } from "react";
 import PetCard from "../components/PetCard";
 import { useQuery } from "@tanstack/react-query";
 import { getUserPets } from "../api/pets";
 import AddButton from "../components/AddButton";
+import { BASE_URL } from "../api";
+
 const Home = () => {
-  const { data } = useQuery({
+  const [refreshing, setRefreshing] = useState(false);
+
+  const { data, isLoading, refetch } = useQuery({
     queryKey: ["getUserPets"],
     queryFn: getUserPets,
   });
 
- // console.log("AUAAA", data);
+  const onRefresh = React.useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await refetch();
+    } catch (error) {
+      console.error("Refresh error:", error);
+    } finally {
+      setRefreshing(false);
+    }
+  }, [refetch]);
 
-  const samplePets = [
-    {
-      name: "Grace",
-      breed: "Rainbow Lorikeet parrot",
-      medications: null,
-      nextVaccination: "7 Nov 2024",
-      nextAppointment: "25 Dec 2024",
-      image: require("../../assets/parrot.jpg"),
-    },
-    {
-      name: "Alex",
-      breed: "Maine Coon cat",
-      medications: "FelineRx\nTwice daily",
-      nextVaccination: "15 Jan 2025",
-      nextAppointment: "25 Dec 2024",
-      image: require("../../assets/cat1.jpg"),
-    },
-    {
-      name: "Luna",
-      breed: "Persian cat",
-      medications: null,
-      nextVaccination: "4 Feb 2025",
-      nextAppointment: "12 Mar 2025",
-      image: require("../../assets/cat2.jpg"),
-    },
-    {
-      name: "Max",
-      breed: "Siberian Husky",
-      medications: null,
-      nextVaccination: "7 Dec 2024",
-      nextAppointment: "17 Nov 2024",
-      image: require("../../assets/dog.jpg"),
-    },
-  ];
+  // Debug log to see the data structure
+  console.log("Pet data:", data?.pets);
 
-  // console.log("Sample pets data:", samplePets);
+  // Simplify the image URL creation
+  const formattedPets = data?.pets?.map((pet) => ({
+    ...pet,
+  }));
 
-  // Call createService to test its functionality
+  console.log("Testing image URL:", formattedPets?.[0]?.imageUrl); // Debug log
+
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#64C5B7" />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        {data?.pets?.map((pet, index) => (
-          <PetCard key={index} pet={pet} />
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={["#64C5B7"]}
+            tintColor="#64C5B7"
+          />
+        }
+      >
+        {formattedPets?.map((pet) => (
+          <PetCard
+            key={pet._id}
+            pet={{
+              ...pet,
+              image: pet.image?.replace(/\\/g, "/"),
+            }}
+          />
         ))}
         <View style={{ width: "auto" }}>
           <AddButton />
@@ -72,6 +86,12 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 10,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#F8F8F8",
   },
 });
 

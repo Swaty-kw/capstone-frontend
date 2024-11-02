@@ -21,8 +21,10 @@ const MainNavigation = () => {
           backgroundColor: "#64C5B7",
           borderRadius: 50,
           margin: 20,
-          alignContent: "center",
-          // backgroundColor: "#FFFFFF",
+
+          alignItems: "center",
+          // backgroundColor: "#FFFFFF,
+          justifyContent: "center",
         },
       }}
     >

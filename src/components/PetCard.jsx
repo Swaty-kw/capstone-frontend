@@ -1,19 +1,39 @@
-import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
-import React from "react";
+import React, { useState } from "react";
+import { View, Image, Text, StyleSheet } from "react-native";
 import { BASE_URL } from "../api";
 
 const PetCard = ({ pet }) => {
-  console.log("IMAGES", pet?.image);
+  const [imageError, setImageError] = useState(false);
+
+  // Format the image path correctly
+  const imageUrl = pet.image
+    ? `${BASE_URL}/${pet.image.split("\\").join("/")}`
+    : null;
+
+  console.log("Image URL:", imageUrl); // Debug log
+
   return (
     <View style={styles.card}>
       <View style={styles.header}>
         <View style={styles.imageContainer}>
           <Image
-            source={{
-              uri: BASE_URL + pet.image.replace("//", "\\"),
-            }}
+            source={
+              imageUrl
+                ? {
+                    uri: imageUrl,
+                    // Add cache busting
+                    cache: "reload",
+                    headers: {
+                      Pragma: "no-cache",
+                    },
+                  }
+                : require("../../assets/default-pet.png")
+            }
             style={styles.petImage}
-            resizeMode="cover"
+            onError={(e) => {
+              console.log("Image Error:", e.nativeEvent.error);
+              setImageError(true);
+            }}
           />
         </View>
         <View style={styles.titleContainer}>
@@ -74,15 +94,16 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   imageContainer: {
-    width: 65,
-    height: 65,
-    borderRadius: 32.5,
+    width: 80,
+    height: 80,
+    borderRadius: 40,
     overflow: "hidden",
-    backgroundColor: "#E8F6F5",
+    backgroundColor: "#E8F6F5", // Fallback color
   },
   petImage: {
     width: "100%",
     height: "100%",
+    resizeMode: "cover",
   },
   titleContainer: {
     marginLeft: 15,
