@@ -34,6 +34,3 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 .env
-
-# OpenAI API key
-src/config/openai.js

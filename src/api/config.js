@@ -1,2 +1,4 @@
 // Add your Google Places API key
-export const GOOGLE_PLACES_API_KEY = "AIzaSyA0x2BVVqJV6xHjjSiDR6Ks8z4owAa13Fw";
+
+export const GOOGLE_PLACES_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_API_KEY;
+export const OPENAI_API_KEY = process.env.EXPO_PUBLIC_OPENAI_API_KEY;

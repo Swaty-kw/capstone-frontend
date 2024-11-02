@@ -12,8 +12,10 @@ import { BASE_URL } from "../api";
 const PetDetails = ({ route }) => {
   const { pet } = route.params;
 
+  console.log("Pet Image:", pet.image);
+
   // Use the same format as Home.jsx
-  const imageUrl = `${BASE_URL}/media/${pet.image.replace("media\\", "")}`;
+  const imageUrl = `${BASE_URL}/${pet.image.replace(/\\/g, "/")}`;
 
   console.log("Final Image URL in Details:", imageUrl);
 

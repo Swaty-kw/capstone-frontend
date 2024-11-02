@@ -9,6 +9,7 @@ import {
   Linking,
   Platform,
   ActivityIndicator,
+  RefreshControl,
 } from "react-native";
 import StarRating from "../components/StarRating";
 import BottomNavBar from "../components/BottomNavBar";
@@ -25,6 +26,7 @@ const Review = ({ route }) => {
   const [allReviews, setAllReviews] = useState([]);
   const [loadingMore, setLoadingMore] = useState(false);
   const [businessInfo, setBusinessInfo] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     fetchGoogleReviews();
@@ -32,28 +34,26 @@ const Review = ({ route }) => {
 
   const fetchGoogleReviews = async () => {
     try {
-      // Log the search query for debugging
       const searchQuery = `${clinicName} ${clinicLocation} Kuwait`;
-      console.log("Searching for:", searchQuery);
+      console.log("Search Query:", searchQuery);
 
-      // First API call - Find the place
       const searchResponse = await fetch(
         `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(
           searchQuery
         )}&key=${GOOGLE_PLACES_API_KEY}`
       );
       const searchData = await searchResponse.json();
-      console.log("Search results:", searchData);
+      console.log("Search API Response:", searchData);
 
       if (searchData.results && searchData.results[0]) {
         const placeId = searchData.results[0].place_id;
+        console.log("Place ID:", placeId);
 
-        // Second API call - Get place details
         const detailsResponse = await fetch(
           `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=name,rating,reviews,user_ratings_total,opening_hours,formatted_phone_number,website,business_status&key=${GOOGLE_PLACES_API_KEY}`
         );
         const detailsData = await detailsResponse.json();
-        console.log("Place details:", detailsData);
+        console.log("Details API Response:", detailsData);
 
         if (detailsData.result) {
           setGoogleReviews(detailsData.result);
@@ -264,6 +264,14 @@ const Review = ({ route }) => {
     }
   };
 
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    // Refetch your data here
+    fetchGoogleReviews().then(() => {
+      setRefreshing(false);
+    });
+  }, []);
+
   return (
     <View style={styles.container}>
       {/* Clinic Info Section */}
@@ -352,6 +360,14 @@ const Review = ({ route }) => {
       {/* Reviews List - Combined local and Google reviews */}
       <ScrollView
         style={styles.reviewsList}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={["#64C5B7"]} // Android
+            tintColor="#64C5B7" // iOS
+          />
+        }
         onScroll={({ nativeEvent }) => {
           const { layoutMeasurement, contentOffset, contentSize } = nativeEvent;
           const isCloseToBottom =

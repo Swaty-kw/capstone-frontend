@@ -37,7 +37,6 @@ const Home = () => {
   // Simplify the image URL creation
   const formattedPets = data?.pets?.map((pet) => ({
     ...pet,
-    imageUrl: `${BASE_URL}/media/image-1730496710531-910315736-Labrador Retriever.jpeg`, // Hardcode temporarily to test
   }));
 
   console.log("Testing image URL:", formattedPets?.[0]?.imageUrl); // Debug log
@@ -68,7 +67,7 @@ const Home = () => {
             key={pet._id}
             pet={{
               ...pet,
-              image: pet.imageUrl,
+              image: pet.image?.replace(/\\/g, "/"),
             }}
           />
         ))}

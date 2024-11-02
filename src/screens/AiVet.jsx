@@ -16,7 +16,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import RobotIcon from "../components/RobotIcon";
 import OpenAI from "openai";
-import { OPENAI_API_KEY } from "../api/openai";
+import { OPENAI_API_KEY } from "../api/config";
 
 const openai = new OpenAI({
   apiKey: OPENAI_API_KEY,

@@ -5,6 +5,8 @@ import {
   StyleSheet,
   Animated,
   Image,
+  RefreshControl,
+  ScrollView,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
@@ -31,6 +33,7 @@ export default ChooseService = () => {
     },
   ];
   const [googleRatings, setGoogleRatings] = useState({});
+  const [refreshing, setRefreshing] = useState(false);
 
   const animateUnderline = (toValue) => {
     Animated.timing(underlineAnim, {
@@ -56,27 +59,29 @@ export default ChooseService = () => {
     queryFn: getAllServices,
   });
 
-  const fetchGoogleReviews = async (clinicName) => {
+  const fetchGoogleReviews = async (clinicName, location) => {
     try {
-      // Hardcoded Place IDs for the problematic clinics
-      const placeIds = {
-        "Companion Clinic": "ChIJXXXXXXXXXXXXXXXXXX", // Replace with actual Place ID
-        "Al-Dohama": "ChIJXXXXXXXXXXXXXXXXXX", // Replace with actual Place ID
-      };
+      const searchQuery = `${clinicName} ${location} Kuwait`;
 
-      if (placeIds[clinicName]) {
+      const searchResponse = await fetch(
+        `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(
+          searchQuery
+        )}&key=${GOOGLE_PLACES_API_KEY}`
+      );
+      const searchData = await searchResponse.json();
+
+      if (searchData.results && searchData.results[0]) {
+        const placeId = searchData.results[0].place_id;
+
         const detailsResponse = await fetch(
-          `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeIds[clinicName]}&fields=name,rating,reviews&key=${GOOGLE_PLACES_API_KEY}`
+          `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=name,rating,reviews&key=${GOOGLE_PLACES_API_KEY}`
         );
         const detailsData = await detailsResponse.json();
 
         if (detailsData.result) {
-          console.log("✅ Found details for:", clinicName);
-          return detailsData.result;
+          return detailsData.result.rating;
         }
       }
-
-      console.log("❌ No results found for:", clinicName);
       return null;
     } catch (error) {
       console.error("Error fetching reviews for", clinicName, ":", error);
@@ -87,16 +92,40 @@ export default ChooseService = () => {
   useEffect(() => {
     const fetchAllRatings = async () => {
       if (data) {
+        const ratings = {};
         for (const service of data) {
-          const result = await fetchGoogleReviews(service.name);
-          if (result) {
-            setGoogleRatings((prev) => ({
-              ...prev,
-              [service.name]: result.rating,
-            }));
+          const rating = await fetchGoogleReviews(
+            service.name,
+            service.location?.address
+          );
+          if (rating) {
+            ratings[service.name] = rating;
           }
         }
+        setGoogleRatings(ratings);
       }
+    };
+
+    fetchAllRatings();
+  }, [data]);
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    const fetchAllRatings = async () => {
+      if (data) {
+        const ratings = {};
+        for (const service of data) {
+          const rating = await fetchGoogleReviews(
+            service.name,
+            service.location?.address
+          );
+          if (rating) {
+            ratings[service.name] = rating;
+          }
+        }
+        setGoogleRatings(ratings);
+      }
+      setRefreshing(false);
     };
 
     fetchAllRatings();
@@ -167,145 +196,167 @@ export default ChooseService = () => {
       </View>
 
       {/* Services List */}
-      <View style={styles.servicesContainer}>
-        {selectedService === "VetClinic"
-          ? data
-              .filter((d) => d.serviceType == "Vet Clinic")
-              .map((clinic, index) => (
-                <View key={index} style={styles.serviceCard}>
-                  <View style={styles.imageContainer}>
-                    <Image
-                      source={{
-                        uri: `${BASE_URL}/${clinic.image.replace(/\\/g, "/")}`,
-                      }}
-                      style={styles.image}
-                      resizeMode="cover"
-                    />
-                  </View>
-                  <View style={styles.serviceInfo}>
-                    <Text style={styles.serviceName}>{clinic.name}</Text>
-                    <Text style={styles.locationText}>
-                      {clinic.location?.address}
-                    </Text>
-                    <View style={styles.ratingContainer}>
-                      <Ionicons name="star" size={16} color="#64C5B7" />
-                      <Text style={styles.ratingText}>
-                        {googleRatings[clinic.name]?.toFixed(1) || "N/A"}
-                      </Text>
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={["#64C5B7"]}
+            tintColor="#64C5B7"
+          />
+        }
+      >
+        <View style={styles.servicesContainer}>
+          {selectedService === "VetClinic"
+            ? data
+                .filter((d) => d.serviceType == "Vet Clinic")
+                .map((clinic, index) => (
+                  <View key={index} style={styles.serviceCard}>
+                    <View style={styles.imageContainer}>
+                      <Image
+                        source={{
+                          uri: `${BASE_URL}/${clinic.image.replace(
+                            /\\/g,
+                            "/"
+                          )}`,
+                        }}
+                        style={styles.image}
+                        resizeMode="cover"
+                      />
                     </View>
-                  </View>
-                  <View style={styles.buttonsContainer}>
-                    <TouchableOpacity
-                      style={styles.bookButton}
-                      onPress={() => {
-                        navigation.navigate(
-                          NAVIGATION.SERVICE.BOOK_APPOINTMENT,
-                          {
+                    <View style={styles.serviceInfo}>
+                      <Text style={styles.serviceName}>{clinic.name}</Text>
+                      <Text style={styles.locationText}>
+                        {clinic.location?.address}
+                      </Text>
+                      <View style={styles.ratingContainer}>
+                        <Ionicons name="star" size={16} color="#64C5B7" />
+                        <Text style={styles.ratingText}>
+                          {googleRatings[clinic.name]?.toFixed(1) || "N/A"}
+                        </Text>
+                      </View>
+                    </View>
+                    <View style={styles.buttonsContainer}>
+                      <TouchableOpacity
+                        style={styles.bookButton}
+                        onPress={() => {
+                          navigation.navigate(
+                            NAVIGATION.SERVICE.BOOK_APPOINTMENT,
+                            {
+                              clinicName: clinic.name,
+                              clinicLocation: clinic.location?.address,
+                              clinicRating:
+                                googleRatings[clinic.name]?.rating?.toFixed(
+                                  1
+                                ) || "N/A",
+                              clinicImage: clinic.image,
+                            }
+                          );
+                        }}
+                      >
+                        <Text style={styles.bookText}>Book</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={[styles.bookButton, styles.reviewsButton]}
+                        onPress={() => {
+                          console.log("Clinic Data:", {
+                            name: clinic.name,
+                            location: clinic.location,
+                            image: clinic.image,
+                            rating:
+                              clinic.googleReviews?.rating?.toFixed(1) || "N/A",
+                          });
+                          navigation.navigate("Review", {
                             clinicName: clinic.name,
                             clinicLocation: clinic.location?.address,
                             clinicRating:
-                              googleRatings[clinic.name]?.rating?.toFixed(1) ||
-                              "N/A",
-                          }
-                        );
-                      }}
-                    >
-                      <Text style={styles.bookText}>Book</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={[styles.bookButton, styles.reviewsButton]}
-                      onPress={() => {
-                        console.log("Clinic Data:", {
-                          name: clinic.name,
-                          location: clinic.location,
-                          image: clinic.image,
-                          rating:
-                            clinic.googleReviews?.rating?.toFixed(1) || "N/A",
-                        });
-                        navigation.navigate("Review", {
-                          clinicName: clinic.name,
-                          clinicLocation: clinic.location?.address,
-                          clinicRating:
-                            clinic.googleReviews?.rating?.toFixed(1) || "N/A",
-                          coordinates: clinic.location?.coordinates,
-                          clinicImage: clinic.image,
-                        });
-                      }}
-                    >
-                      <Text style={styles.bookText}>Reviews</Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              ))
-          : data
-              .filter((d) => d.serviceType == "Grooming Service")
-              .map((service, index) => (
-                <View key={index} style={styles.serviceCard}>
-                  <View style={styles.imageContainer}>
-                    <Image
-                      source={{
-                        uri: `${BASE_URL}/${service.image.replace(/\\/g, "/")}`,
-                      }}
-                      style={styles.image}
-                      resizeMode="cover"
-                    />
-                  </View>
-                  <View style={styles.serviceInfo}>
-                    <Text style={styles.serviceName}>{service.name}</Text>
-                    <Text style={styles.locationText}>
-                      {service.location?.address}
-                    </Text>
-                    <View style={styles.ratingContainer}>
-                      <Ionicons name="star" size={16} color="#64C5B7" />
-                      <Text style={styles.ratingText}>
-                        {googleRatings[service.name]?.toFixed(1) || "N/A"}
-                      </Text>
+                              clinic.googleReviews?.rating?.toFixed(1) || "N/A",
+                            coordinates: clinic.location?.coordinates,
+                            clinicImage: clinic.image,
+                          });
+                        }}
+                      >
+                        <Text style={styles.bookText}>Reviews</Text>
+                      </TouchableOpacity>
                     </View>
                   </View>
-                  <View style={styles.buttonsContainer}>
-                    <TouchableOpacity
-                      style={styles.bookButton}
-                      onPress={() => {
-                        navigation.navigate(
-                          NAVIGATION.SERVICE.BOOK_APPOINTMENT,
-                          {
+                ))
+            : data
+                .filter((d) => d.serviceType == "Grooming Service")
+                .map((service, index) => (
+                  <View key={index} style={styles.serviceCard}>
+                    <View style={styles.imageContainer}>
+                      <Image
+                        source={{
+                          uri: `${BASE_URL}/${service.image.replace(
+                            /\\/g,
+                            "/"
+                          )}`,
+                        }}
+                        style={styles.image}
+                        resizeMode="cover"
+                      />
+                    </View>
+                    <View style={styles.serviceInfo}>
+                      <Text style={styles.serviceName}>{service.name}</Text>
+                      <Text style={styles.locationText}>
+                        {service.location?.address}
+                      </Text>
+                      <View style={styles.ratingContainer}>
+                        <Ionicons name="star" size={16} color="#64C5B7" />
+                        <Text style={styles.ratingText}>
+                          {googleRatings[service.name]?.toFixed(1) || "N/A"}
+                        </Text>
+                      </View>
+                    </View>
+                    <View style={styles.buttonsContainer}>
+                      <TouchableOpacity
+                        style={styles.bookButton}
+                        onPress={() => {
+                          navigation.navigate(
+                            NAVIGATION.SERVICE.BOOK_APPOINTMENT,
+                            {
+                              clinicName: service.name,
+                              clinicLocation: service.location?.address,
+                              clinicRating:
+                                service.googleReviews?.rating?.toFixed(1) ||
+                                "N/A",
+                              clinicImage: service.image,
+                            }
+                          );
+                        }}
+                      >
+                        <Text style={styles.bookText}>Book</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={[styles.bookButton, styles.reviewsButton]}
+                        onPress={() => {
+                          console.log("Clinic Data:", {
+                            name: service.name,
+                            location: service.location,
+                            image: service.image,
+                            rating:
+                              service.googleReviews?.rating?.toFixed(1) ||
+                              "N/A",
+                          });
+                          navigation.navigate("Review", {
                             clinicName: service.name,
                             clinicLocation: service.location?.address,
                             clinicRating:
                               service.googleReviews?.rating?.toFixed(1) ||
                               "N/A",
-                          }
-                        );
-                      }}
-                    >
-                      <Text style={styles.bookText}>Book</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={[styles.bookButton, styles.reviewsButton]}
-                      onPress={() => {
-                        console.log("Clinic Data:", {
-                          name: service.name,
-                          location: service.location,
-                          image: service.image,
-                          rating:
-                            service.googleReviews?.rating?.toFixed(1) || "N/A",
-                        });
-                        navigation.navigate("Review", {
-                          clinicName: service.name,
-                          clinicLocation: service.location?.address,
-                          clinicRating:
-                            service.googleReviews?.rating?.toFixed(1) || "N/A",
-                          coordinates: service.location?.coordinates,
-                          clinicImage: service.image,
-                        });
-                      }}
-                    >
-                      <Text style={styles.bookText}>Reviews</Text>
-                    </TouchableOpacity>
+                            coordinates: service.location?.coordinates,
+                            clinicImage: service.image,
+                          });
+                        }}
+                      >
+                        <Text style={styles.bookText}>Reviews</Text>
+                      </TouchableOpacity>
+                    </View>
                   </View>
-                </View>
-              ))}
-      </View>
+                ))}
+        </View>
+      </ScrollView>
     </View>
   );
 };
