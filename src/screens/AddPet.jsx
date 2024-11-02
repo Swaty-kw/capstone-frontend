@@ -1,4 +1,11 @@
-import { View, Text, ScrollView, Switch, Button } from "react-native";
+import {
+  View,
+  Text,
+  ScrollView,
+  Switch,
+  Button,
+  StyleSheet,
+} from "react-native";
 import React, { useState } from "react";
 import TextField from "../components/Textfield";
 import { TouchableOpacity } from "react-native";
@@ -63,161 +70,115 @@ const AddPet = () => {
   });
 
   return (
-    <View>
-      <Text>AddPet</Text>
+    <ScrollView style={styles.container}>
+      <Text style={styles.title}>Add a New Pet</Text>
 
-      <ScrollView>
-        <TextField
-          color={"#1239"}
-          backgroundColor={"#987654"}
-          placeholder={"name"}
-          placeholderTextColor={"#555555"}
-          secureTextEntry={false}
-          borderColor={"#333A33"}
-          onChangeText={setPetName}
+      <TextField label="Pet Name" onChangeText={setPetName} />
+      <TextField label="Species" onChangeText={setPetSpecies} />
+      <TextField label="Breed" onChangeText={setPetBreed} />
+      <TextField label="Allergies" onChangeText={setPetAllergies} />
+      <TextField label="Medication" onChangeText={setPetMedication} />
+
+      <View style={styles.genderContainer}>
+        <Text style={styles.label}>Gender:</Text>
+        <Text>Female</Text>
+        <Switch
+          trackColor={{ false: "blue", true: "pink" }}
+          thumbColor={isEnabled ? "#64C5B7" : "#64C5B7"}
+          onValueChange={toggleSwitch}
+          value={isEnabled}
         />
-        <TextField
-          color={"#1239"}
-          backgroundColor={"#987654"}
-          placeholder={"species"}
-          placeholderTextColor={"#555555"}
-          secureTextEntry={false}
-          borderColor={"#333A33"}
-          onChangeText={setPetSpecies}
-        />
-        <TextField
-          color={"#1239"}
-          backgroundColor={"#987654"}
-          placeholder={"breed"}
-          placeholderTextColor={"#555555"}
-          secureTextEntry={false}
-          borderColor={"#333A33"}
-          onChangeText={setPetBreed}
-        />
-        <TextField
-          color={"#1239"}
-          backgroundColor={"#987654"}
-          placeholder={"allergies"}
-          placeholderTextColor={"#555555"}
-          secureTextEntry={false}
-          borderColor={"#333A33"}
-          onChangeText={setPetAllergies}
-        />
-        <TextField
-          color={"#1239"}
-          backgroundColor={"#987654"}
-          placeholder={"medication"}
-          placeholderTextColor={"#555555"}
-          secureTextEntry={false}
-          borderColor={"#333A33"}
-          onChangeText={setPetMedication}
-        />
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <Text>Female</Text>
-          <Switch
-            trackColor={{ false: "blue", true: "pink" }}
-            thumbColor={isEnabled ? "#64C5B7" : "#64C5B7"}
-            ios_backgroundColor="#3e3e3e"
-            onValueChange={toggleSwitch}
-            value={isEnabled}
-          />
-          <Text>Male</Text>
-        </View>
-      </ScrollView>
-      <View
-        style={{
-          flexDirection: "row",
-          gap: 10,
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <TouchableOpacity
-          style={{
-            justifyContent: "center",
-            alignItems: "center",
-            borderColor: "#64C5B7",
-            borderWidth: 1,
-            borderRadius: 5,
-            width: 30,
-            height: 30,
-            backgroundColor: "white",
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.05,
-            elevation: 3,
-            shadowColor: "#000",
-            shadowRadius: 8,
-          }}
-          onPress={increaseWeight}
-        >
-          <Text>+</Text>
+        <Text>Male</Text>
+      </View>
+
+      <View style={styles.weightContainer}>
+        <TouchableOpacity style={styles.weightButton} onPress={increaseWeight}>
+          <Text style={styles.buttonText}>+</Text>
         </TouchableOpacity>
 
-        <View
-          style={{
-            backgroundColor: "#64C5B7",
-            height: 50,
-            width: 40,
-            borderRadius: 55,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <Text style={{ color: "white", fontWeight: "bold" }}>
-            {weight}.0 Kg
-          </Text>
+        <View style={styles.weightDisplay}>
+          <Text style={styles.weightText}>{weight}.0 Kg</Text>
         </View>
 
-        <View style={{ flexDirection: "row", gap: 50 }}>
-          <TouchableOpacity
-            style={{
-              justifyContent: "center",
-              alignItems: "center",
-              borderColor: "#64C5B7",
-              borderWidth: 1,
-              borderRadius: 5,
-              width: 30,
-              height: 30,
-              backgroundColor: "white",
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.05,
-              elevation: 3,
-              shadowColor: "#000",
-              shadowRadius: 8,
-            }}
-            onPress={decreaseWeight}
-          >
-            <Text>-</Text>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity style={styles.weightButton} onPress={decreaseWeight}>
+          <Text style={styles.buttonText}>-</Text>
+        </TouchableOpacity>
       </View>
 
       <Button title="Pick An Image" onPress={pickImage} />
       <Button
-        title="Add Birth date field here"
+        title="Add Birth Date"
         onPress={() => setShowDateTimePicker(true)}
       />
+
       {showDateTimePicker && (
         <RNDateTimePicker
           mode="date"
-          dateFormat="dayofweek day month"
           value={date}
           onChange={(event, selectedDate) => {
             setDate(selectedDate);
-            console.log(selectedDate);
             setShowDateTimePicker(false);
           }}
-          display="inline"
         />
       )}
-    </View>
+    </ScrollView>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: "#f9f9f9",
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  label: {
+    fontSize: 16,
+    marginBottom: 5,
+  },
+  genderContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginVertical: 10,
+  },
+  weightContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginVertical: 20,
+  },
+  weightButton: {
+    justifyContent: "center",
+    alignItems: "center",
+    borderColor: "#64C5B7",
+    borderWidth: 1,
+    borderRadius: 5,
+    width: 40,
+    height: 40,
+    backgroundColor: "white",
+    marginHorizontal: 10,
+  },
+  weightDisplay: {
+    backgroundColor: "#64C5B7",
+    height: 50,
+    width: 60,
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  weightText: {
+    color: "white",
+    fontWeight: "bold",
+  },
+  buttonText: {
+    fontSize: 20,
+  },
+});
 
 export default AddPet;
