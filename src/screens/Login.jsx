@@ -1,4 +1,4 @@
-import { View, Text } from "react-native";
+import { View, Text, TouchableOpacity, StatusBar } from "react-native";
 import React, { useState, useContext } from "react";
 import TextField from "../components/Textfield";
 import { StyleSheet } from "react-native";
@@ -7,13 +7,15 @@ import WelcomeButton from "../components/WelcomeButton";
 import { useMutation } from "@tanstack/react-query";
 import { login } from "../api/Auth";
 import UserContext from "../context/UserContext";
-
+import { useNavigation } from "@react-navigation/native";
+import NAVIGATION from "../navigation";
+import { SafeAreaView } from "react-native-safe-area-context";
 const Login = () => {
+  const navigation = useNavigation();
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useContext(UserContext);
-
-  const STATUSBAR_HEIGHT = Constants.statusBarHeight;
 
   const { mutate } = useMutation({
     mutationKey: ["register"],
@@ -29,127 +31,137 @@ const Login = () => {
   });
 
   return (
-    <View
-      style={[
-        styles.container,
-        {
-          paddingTop: STATUSBAR_HEIGHT,
-        },
-      ]}
-    >
-      <Text style={styles.headerText}>
-        Signin to keep track of your pet's care and well-being
-      </Text>
+    <>
+      <StatusBar barStyle="light-content" />
+      <SafeAreaView
+        edges={["top"]}
+        style={{ flex: 0, backgroundColor: "#64C5B7" }}
+      />
+      <SafeAreaView edges={["left", "right"]} style={styles.safeArea}>
+        <View style={styles.container}>
+          <View style={styles.tealBackground} />
+          <Text style={styles.headerText}>
+            Sign in to keep track of your pet's care and well-being
+          </Text>
 
-      <View style={styles.formContainer}>
-        <TextField
-          color="#5CCBAB"
-          placeholder="Username"
-          borderColor="#64C5B7"
-          placeholderTextColor="#5CCBAB"
-          backgroundColor="white"
-          secureTextEntry={false}
-          value={username}
-          onChangeText={setUsername}
-        />
-        <TextField
-          color="#5CCBAB"
-          borderColor="#64C5B7"
-          placeholder="Password"
-          placeholderTextColor="#5CCBAB"
-          backgroundColor="white"
-          secureTextEntry={true}
-          value={password}
-          onChangeText={setPassword}
-        />
-
-        <WelcomeButton
-          text="Sign in"
-          color="#64C5B7"
-          width="50%"
-          height="10%"
-          onPress={() => {
-            /* Handle sign in */
-            console.log({
-              username: username,
-              password: password,
-            });
-            mutate();
-          }}
-        />
-      </View>
-    </View>
+          <View style={styles.formContainer}>
+            <TextField
+              placeholder="Username"
+              value={username}
+              onChangeText={setUsername}
+              style={styles.input}
+              placeholderTextColor="#64C5B7"
+              color="#64C5B7"
+              borderColor="#64C5B7"
+            />
+            <TextField
+              placeholder="Password"
+              value={password}
+              onChangeText={setPassword}
+              style={styles.input}
+              secureTextEntry
+              placeholderTextColor="#64C5B7"
+              color="#64C5B7"
+              borderColor="#64C5B7"
+            />
+            <View style={{ flexDirection: "row", justifyContent: "center" }}>
+              <Text style={{ paddingBottom: 10, color: "#64C5B7" }}>
+                Don't have an Account?{" "}
+              </Text>
+              <TouchableOpacity
+                onPress={() => navigation.navigate(NAVIGATION.AUTH.REGISTER)}
+              >
+                <Text style={styles.signUpText}>Sign up</Text>
+              </TouchableOpacity>
+            </View>
+            <WelcomeButton
+              text="Sign in"
+              color="#64C5B7"
+              width="50%"
+              height="10%"
+              onPress={() => {
+                /* Handle sign in */
+                console.log({
+                  username: username,
+                  password: password,
+                });
+                mutate();
+              }}
+            />
+          </View>
+        </View>
+      </SafeAreaView>
+    </>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#64C5B7",
+  },
   container: {
     flex: 1,
     backgroundColor: "white",
   },
-  greenBackground: {
+  tealBackground: {
     position: "absolute",
     top: 0,
     left: 0,
     right: 0,
-    height: "80%",
+    height: "45%",
     backgroundColor: "#64C5B7",
-    borderBottomLeftRadius: 50,
-    borderBottomRightRadius: 50,
+    borderBottomLeftRadius: 60,
+    borderBottomRightRadius: 60,
   },
-  whiteOverlay: {
+  headerText: {
+    fontSize: 28,
+    color: "white",
+    textAlign: "center",
+    lineHeight: 42,
+    paddingHorizontal: 40,
+    marginTop: 60,
+  },
+  formContainer: {
     position: "absolute",
-    top: "27%",
+    top: "35%",
     left: 0,
     right: 0,
     bottom: 0,
     backgroundColor: "white",
-    borderTopLeftRadius: 50,
-    borderTopRightRadius: 50,
-  },
-  contentContainer: {
-    flex: 1,
-    justifyContent: "flex-start",
-    padding: 20,
-    zIndex: 2,
-    paddingTop: 40,
-  },
-  formContainer: {
-    backgroundColor: "white",
-    borderRadius: 30,
-    padding: 20,
-    width: "100%",
-    marginTop: 100,
-  },
-  title: {
-    fontSize: 24,
-    color: "white",
-    textAlign: "center",
-    marginBottom: 20,
-    marginTop: 20,
+    borderTopLeftRadius: 60,
+    borderTopRightRadius: 60,
+    paddingHorizontal: 40,
+    paddingTop: 60,
+    alignItems: "center",
   },
   input: {
-    marginBottom: 15,
-    height: 50,
-    backgroundColor: "#64C5B7",
-    padding: 20,
-    paddingBottom: 0,
-    justifyContent: "center",
-  },
-  headerText: {
-    fontSize: 15,
-    color: "#64C5B7",
-    textAlign: "center",
-    marginBottom: 30,
-  },
-  formContainer: {
-    backgroundColor: "rrgba(175, 230, 218, 0.8)",
+    width: "100%",
+    height: 55,
+    borderWidth: 0.5,
+    borderColor: "#64C5B7",
     borderRadius: 30,
-    padding: 30,
-    alignItems: "center",
-    // height: "	100%",
-    flex: 1,
-    // backgroundColor: "white",
+    paddingHorizontal: 25,
+    marginBottom: 20,
+    fontSize: 20,
+    color: "#64C5B7",
+  },
+  signInButton: {
+    backgroundColor: "#64C5B7",
+    paddingVertical: 12,
+    paddingHorizontal: 40,
+    borderRadius: 25,
+    marginTop: 80,
+  },
+  signInText: {
+    color: "white",
+    fontSize: 20,
+    fontWeight: "300",
+  },
+  signUpText: {
+    color: "#64C5B7",
+    fontWeight: "bold",
+    textDecorationLine: "underline",
   },
 });
 

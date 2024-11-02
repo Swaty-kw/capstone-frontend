@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { NavigationContainer } from "@react-navigation/native";
 import OnBoarding from "./src/screens/OnBoarding";
@@ -21,17 +20,22 @@ export default function App() {
   const checkToken = async () => {
     const token = await getToken();
     if (token) {
+      console.log(token);
       setUser(true);
     }
   };
 
   useEffect(() => {
     checkToken();
-  });
+  }, []);
 
   return (
     <UserContext.Provider value={[user, setUser]}>
       <QueryClientProvider client={queryClient}>
+        <NavigationContainer>
+          {user ? <MainNavigation /> : <AuthNavigation />}
+          {/* <Login /> */}
+        </NavigationContainer>
         <NavigationContainer>
           {user ? (
             <View style={{ flex: 1 }}>

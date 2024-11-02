@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import {
   StyleSheet,
   Text,
@@ -7,51 +7,53 @@ import {
   ScrollView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { deleteToken } from "../api/storage";
+import { useNavigation } from "@react-navigation/native";
+import NAVIGATION from "../navigation";
+import UserContext from "../context/UserContext";
+import { useQuery } from "@tanstack/react-query";
+import { getUserInfo, getUserPetsWithDetails } from "../api/user";
 
 const Greeting = ({ name }) => (
   <Text style={styles.greeting}>Hey, {name}!</Text>
 );
 
-const UpcomingEvents = () => (
+const UpcomingEvents = ({ appointments }) => (
   <View style={styles.upcomingEvents}>
     <Text style={styles.upcomingTitle}>Coming up!</Text>
     <View style={styles.eventsContainer}>
-      <View style={styles.eventCardTeal}>
-        <Text style={styles.eventText}>Upcoming appointment for Alex on:</Text>
-        <Text style={styles.eventDate}>24 Feb 2026</Text>
-      </View>
-      <View style={styles.eventCardTeal}>
-        <Text style={styles.eventText}>Upcoming Vaccination for Grace on:</Text>
-        <Text style={styles.eventDate}>2 Feb 2026</Text>
-      </View>
+      {appointments?.Appts?.map((appointment, index) => (
+        <View key={index} style={styles.eventCardTeal}>
+          <Text style={styles.eventText}>
+            Upcoming appointment for {appointment.name} on:
+          </Text>
+          <Text style={styles.eventDate}>{appointment.date}</Text>
+        </View>
+      ))}
     </View>
   </View>
 );
 
-const PersonalInfo = () => (
+const PersonalInfo = ({ userInfo }) => (
   <View style={styles.section}>
     <Text style={styles.sectionTitle}>
-      <Ionicons name="person-outline" size={20} color="#91ACBF" />{" "}
-      {/* Updated icon color */}
+      <Ionicons name="person-outline" size={20} color="#91ACBF" />
       Personal informations
     </Text>
-    {[
-      "Dalal Salam",
-      "dalaly2005@outlook.com",
-      "9910****",
-      "vhebuwlj42q@#fs",
-    ].map((info, index) => (
-      <View key={index} style={styles.infoItem}>
-        <Text style={styles.infoText}>{info}</Text>
-        <TouchableOpacity>
-          <Ionicons name="pencil" size={20} color="#64C5B7" />
-        </TouchableOpacity>
-      </View>
-    ))}
+    {[userInfo?.username, userInfo?.email, userInfo?.phone].map(
+      (info, index) => (
+        <View key={index} style={styles.infoItem}>
+          <Text style={styles.infoText}>{info}</Text>
+          <TouchableOpacity>
+            <Ionicons name="pencil" size={20} color="#64C5B7" />
+          </TouchableOpacity>
+        </View>
+      )
+    )}
   </View>
 );
 
-const PetInfo = () => (
+const PetInfo = ({ petsInfo }) => (
   <View style={styles.section}>
     <Text style={styles.petSectionTitle}>
       <Ionicons name="gift-outline" size={20} color="#F26445" /> Your pet
@@ -60,7 +62,7 @@ const PetInfo = () => (
       <Text style={styles.petInfoTitle}>Current favourite service</Text>
       <Text style={styles.petInfoText}>Pet grooming at petzone</Text>
       <Text style={styles.petInfoTitle}>Number of pets</Text>
-      <Text style={styles.petInfoText}>4</Text>
+      <Text style={styles.petInfoText}>{petsInfo?.length || 0}</Text>
     </View>
   </View>
 );
@@ -80,15 +82,46 @@ const BottomNavigation = () => (
 );
 
 const UserProfile = () => {
+  const navigation = useNavigation();
+  const [user, setUser] = useContext(UserContext);
+
+  const { data: userInfo } = useQuery({
+    queryKey: ["userInfo"],
+    queryFn: getUserInfo,
+  });
+
+  const { data: petsInfo } = useQuery({
+    queryKey: ["userPetsDetails"],
+    queryFn: getUserPetsWithDetails,
+  });
+
+  if (!user) {
+    navigation.navigate(NAVIGATION.AUTH.LOGIN);
+    return null;
+  }
+
+  const handleLogout = async () => {
+    try {
+      await deleteToken();
+      setUser(false);
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
+  };
+
+  console.log("PROFILE", petsInfo);
+
   return (
     <View style={styles.container}>
       <ScrollView style={styles.content}>
-        <Greeting name="Dalal Salam" />
-        <UpcomingEvents />
-        <PersonalInfo />
-        <PetInfo />
+        <Greeting name={userInfo?.username} />
+        <UpcomingEvents appointments={petsInfo} />
+        <PersonalInfo userInfo={userInfo} />
+        <PetInfo petsInfo={userInfo?.pets} />
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <Text style={styles.logoutText}>Logout</Text>
+        </TouchableOpacity>
       </ScrollView>
-      <BottomNavigation />
     </View>
   );
 };
@@ -206,6 +239,21 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#F26445", // Changed text color to #F26445
     marginBottom: 10,
+  },
+  logoutButton: {
+    backgroundColor: "#F26445",
+    paddingVertical: 15,
+    paddingHorizontal: 30,
+    borderRadius: 25,
+    alignSelf: "center",
+    marginTop: 20,
+    marginBottom: 30,
+  },
+  logoutText: {
+    color: "#FFFFFF",
+    fontSize: 18,
+    fontWeight: "400",
+    fontFamily: "Telugu MN",
   },
 });
 

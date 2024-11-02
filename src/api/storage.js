@@ -1,11 +1,13 @@
 import { deleteItemAsync, getItemAsync, setItemAsync } from "expo-secure-store";
 
 const storeToken = async (token) => {
+  console.log("storeToken", token);
   return await setItemAsync("token", token);
 };
 
 const getToken = async () => {
   const token = await getItemAsync("token");
+  console.log("getToken", token);
   return token;
 };
 
@@ -14,8 +16,7 @@ const logout = () => {
 };
 
 const deleteToken = async () => {
-  const token = await deleteItemAsync("token");
-  return token;
+  await deleteItemAsync("token");
 };
 
 export { storeToken, getToken, deleteToken, logout };
