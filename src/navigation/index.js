@@ -3,7 +3,8 @@ const NAVIGATION = {
     INDEX: "HomeIndex",
     HOME: "Home",
     PET_DETAILS: "Pet Details",
-    ADD_PET: "Add Pet"
+    ADD_PET: "Add Pet",
+    AI_VET: "Ai Vet",
   },
   AUTH: {
     INDEX: "Auth",

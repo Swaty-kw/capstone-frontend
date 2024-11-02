@@ -1,3 +1,4 @@
+import React from "react";
 import {
   View,
   Text,
@@ -6,12 +7,17 @@ import {
   SafeAreaView,
   ScrollView,
 } from "react-native";
-import React from "react";
-import { Ionicons } from "@expo/vector-icons"; // Make sure to install expo icons if not already
 import { BASE_URL } from "../api";
 
 const PetDetails = ({ route }) => {
   const { pet } = route.params;
+
+  console.log("Pet Image:", pet.image);
+
+  // Use the same format as Home.jsx
+  const imageUrl = `${BASE_URL}/${pet.image.replace(/\\/g, "/")}`;
+
+  console.log("Final Image URL in Details:", imageUrl);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -21,7 +27,7 @@ const PetDetails = ({ route }) => {
           <View style={styles.header}>
             <View style={styles.imageContainer}>
               <Image
-                source={{ uri: `${BASE_URL}/${pet.image}` }}
+                source={{ uri: imageUrl }}
                 style={styles.petImage}
                 resizeMode="cover"
               />

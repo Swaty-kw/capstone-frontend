@@ -6,19 +6,32 @@ import {
   SafeAreaView,
   ScrollView,
   Modal,
+  Linking,
+  Image,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-
+import { GOOGLE_PLACES_API_KEY } from "../api/config";
+import { BASE_URL } from "../api/index";
 const BookAppointment = ({ route }) => {
-  const { clinicName, clinicLocation, clinicRating } = route.params;
+  const { clinicName, clinicLocation, clinicRating, clinicImage } =
+    route.params;
   const navigation = useNavigation();
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);
   const [availableTimes, setAvailableTimes] = useState([]);
   const [showMonthPicker, setShowMonthPicker] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState(new Date());
+  const [placeDetails, setPlaceDetails] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // Add this console log to check the image path
+  console.log("Clinic Image Path:", {
+    fullPath: `${BASE_URL}/${clinicImage?.replace(/\\/g, "/")}`,
+    clinicImage: clinicImage,
+    BASE_URL: BASE_URL,
+  });
 
   // Generate months for the next 2 years
   const generateMonths = () => {
@@ -114,6 +127,57 @@ const BookAppointment = ({ route }) => {
 
   const months = generateMonths();
 
+  const fetchPlaceDetails = async () => {
+    try {
+      const searchQuery = `${clinicName} ${clinicLocation} Kuwait`;
+
+      const searchResponse = await fetch(
+        `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(
+          searchQuery
+        )}&key=${GOOGLE_PLACES_API_KEY}`
+      );
+      const searchData = await searchResponse.json();
+
+      if (searchData.results && searchData.results[0]) {
+        const placeId = searchData.results[0].place_id;
+
+        const detailsResponse = await fetch(
+          `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=name,rating,reviews,user_ratings_total,formatted_address,geometry,opening_hours,formatted_phone_number,website,business_status&key=${GOOGLE_PLACES_API_KEY}`
+        );
+        const detailsData = await detailsResponse.json();
+
+        if (detailsData.result) {
+          setPlaceDetails(detailsData.result);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching place details:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPlaceDetails();
+  }, [clinicName, clinicLocation]);
+
+  const formatReviewCount = (count) => {
+    return count >= 1000 ? `${(count / 1000).toFixed(1)}k` : count;
+  };
+
+  const handlePhoneCall = (phoneNumber) => {
+    if (phoneNumber) {
+      const phoneUrl = `tel:${phoneNumber.replace(/\s+/g, "")}`;
+      Linking.canOpenURL(phoneUrl)
+        .then((supported) => {
+          if (supported) {
+            return Linking.openURL(phoneUrl);
+          }
+        })
+        .catch((error) => console.log("Error making phone call:", error));
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
@@ -126,23 +190,41 @@ const BookAppointment = ({ route }) => {
 
       {/* Clinic Info */}
       <View style={styles.clinicContainer}>
-        <View style={styles.clinicImage} />
+        <View style={styles.imageContainer}>
+          <Image
+            source={{
+              uri: `${BASE_URL}/${clinicImage?.replace(/\\/g, "/")}`,
+            }}
+            style={styles.image}
+            resizeMode="cover"
+          />
+        </View>
         <View style={styles.clinicInfo}>
-          <Text style={styles.clinicName}>{clinicName}</Text>
-          <Text style={styles.clinicAddress}>{clinicLocation}</Text>
+          <Text style={styles.clinicName}>
+            {placeDetails?.name || clinicName}
+          </Text>
+          <Text style={styles.clinicAddress}>
+            {placeDetails?.formatted_address || clinicLocation}
+          </Text>
         </View>
       </View>
 
-      {/* Rating and Distance */}
+      {/* Rating and Phone Number */}
       <View style={styles.ratingContainer}>
         <Text style={styles.ratingText}>
-          {clinicRating} ({Math.round(clinicRating * 1000)} reviews)
+          {placeDetails?.rating?.toFixed(1) || clinicRating} (
+          {formatReviewCount(placeDetails?.user_ratings_total || 0)} reviews)
         </Text>
         <Text style={styles.ratingText}> | </Text>
-        <View style={styles.distanceContainer}>
-          <Ionicons name="location" size={20} color="#64C5B7" />
-          <Text style={styles.ratingText}>15km</Text>
-        </View>
+        <TouchableOpacity
+          style={styles.phoneContainer}
+          onPress={() => handlePhoneCall(placeDetails?.formatted_phone_number)}
+        >
+          <Ionicons name="call" size={20} color="#64C5B7" />
+          <Text style={[styles.ratingText, styles.phoneText]}>
+            {placeDetails?.formatted_phone_number || "No phone"}
+          </Text>
+        </TouchableOpacity>
       </View>
 
       {/* Calendar Section */}
@@ -305,17 +387,23 @@ const styles = StyleSheet.create({
   },
   clinicContainer: {
     flexDirection: "row",
-    padding: 20,
     gap: 15,
+    padding: 15,
   },
-  clinicImage: {
-    width: 100,
-    height: 100,
-    backgroundColor: "#E8F6F5",
-    borderRadius: 20,
+  imageContainer: {
+    width: 60,
+    height: 60,
+    backgroundColor: "#E8EEF1",
+    borderRadius: 15,
+  },
+  image: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 15,
   },
   clinicInfo: {
     flex: 1,
+    justifyContent: "center",
   },
   clinicName: {
     fontSize: 24,
@@ -340,10 +428,14 @@ const styles = StyleSheet.create({
     color: "#64C5B7",
     fontWeight: "400",
   },
-  distanceContainer: {
+  phoneContainer: {
     flexDirection: "row",
     alignItems: "center",
     gap: 5,
+    padding: 5,
+  },
+  phoneText: {
+    textDecorationLine: "underline",
   },
   calendarSection: {
     flex: 1,

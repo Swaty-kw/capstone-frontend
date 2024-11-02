@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -8,72 +8,86 @@ import {
   TouchableOpacity,
   Linking,
   Platform,
+  ActivityIndicator,
+  RefreshControl,
 } from "react-native";
-import StarRating from "../components/StarRating"; // You'll need to create this component
-import BottomNavBar from "../components/BottomNavBar"; // You'll need to create this component
+import StarRating from "../components/StarRating";
+import BottomNavBar from "../components/BottomNavBar";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import { BASE_URL } from "../api/index";
+import { GOOGLE_PLACES_API_KEY } from "../api/config";
 
 const Review = ({ route }) => {
-  const { clinicName, clinicLocation, clinicRating } = route.params;
+  const { clinicName, clinicLocation, clinicRating, coordinates, clinicImage } =
+    route.params;
+  const [googleReviews, setGoogleReviews] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [allReviews, setAllReviews] = useState([]);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [businessInfo, setBusinessInfo] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
 
-  // Add coordinates for each location
-  const locationCoordinates = {
-    "City Pet Clinic": {
-      lat: 29.3399,
-      lng: 47.9337,
-      address: "Block 1, Street 2, Shuwaikh Industrial, Kuwait",
-    },
-    "Pet Care Center": {
-      lat: 29.3317,
-      lng: 48.0258,
-      address: "Salem Al Mubarak Street, Salmiya, Kuwait",
-    },
-    "Animal Care Hospital": {
-      lat: 29.3267,
-      lng: 48.0163,
-      address: "Block 12, Street 103, Jabriya, Kuwait",
-    },
-    "Paws & Claws Clinic": {
-      lat: 29.3378,
-      lng: 47.9755,
-      address: "Tunis Street, Block 4, Hawally, Kuwait",
-    },
-    "Pets Grooming Center": {
-      lat: 29.3317,
-      lng: 48.0258,
-      address: "Block 10, Salem Al Mubarak Street, Salmiya, Kuwait",
-    },
-    "Pampered Paws": {
-      lat: 29.3267,
-      lng: 48.0163,
-      address: "Block 8, Street 105, Jabriya, Kuwait",
-    },
-    "Furry Friends Salon": {
-      lat: 29.3378,
-      lng: 47.9755,
-      address: "Block 2, Ibn Khaldoun Street, Hawally, Kuwait",
-    },
+  useEffect(() => {
+    fetchGoogleReviews();
+  }, [clinicName, clinicLocation]);
+
+  const fetchGoogleReviews = async () => {
+    try {
+      const searchQuery = `${clinicName} ${clinicLocation} Kuwait`;
+      console.log("Search Query:", searchQuery);
+
+      const searchResponse = await fetch(
+        `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(
+          searchQuery
+        )}&key=${GOOGLE_PLACES_API_KEY}`
+      );
+      const searchData = await searchResponse.json();
+      console.log("Search API Response:", searchData);
+
+      if (searchData.results && searchData.results[0]) {
+        const placeId = searchData.results[0].place_id;
+        console.log("Place ID:", placeId);
+
+        const detailsResponse = await fetch(
+          `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=name,rating,reviews,user_ratings_total,opening_hours,formatted_phone_number,website,business_status&key=${GOOGLE_PLACES_API_KEY}`
+        );
+        const detailsData = await detailsResponse.json();
+        console.log("Details API Response:", detailsData);
+
+        if (detailsData.result) {
+          setGoogleReviews(detailsData.result);
+          setAllReviews(detailsData.result.reviews || []);
+          setBusinessInfo(detailsData.result);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching Google reviews:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const openMaps = () => {
-    const location = locationCoordinates[clinicName];
-    if (location) {
-      const { lat, lng, address } = location;
-      const scheme = Platform.select({
-        ios: "maps:0,0?q=",
-        android: "geo:0,0?q=",
-      });
-      const latLng = `${lat},${lng}`;
-      const label = clinicName;
-      const url = Platform.select({
-        ios: `${scheme}${label}@${latLng}`,
-        android: `${scheme}${latLng}(${label})`,
-      });
+    // Create search query with clinic name and Kuwait
+    const searchQuery = encodeURIComponent(
+      `${clinicName} veterinary clinic Kuwait`
+    );
 
-      Linking.openURL(url).catch((err) =>
-        console.error("An error occurred", err)
+    // Use Google Maps search URL
+    const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${searchQuery}`;
+
+    Linking.openURL(mapsUrl).catch((err) => {
+      console.error("Error opening Google Maps:", err);
+
+      // Fallback to address search if the name search fails
+      const addressUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+        clinicLocation + " Kuwait"
+      )}`;
+      Linking.openURL(addressUrl).catch((err) =>
+        console.error("Error opening fallback maps:", err)
       );
-    }
+    });
   };
 
   // Reviews database
@@ -177,11 +191,16 @@ const Review = ({ route }) => {
     },
   };
 
-  // Get the specific service reviews
-  const serviceReviews = reviewsDatabase[clinicName] || {
-    totalReviews: 0,
-    ratingDistribution: [0, 0, 0, 0, 0],
-    reviews: [],
+  // Combine local and Google reviews
+  const combinedReviews = {
+    ...reviewsDatabase[clinicName],
+    googleReviews: googleReviews
+      ? {
+          rating: googleReviews.rating,
+          totalReviews: googleReviews.user_ratings_total,
+          reviews: googleReviews.reviews,
+        }
+      : null,
   };
 
   const ReviewCard = ({ review }) => (
@@ -201,62 +220,217 @@ const Review = ({ route }) => {
     </View>
   );
 
+  // Calculate total reviews (combine Google and local reviews)
+  const totalReviews =
+    (googleReviews?.user_ratings_total || 0) +
+    (reviewsDatabase[clinicName]?.totalReviews || 0);
+
+  // Use Google rating if available, otherwise fallback to local rating
+  const overallRating = googleReviews?.rating || clinicRating || 0;
+
+  // Calculate rating distribution from Google reviews
+  const calculateRatingDistribution = () => {
+    if (!googleReviews?.reviews) return [0, 0, 0, 0, 0];
+
+    // Initialize distribution array for 5 to 1 stars
+    const distribution = [0, 0, 0, 0, 0];
+
+    // Count each rating
+    googleReviews.reviews.forEach((review) => {
+      const rating = Math.floor(review.rating);
+      if (rating >= 1 && rating <= 5) {
+        distribution[5 - rating]++;
+      }
+    });
+
+    return distribution;
+  };
+
+  const ratingDistribution = calculateRatingDistribution();
+
+  // Function to load more reviews
+  const loadMoreReviews = async () => {
+    if (loadingMore) return;
+
+    try {
+      setLoadingMore(true);
+      // You would need to implement pagination here
+      // Unfortunately, Google Places API has limitations on the number of reviews
+      // you can fetch. You might want to show a message to users about this.
+      setLoadingMore(false);
+    } catch (error) {
+      console.error("Error loading more reviews:", error);
+      setLoadingMore(false);
+    }
+  };
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    // Refetch your data here
+    fetchGoogleReviews().then(() => {
+      setRefreshing(false);
+    });
+  }, []);
+
   return (
     <View style={styles.container}>
       {/* Clinic Info Section */}
       <View style={styles.clinicSection}>
-        <View style={[styles.clinicImage, { backgroundColor: "#F0F0F0" }]} />
+        <View style={styles.clinicImageContainer}>
+          {clinicImage ? (
+            <Image
+              source={{
+                uri: `${BASE_URL}/${clinicImage.replace(/\\/g, "/")}`,
+              }}
+              style={styles.clinicImage}
+              resizeMode="cover"
+              onError={(e) => console.log("Image Error:", e.nativeEvent.error)}
+            />
+          ) : (
+            <View
+              style={[styles.clinicImage, { backgroundColor: "#F0F0F0" }]}
+            />
+          )}
+        </View>
         <View style={styles.clinicInfo}>
           <Text style={styles.clinicName}>{clinicName}</Text>
           <TouchableOpacity onPress={openMaps} style={styles.locationButton}>
             <Ionicons name="location" size={16} color="#64C5B7" />
-            <Text style={styles.clinicAddress}>
-              {locationCoordinates[clinicName]?.address || clinicLocation}
-            </Text>
+            <Text style={styles.clinicAddress}>{clinicLocation}</Text>
           </TouchableOpacity>
         </View>
       </View>
 
-      {/* Rating Overview Section */}
-      <View style={styles.ratingSection}>
-        <View style={styles.ratingHeader}>
-          <View style={styles.ratingLeft}>
-            <Text style={styles.ratingNumber}>{clinicRating}</Text>
-            <StarRating rating={parseFloat(clinicRating)} size={24} />
-            <Text style={styles.reviewCount}>
-              {serviceReviews.totalReviews} reviews
+      {/* Rating Section */}
+      <View style={styles.ratingAndInfoContainer}>
+        {/* Left side - Rating */}
+        <View style={styles.ratingSection}>
+          <Text style={styles.ratingNumber}>
+            {googleReviews?.rating?.toFixed(1) || "N/A"}
+          </Text>
+          <StarRating rating={googleReviews?.rating || 0} />
+          <Text style={styles.totalReviews}>
+            {googleReviews?.user_ratings_total || 0} reviews
+          </Text>
+        </View>
+
+        {/* Right side - Business Info */}
+        <View style={styles.businessInfoSection}>
+          <View style={styles.businessStatusContainer}>
+            <Ionicons
+              name={
+                googleReviews?.opening_hours?.open_now
+                  ? "checkmark-circle"
+                  : "time"
+              }
+              size={20}
+              color="#64C5B7"
+            />
+            <Text style={styles.businessStatusText}>
+              {googleReviews?.opening_hours?.open_now ? "Open Now" : "Closed"}
             </Text>
           </View>
 
-          {/* Rating Distribution Bars */}
-          <View style={styles.ratingBars}>
-            {serviceReviews.ratingDistribution.map((count, index) => (
-              <View key={5 - index} style={styles.ratingBar}>
-                <Text style={styles.ratingLabel}>{5 - index}</Text>
-                <View style={styles.barContainer}>
-                  <View
-                    style={[
-                      styles.bar,
-                      {
-                        width: `${
-                          (count / serviceReviews.totalReviews) * 100
-                        }%`,
-                      },
-                    ]}
-                  />
-                </View>
-                <Text style={styles.ratingCount}>{count}</Text>
-              </View>
-            ))}
-          </View>
+          {googleReviews?.formatted_phone_number && (
+            <TouchableOpacity
+              style={styles.infoRow}
+              onPress={() =>
+                Linking.openURL(`tel:${googleReviews.formatted_phone_number}`)
+              }
+            >
+              <Ionicons name="call" size={16} color="#64C5B7" />
+              <Text style={styles.infoText}>
+                {googleReviews.formatted_phone_number}
+              </Text>
+            </TouchableOpacity>
+          )}
+
+          {googleReviews?.website && (
+            <TouchableOpacity
+              style={styles.infoRow}
+              onPress={() => Linking.openURL(googleReviews.website)}
+            >
+              <Ionicons name="globe" size={16} color="#64C5B7" />
+              <Text style={styles.infoText}>Visit Website</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
 
-      {/* Reviews List */}
-      <ScrollView style={styles.reviewsList}>
-        {serviceReviews.reviews.map((review, index) => (
-          <ReviewCard key={index} review={review} />
+      {/* Reviews List - Combined local and Google reviews */}
+      <ScrollView
+        style={styles.reviewsList}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={["#64C5B7"]} // Android
+            tintColor="#64C5B7" // iOS
+          />
+        }
+        onScroll={({ nativeEvent }) => {
+          const { layoutMeasurement, contentOffset, contentSize } = nativeEvent;
+          const isCloseToBottom =
+            layoutMeasurement.height + contentOffset.y >=
+            contentSize.height - 20;
+
+          if (isCloseToBottom && !loadingMore) {
+            loadMoreReviews();
+          }
+        }}
+        scrollEventThrottle={400}
+      >
+        {googleReviews?.reviews?.map((review, index) => (
+          <View key={index} style={styles.reviewCard}>
+            <View style={styles.reviewHeader}>
+              <View style={styles.reviewerInfo}>
+                {review.profile_photo_url && (
+                  <Image
+                    source={{ uri: review.profile_photo_url }}
+                    style={styles.reviewerPhoto}
+                  />
+                )}
+                <Text style={styles.reviewerName}>{review.author_name}</Text>
+              </View>
+              <Text style={styles.reviewDate}>
+                {new Date(review.time * 1000).toLocaleDateString()}
+              </Text>
+            </View>
+            <StarRating
+              rating={review.rating}
+              size={20}
+              style={styles.reviewStars}
+            />
+            <Text style={styles.reviewText}>{review.text}</Text>
+          </View>
         ))}
+
+        {/* Add a note about review limitations */}
+        <View style={styles.reviewNote}>
+          <Text style={styles.reviewNoteText}>
+            Showing {googleReviews?.reviews?.length || 0} of{" "}
+            {googleReviews?.user_ratings_total || 0} reviews
+          </Text>
+          <Text style={styles.reviewNoteSubtext}>
+            Due to Google Places API limitations, only the most relevant reviews
+            are shown. Visit Google Maps to see all reviews.
+          </Text>
+
+          {/* Add a button to view all reviews on Google Maps */}
+          <TouchableOpacity
+            style={styles.viewAllButton}
+            onPress={() => {
+              const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                clinicName + " " + clinicLocation
+              )}`;
+              Linking.openURL(url);
+            }}
+          >
+            <Text style={styles.viewAllButtonText}>
+              View All Reviews on Google Maps
+            </Text>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
     </View>
   );
@@ -265,17 +439,23 @@ const Review = ({ route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#FFFFFF",
   },
   clinicSection: {
     flexDirection: "row",
     padding: 16,
+    alignItems: "center",
   },
-  clinicImage: {
+  clinicImageContainer: {
     width: 80,
     height: 80,
     borderRadius: 8,
-    backgroundColor: "#F0F0F0",
+    overflow: "hidden", // This ensures the image respects the border radius
+  },
+  clinicImage: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 8,
   },
   clinicInfo: {
     marginLeft: 16,
@@ -284,80 +464,90 @@ const styles = StyleSheet.create({
   clinicName: {
     fontSize: 20,
     fontWeight: "600",
-    color: "#436B9B",
+    color: "#64C5B7",
   },
   clinicAddress: {
     fontSize: 14,
-    color: "#64C5B7",
+    color: "#B4C5D9",
     flex: 1,
     textDecorationLine: "underline",
   },
-  ratingSection: {
-    padding: 16,
-    paddingRight: 24,
-  },
-  ratingHeader: {
+  ratingAndInfoContainer: {
     flexDirection: "row",
-    alignItems: "flex-start",
+    padding: 16,
+    backgroundColor: "#F7F9FC",
+    borderRadius: 12,
+    marginBottom: 16,
   },
-  ratingLeft: {
-    alignItems: "flex-start",
-    width: 100, // Increased slightly
+  ratingSection: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRightWidth: 1,
+    borderRightColor: "#E8EEF1",
+    paddingRight: 16,
   },
   ratingNumber: {
     fontSize: 48,
-    fontWeight: "500",
+    fontWeight: "600",
     color: "#436B9B",
-    lineHeight: 48,
-    marginBottom: -4, // Added to reduce space below the number
+    marginBottom: 8,
   },
-  reviewCount: {
-    fontSize: 16,
-    color: "#436B9B",
-    marginTop: 4,
+  totalReviews: {
+    fontSize: 14,
+    color: "#91ACBF",
+    marginTop: 8,
   },
-  ratingBars: {
-    flex: 1,
-    paddingTop: 0, // Reduced from 8 to 0
-    marginLeft: 40,
-    marginTop: -8, // Added negative margin to move up
+  businessInfoSection: {
+    flex: 2,
+    paddingLeft: 16,
+    justifyContent: "center",
+    gap: 12,
   },
-  ratingBar: {
+  businessStatusContainer: {
     flexDirection: "row",
     alignItems: "center",
-    height: 22, // Slightly reduced from 24
   },
-  ratingLabel: {
-    width: 20,
-    fontSize: 14,
-    color: "#436B9B",
-    textAlign: "center",
-    marginRight: 4,
-  },
-  barContainer: {
-    width: 180,
-    height: 8,
-    backgroundColor: "#F0F0F0",
-    borderRadius: 4,
+  businessStatusText: {
     marginLeft: 8,
+    fontSize: 16,
+    color: "#436B9B",
+    fontWeight: "500",
   },
-  bar: {
-    height: "100%",
-    backgroundColor: "#436B9B",
-    borderRadius: 4,
+  infoRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  infoText: {
+    marginLeft: 12,
+    color: "#436B9B",
+    fontSize: 14,
+  },
+  hoursContainer: {
+    marginTop: 12,
+  },
+  hoursTitle: {
+    fontSize: 16,
+    color: "#436B9B",
+    fontWeight: "500",
+    marginBottom: 8,
+  },
+  hoursText: {
+    color: "#91ACBF",
+    fontSize: 14,
+    marginVertical: 2,
   },
   reviewsList: {
-    flex: 1,
-    paddingHorizontal: 16,
-    marginTop: 16,
+    padding: 16,
+    paddingBottom: 0,
+    marginBottom: 0, // Remove any margin
   },
   reviewCard: {
-    backgroundColor: "#F5F7F9",
+    backgroundColor: "#F7F9FC",
+    padding: 20,
+    marginVertical: 8,
     borderRadius: 16,
-    padding: 16,
-    marginBottom: 12,
-    height: 120, // Adjust height as needed
-    width: "100%",
+    marginBottom: 16, // Add space between cards
   },
   reviewStars: {
     marginBottom: 8,
@@ -365,23 +555,25 @@ const styles = StyleSheet.create({
   reviewHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 8,
+    alignItems: "center",
+    marginBottom: 12,
   },
   reviewerName: {
+    color: "#64C5B7",
     fontSize: 16,
-    fontWeight: "500",
-    color: "#436B9B",
+    flex: 1, // Take available space
   },
   reviewDate: {
+    color: "#91ACBF",
     fontSize: 14,
-    color: "#436B9B",
-    opacity: 0.7,
   },
   reviewText: {
-    fontSize: 14,
     color: "#436B9B",
-    lineHeight: 20,
+    fontSize: 14,
+    lineHeight: 20, // Better text readability
     marginTop: 8,
+    // Ensure text stays within card bounds
+    flexWrap: "wrap",
   },
   helpfulContainer: {
     flexDirection: "row",
@@ -394,18 +586,172 @@ const styles = StyleSheet.create({
     color: "#436B9B",
     opacity: 0.7,
   },
-  ratingCount: {
-    fontSize: 14,
-    color: "#436B9B",
-    marginLeft: 8,
-    width: 30,
-  },
   locationButton: {
     flexDirection: "row",
     alignItems: "center",
     gap: 4,
     marginTop: 4,
     padding: 4, // Add some padding for better touch area
+  },
+  googleIcon: {
+    width: 16,
+    height: 16,
+    marginLeft: 8,
+  },
+  reviewerInfo: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1, // Take available space
+  },
+  overallStars: {
+    marginTop: 8,
+    marginBottom: 4,
+  },
+  reviewStars: {
+    marginVertical: 8,
+  },
+  reviewerPhoto: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    marginRight: 8,
+  },
+  reviewNote: {
+    padding: 16,
+    alignItems: "center",
+    marginTop: 16,
+  },
+  reviewNoteText: {
+    fontSize: 14,
+    color: "#436B9B",
+    textAlign: "center",
+  },
+  reviewNoteSubtext: {
+    fontSize: 12,
+    color: "#91ACBF",
+    textAlign: "center",
+    marginTop: 4,
+  },
+  viewAllButton: {
+    marginTop: 16,
+    padding: 12,
+    backgroundColor: "#64C5B7",
+    borderRadius: 8,
+  },
+  viewAllButtonText: {
+    color: "#FFFFFF",
+    fontSize: 14,
+    fontWeight: "500",
+  },
+  barContainer: {
+    flex: 1,
+    height: 8, // Make bars thinner
+    backgroundColor: "#F0F4F8", // Very light gray for empty bar
+    borderRadius: 4, // Rounded corners
+    marginHorizontal: 8,
+    overflow: "hidden",
+  },
+  bar: {
+    height: "100%",
+    backgroundColor: "#9CCEC3", // Lighter mint green
+    borderRadius: 4,
+  },
+  bottomNav: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    backgroundColor: "#9CCEC3",
+    padding: 16,
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    elevation: 8, // Add elevation for Android
+    shadowColor: "#000", // Add shadow for iOS
+    shadowOffset: {
+      width: 0,
+      height: -2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+  },
+  businessInfoContainer: {
+    backgroundColor: "#F7F9FC",
+    padding: 16,
+    borderRadius: 12,
+    marginTop: 16,
+    marginBottom: 16,
+  },
+  businessStatusContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  businessStatusText: {
+    marginLeft: 8,
+    fontSize: 16,
+    color: "#436B9B",
+    fontWeight: "500",
+  },
+  infoRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 8,
+  },
+  infoText: {
+    marginLeft: 12,
+    color: "#436B9B",
+    fontSize: 14,
+  },
+  hoursContainer: {
+    marginTop: 12,
+  },
+  hoursTitle: {
+    fontSize: 16,
+    color: "#436B9B",
+    fontWeight: "500",
+    marginBottom: 8,
+  },
+  hoursText: {
+    color: "#91ACBF",
+    fontSize: 14,
+    marginVertical: 2,
+  },
+  statusPill: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 16,
+    marginBottom: 12,
+  },
+  contactContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  contactButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    padding: 8,
+    borderWidth: 2,
+    borderColor: "#64C5B7",
+    borderRadius: 8,
+  },
+  iconCircle: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: "#64C5B7",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  contactText: {
+    color: "#64C5B7",
+    fontSize: 14,
+    fontWeight: "500",
   },
 });
 
