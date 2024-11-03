@@ -35,8 +35,8 @@ const HomeNavigation = () => {
         <Stack.Screen name={NAVIGATION.HOME.ADD_PET} component={AddPet} />
       </Stack.Navigator>
 
-      <FloatingAiButton onPress={() => setShowAiChat(true)} />
-      <AiVet visible={showAiChat} onClose={() => setShowAiChat(false)} />
+      {/* <FloatingAiButton onPress={() => setShowAiChat(true)} /> */}
+      {/* <AiVet visible={showAiChat} onClose={() => setShowAiChat(false)} /> */}
     </>
   );
 };

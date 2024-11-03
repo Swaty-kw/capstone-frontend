@@ -9,6 +9,27 @@ import {
 } from "react-native";
 import { BASE_URL } from "../api";
 
+// Add this function at the top of your file, outside the component
+const calculateAge = (birthdate) => {
+  if (!birthdate) return "";
+
+  const birth = new Date(birthdate);
+  const today = new Date();
+
+  let months = (today.getFullYear() - birth.getFullYear()) * 12;
+  months -= birth.getMonth();
+  months += today.getMonth();
+
+  const years = Math.floor(months / 12);
+  const remainingMonths = months % 12;
+
+  if (years > 0) {
+    return `${years} ${years === 1 ? "Year" : "Years"}`;
+  } else {
+    return `${remainingMonths} ${remainingMonths === 1 ? "Month" : "Months"}`;
+  }
+};
+
 const PetDetails = ({ route }) => {
   const { pet } = route.params;
 
@@ -19,18 +40,23 @@ const PetDetails = ({ route }) => {
 
   console.log("Final Image URL in Details:", imageUrl);
 
+  // Calculate age from birthdate
+  const age = calculateAge(pet.birthdate);
+
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView>
+      <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.content}>
-          {/* Header with image and name */}
+          {/* Header */}
           <View style={styles.header}>
-            <View style={styles.imageContainer}>
-              <Image
-                source={{ uri: imageUrl }}
-                style={styles.petImage}
-                resizeMode="cover"
-              />
+            <View style={styles.imageWrapper}>
+              <View style={styles.imageContainer}>
+                <Image
+                  source={{ uri: imageUrl }}
+                  style={styles.petImage}
+                  resizeMode="cover"
+                />
+              </View>
             </View>
             <View style={styles.titleContainer}>
               <Text style={styles.name}>{pet.name}</Text>
@@ -39,41 +65,60 @@ const PetDetails = ({ route }) => {
           </View>
 
           {/* Info Grid */}
-          <View style={styles.infoGrid}>
-            <View style={[styles.infoBox, styles.mintBox]}>
-              <Text style={styles.infoLabel}>Gender</Text>
-              <Text style={styles.infoValue}>Male</Text>
+          <View style={styles.grid}>
+            {/* First Row */}
+            <View style={styles.row}>
+              <View style={[styles.card, styles.genderCard]}>
+                <Text style={styles.cardLabel}>Gender</Text>
+                <Text style={[styles.cardValue, styles.genderValue]}>
+                  {pet.gender}
+                </Text>
+              </View>
+              <View style={[styles.card, styles.vaccinationCard]}>
+                <Text style={styles.cardLabel}>
+                  Vaccination{"\n"}for {pet.name}
+                </Text>
+                {pet.vaccinationClinic && (
+                  <>
+                    <Text style={styles.clinicName}>
+                      {pet.vaccinationClinic}
+                    </Text>
+                    <Text style={styles.date}>{pet.vaccinationDate}</Text>
+                  </>
+                )}
+              </View>
             </View>
 
-            <View style={[styles.infoBox, styles.mintBox, styles.wideBox]}>
-              <Text style={styles.infoLabel}>Vaccination for {pet.name}</Text>
-              <Text style={styles.infoSubtext}>//add data</Text>
-              <Text style={styles.infoDate}>{pet.nextVaccination}</Text>
+            {/* Second Row */}
+            <View style={styles.row}>
+              <View style={[styles.card, styles.ageCard]}>
+                <Text style={styles.cardLabel}>Age</Text>
+                <Text style={[styles.cardValue, styles.ageValue]}>{age}</Text>
+              </View>
+              <View style={[styles.card, styles.beakCard]}>
+                <Text style={styles.cardLabel}>Beak and nails{"\n"}care</Text>
+                <Text style={styles.clinicName}>{pet.serviceClinic}</Text>
+                <Text style={styles.date}>{pet.serviceDate}</Text>
+              </View>
             </View>
 
-            <View style={[styles.infoBox, styles.grayBox]}>
-              <Text style={styles.infoLabel}>Birth date</Text>
-              <Text style={styles.infoValue}>{pet.birthdate.slice(0, 10)}</Text>
+            {/* Third Row */}
+            <View style={styles.row}>
+              <View style={[styles.card, styles.weightCard]}>
+                <Text style={styles.cardLabel}>Weight</Text>
+                <Text style={[styles.cardValue, styles.weightValue]}>
+                  {pet.weight}
+                </Text>
+              </View>
             </View>
 
-            <View style={[styles.infoBox, styles.grayBox]}>
-              <Text style={styles.infoLabel}>Weight</Text>
-              <Text style={styles.infoValue}>{pet.weight}</Text>
+            {/* Medications Card */}
+            <View style={styles.medicationCard}>
+              <Text style={styles.medicationTitle}>Current medications</Text>
+              <Text style={styles.medicationText}>
+                {pet.medication || "No current medications"}
+              </Text>
             </View>
-
-            <View style={[styles.infoBox, styles.grayBox, styles.wideBox]}>
-              <Text style={styles.infoLabel}>Allergies</Text>
-              <Text style={styles.infoSubtext}>{pet.allergies}</Text>
-              <Text style={styles.infoDate}>{pet.nextAppointment}</Text>
-            </View>
-          </View>
-
-          {/* Medications Section */}
-          <View style={styles.medicationBox}>
-            <Text style={styles.medicationTitle}>Current medications</Text>
-            <Text style={styles.medicationText}>
-              {pet.medication || "No current medications"}
-            </Text>
           </View>
         </View>
       </ScrollView>
@@ -84,109 +129,122 @@ const PetDetails = ({ route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F8F8F8",
+    backgroundColor: "#F8FAFA",
+    padding: 20,
   },
   content: {
     flex: 1,
-    padding: 20,
+    paddingTop: 10,
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 30,
+    marginBottom: 24,
+  },
+  imageWrapper: {
+    width: 100,
+    height: 100,
+    borderRadius: 40,
+    backgroundColor: "#E8F6F5",
+    padding: 2,
+    marginRight: 16,
   },
   imageContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: "100%",
+    height: "100%",
+    borderRadius: 38,
     overflow: "hidden",
-    backgroundColor: "#E8F6F5",
   },
   petImage: {
+    marginTop: 10,
     width: "100%",
     height: "100%",
   },
   titleContainer: {
-    marginLeft: 15,
+    flex: 1,
   },
   name: {
     fontSize: 32,
-    color: "#64C5B7",
-    fontWeight: "500",
+    color: "#4EBFAC",
+    fontWeight: "600",
+    marginBottom: 4,
   },
   breed: {
-    fontSize: 20,
-    color: "#A8D3CF",
+    fontSize: 16,
+    color: "#4EBFAC",
   },
-  infoGrid: {
+  grid: {
+    gap: 12,
+  },
+  row: {
     flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 15,
-    marginBottom: 20,
+    gap: 12,
   },
-  infoBox: {
+  card: {
+    flex: 1,
     borderRadius: 20,
-    padding: 15,
-    minWidth: "45%",
+    padding: 16,
+    minHeight: 90,
   },
-  wideBox: {
-    width: "100%",
-  },
-  mintBox: {
+  genderCard: {
     backgroundColor: "#E8F6F5",
   },
-  grayBox: {
-    backgroundColor: "#E8EFF1",
+  vaccinationCard: {
+    backgroundColor: "#E8F6F5",
   },
-  infoLabel: {
-    fontSize: 16,
-    color: "#64C5B7",
-    marginBottom: 5,
+  ageCard: {
+    backgroundColor: "#F0F4F8",
   },
-  infoValue: {
-    fontSize: 24,
-    color: "#64C5B7",
-    fontWeight: "500",
+  beakCard: {
+    backgroundColor: "#E8F6F5",
   },
-  infoSubtext: {
-    fontSize: 14,
-    color: "#64C5B7",
-    marginBottom: 5,
+  weightCard: {
+    backgroundColor: "#F0F4F8",
+    width: "48%",
   },
-  infoDate: {
-    fontSize: 16,
-    color: "#64C5B7",
-    fontWeight: "500",
-    position: "absolute",
-    right: 15,
-    bottom: 15,
+  cardLabel: {
+    fontSize: 15,
+    color: "#8FA5B3",
+    marginBottom: 12,
+    lineHeight: 20,
   },
-  medicationBox: {
-    backgroundColor: "#FFE8E8",
-    borderRadius: 20,
-    padding: 20,
-    marginTop: 10,
+  cardValue: {
+    fontSize: 22,
+    color: "#455A64",
+    fontWeight: "600",
+    letterSpacing: 0.3,
   },
-  medicationTitle: {
-    fontSize: 20,
-    color: "#F26445",
-    marginBottom: 10,
+  clinicName: {
+    fontSize: 13,
+    color: "#455A64",
+    marginBottom: 4,
+    letterSpacing: 0.2,
   },
-  medicationText: {
-    fontSize: 18,
-    color: "#F26445",
-  },
-  bottomNav: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    alignItems: "center",
-    backgroundColor: "#64C5B7",
-    borderRadius: 30,
-    padding: 15,
+  date: {
+    fontSize: 13,
+    color: "#8FA5B3",
     position: "absolute",
     bottom: 20,
-    left: 20,
     right: 20,
+  },
+  medicationCard: {
+    backgroundColor: "#FFE8E8",
+    borderRadius: 24,
+    padding: 20,
+    height: 130,
+  },
+  medicationTitle: {
+    fontSize: 22,
+    color: "#F26445",
+    fontWeight: "600",
+    marginBottom: 12,
+    letterSpacing: 0.3,
+  },
+  medicationText: {
+    fontSize: 17,
+    color: "#F26445",
+    opacity: 0.8,
+    letterSpacing: 0.2,
   },
 });
 

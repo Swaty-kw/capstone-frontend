@@ -51,7 +51,7 @@ const PetCard = ({ pet }) => {
             </>
           ) : (
             <Text style={styles.medicationText}>
-              No current{"\n"}medications
+              {pet.medications || "No current\nmedications"}
             </Text>
           )}
         </View>

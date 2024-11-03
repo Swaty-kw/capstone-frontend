@@ -14,6 +14,10 @@ import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { GOOGLE_PLACES_API_KEY } from "../api/config";
 import { BASE_URL } from "../api/index";
+import SelectDropdown from "react-native-select-dropdown";
+import { getUserPets } from "../api/pets";
+import { useQuery } from "@tanstack/react-query";
+
 const BookAppointment = ({ route }) => {
   const { clinicName, clinicLocation, clinicRating, clinicImage } =
     route.params;
@@ -25,6 +29,14 @@ const BookAppointment = ({ route }) => {
   const [selectedMonth, setSelectedMonth] = useState(new Date());
   const [placeDetails, setPlaceDetails] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [userPets, setUserPets] = useState([]);
+  const [selectedPet, setSelectedPet] = useState(null);
+  const [selectedService, setSelectedService] = useState(null);
+
+  const { data: petsData, isLoading: petsLoading } = useQuery({
+    queryKey: ["getUserPets"],
+    queryFn: getUserPets,
+  });
 
   // Add this console log to check the image path
   console.log("Clinic Image Path:", {
@@ -322,15 +334,156 @@ const BookAppointment = ({ route }) => {
           <View style={styles.bottomPadding} />
         </ScrollView>
 
-        <View style={styles.confirmButtonContainer}>
+        {selectedTime && (
+          <>
+            <View style={styles.petSelectWrapper}>
+              <Text style={styles.availableText}>Select Pet</Text>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={styles.petsScrollView}
+              >
+                {petsData?.pets?.map((pet) => (
+                  <TouchableOpacity
+                    key={pet._id}
+                    style={[
+                      styles.petCard,
+                      selectedPet?._id === pet._id && styles.selectedPetCard,
+                    ]}
+                    onPress={() => {
+                      setSelectedPet(pet);
+                      setSelectedService(null); // Reset service when changing pet
+                    }}
+                  >
+                    <Image
+                      source={{
+                        uri: `${BASE_URL}/${pet.image?.replace(/\\/g, "/")}`,
+                      }}
+                      style={styles.petImage}
+                    />
+                    <Text
+                      style={[
+                        styles.petName,
+                        selectedPet?._id === pet._id && styles.selectedPetText,
+                      ]}
+                    >
+                      {pet.name}
+                    </Text>
+                    <Text
+                      style={[
+                        styles.petBreed,
+                        selectedPet?._id === pet._id && styles.selectedPetText,
+                      ]}
+                    >
+                      {pet.breed}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </View>
+
+            {selectedPet && (
+              <View style={styles.serviceSelectWrapper}>
+                <Text style={styles.availableText}>Services</Text>
+                <View style={styles.servicesGrid}>
+                  {route.params.clinicType === "Vet Clinic" ? (
+                    <>
+                      <TouchableOpacity
+                        style={[
+                          styles.serviceCard,
+                          selectedService === "checkup" &&
+                            styles.selectedServiceCard,
+                        ]}
+                        onPress={() => setSelectedService("checkup")}
+                      >
+                        <View style={styles.iconCircle}>
+                          <Ionicons
+                            name="medical-outline"
+                            size={24}
+                            color="#64C5B7"
+                          />
+                        </View>
+                        <Text style={styles.serviceText}>Check Up</Text>
+                      </TouchableOpacity>
+
+                      <TouchableOpacity
+                        style={[
+                          styles.serviceCard,
+                          selectedService === "vaccination" &&
+                            styles.selectedServiceCard,
+                        ]}
+                        onPress={() => setSelectedService("vaccination")}
+                      >
+                        <View style={styles.iconCircle}>
+                          <Ionicons
+                            name="fitness-outline"
+                            size={24}
+                            color="#64C5B7"
+                          />
+                        </View>
+                        <Text style={styles.serviceText}>Vaccination</Text>
+                      </TouchableOpacity>
+                    </>
+                  ) : (
+                    <>
+                      <TouchableOpacity
+                        style={[
+                          styles.serviceCard,
+                          selectedService === "grooming" &&
+                            styles.selectedServiceCard,
+                        ]}
+                        onPress={() => setSelectedService("grooming")}
+                      >
+                        <View style={styles.iconCircle}>
+                          <Ionicons
+                            name="cut-outline"
+                            size={24}
+                            color="#64C5B7"
+                          />
+                        </View>
+                        <Text style={styles.serviceText}>Grooming</Text>
+                      </TouchableOpacity>
+
+                      <TouchableOpacity
+                        style={[
+                          styles.serviceCard,
+                          selectedService === "spa" &&
+                            styles.selectedServiceCard,
+                        ]}
+                        onPress={() => setSelectedService("spa")}
+                      >
+                        <View style={styles.iconCircle}>
+                          <Ionicons
+                            name="water-outline"
+                            size={24}
+                            color="#64C5B7"
+                          />
+                        </View>
+                        <Text style={styles.serviceText}>Spa</Text>
+                      </TouchableOpacity>
+                    </>
+                  )}
+                </View>
+              </View>
+            )}
+          </>
+        )}
+
+        <View style={styles.bottomContainer}>
           <TouchableOpacity
             style={[
               styles.confirmButton,
-              (!selectedDate || !selectedTime) && styles.confirmButtonDisabled,
+              (!selectedDate ||
+                !selectedTime ||
+                !selectedPet ||
+                !selectedService) &&
+                styles.confirmButtonDisabled,
             ]}
-            disabled={!selectedDate || !selectedTime}
+            disabled={
+              !selectedDate || !selectedTime || !selectedPet || !selectedService
+            }
           >
-            <Text style={styles.confirmText}>Confirm Appointment</Text>
+            <Text style={styles.confirmText}>Confirm</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -372,16 +525,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#FFFFFF",
+    padding: 13,
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 20,
     paddingTop: 10,
-    gap: 15,
+    gap: 8,
   },
   headerTitle: {
-    fontSize: 28,
+    fontSize: 20,
     color: "#64C5B7",
     fontWeight: "400",
   },
@@ -399,20 +553,20 @@ const styles = StyleSheet.create({
   image: {
     width: "100%",
     height: "100%",
-    borderRadius: 15,
+    borderRadius: 20,
   },
   clinicInfo: {
     flex: 1,
     justifyContent: "center",
   },
   clinicName: {
-    fontSize: 24,
+    fontSize: 16,
     color: "#64C5B7",
     fontWeight: "400",
     marginBottom: 5,
   },
   clinicAddress: {
-    fontSize: 18,
+    fontSize: 14,
     color: "#91ACBF",
     lineHeight: 24,
     opacity: 0.8,
@@ -444,15 +598,15 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 35,
     borderTopRightRadius: 35,
   },
-  whiteLine: {
-    height: 5,
-    backgroundColor: "#FFFFFF",
-    width: "15%",
-    alignSelf: "center",
-    borderRadius: 3,
-    marginTop: 15,
-    marginBottom: 25,
-  },
+  // whiteLine: {
+  //   height: 5,
+  //   backgroundColor: "#FFFFFF",
+  //   width: "15%",
+  //   alignSelf: "center",
+  //   borderRadius: 3,
+  //   marginTop: 15,
+  //   marginBottom: 25,
+  // },
   monthSelector: {
     flexDirection: "row",
     alignItems: "center",
@@ -473,23 +627,23 @@ const styles = StyleSheet.create({
   dateButton: {
     alignItems: "center",
     justifyContent: "center",
-    padding: 12,
-    borderRadius: 35,
+    padding: 8,
+    borderRadius: 13,
     backgroundColor: "rgba(255, 255, 255, 0.15)",
-    width: 70,
-    height: 70,
+    width: 58,
+    height: 58,
   },
   selectedDate: {
     backgroundColor: "#FFFFFF",
   },
   dayText: {
-    fontSize: 14,
+    fontSize: 12,
     color: "#FFFFFF",
     marginBottom: 4,
     fontWeight: "500",
   },
   dateText: {
-    fontSize: 22,
+    fontSize: 14,
     color: "#FFFFFF",
     fontWeight: "500",
   },
@@ -513,8 +667,8 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255, 255, 255, 0.15)",
     paddingVertical: 12,
     paddingHorizontal: 25,
-    borderRadius: 30,
-    minWidth: 110,
+    borderRadius: 13,
+    minWidth: 88,
     alignItems: "center",
   },
   selectedTime: {
@@ -522,7 +676,7 @@ const styles = StyleSheet.create({
   },
   timeText: {
     color: "#FFFFFF",
-    fontSize: 18,
+    fontSize: 12,
     fontWeight: "400",
   },
   selectedTimeText: {
@@ -533,13 +687,15 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 35,
     alignItems: "center",
+    alignSelf: "center",
+    width: 150,
   },
   confirmButtonDisabled: {
     opacity: 0.7,
   },
   confirmText: {
     color: "#64C5B7",
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: "400",
   },
   scrollContent: {
@@ -593,6 +749,180 @@ const styles = StyleSheet.create({
   },
   dateScrollContainer: {
     marginBottom: 40,
+  },
+  confirmButtonText: {
+    fontSize: 13,
+  },
+  dropdownContainer: {
+    marginTop: 15,
+  },
+  dropdown: {
+    width: "100%",
+    height: 40,
+    backgroundColor: "#F8FAFB",
+    borderRadius: 15,
+    borderWidth: 1,
+    borderColor: "#E8EEF1",
+  },
+  dropdownText: {
+    fontSize: 14,
+    color: "#91ACBF",
+  },
+  bottomContainer: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "#64C5B7",
+    padding: 20,
+    borderTopLeftRadius: 35,
+    borderTopRightRadius: 35,
+  },
+  petSelectContainer: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "#64C5B7",
+    padding: 20,
+    borderTopLeftRadius: 35,
+    borderTopRightRadius: 35,
+  },
+  sectionTitle: {
+    fontSize: 24,
+    color: "#FFFFFF",
+    fontWeight: "400",
+    marginBottom: 10,
+  },
+  petSelectWrapper: {
+    marginTop: 20,
+    marginBottom: 20,
+  },
+  petsScrollView: {
+    marginTop: 10,
+  },
+  petCard: {
+    width: 100,
+    marginHorizontal: 8,
+    alignItems: "center",
+    backgroundColor: "rgba(255, 255, 255, 0.15)",
+    borderRadius: 15,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: "transparent",
+  },
+  selectedPetCard: {
+    backgroundColor: "#FFFFFF",
+  },
+  petImage: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    marginBottom: 8,
+  },
+  petName: {
+    fontSize: 14,
+    color: "#FFFFFF",
+    marginBottom: 4,
+    fontWeight: "500",
+  },
+  petBreed: {
+    fontSize: 12,
+    color: "#FFFFFF",
+    opacity: 0.8,
+  },
+  selectedPetText: {
+    color: "#64C5B7",
+  },
+  serviceOption: {
+    flex: 1,
+    backgroundColor: "rgba(255, 255, 255, 0.15)",
+    padding: 15,
+    borderRadius: 13,
+    alignItems: "center",
+    gap: 8,
+  },
+  selectedServiceOption: {
+    backgroundColor: "#FFFFFF",
+  },
+  serviceText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "500",
+  },
+  selectedServiceText: {
+    color: "#64C5B7",
+  },
+  serviceSelectWrapper: {
+    marginTop: 10,
+    marginBottom: 20,
+    paddingHorizontal: 20,
+  },
+  serviceContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 15,
+    marginTop: 10,
+  },
+  servicesGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 15,
+    justifyContent: "center",
+    marginTop: 10,
+  },
+  serviceCard: {
+    width: "45%",
+    aspectRatio: 1,
+    backgroundColor: "rgba(255, 255, 255, 0.15)",
+    borderRadius: 15,
+    padding: 15,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  selectedServiceCard: {
+    backgroundColor: "#FFFFFF",
+  },
+  iconCircle: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: "#FFFFFF",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 10,
+  },
+  section: {
+    marginBottom: 20,
+    paddingHorizontal: 20,
+  },
+  selectedItemContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(255, 255, 255, 0.15)",
+    borderRadius: 13,
+    padding: 12,
+    marginTop: 5,
+  },
+  selectedItemText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "500",
+  },
+  selectedPetImage: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    marginRight: 10,
+  },
+  selectedServiceIcon: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: "#FFFFFF",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 10,
   },
 });
 
