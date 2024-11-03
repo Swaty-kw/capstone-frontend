@@ -26,7 +26,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     paddingHorizontal: 20,
-    justifyContent: "space-around",
+    justifyContent: "center",
     alignItems: "center",
     position: "absolute",
     bottom: 0,
@@ -37,6 +37,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    marginTop: 15,
   },
 });
 
