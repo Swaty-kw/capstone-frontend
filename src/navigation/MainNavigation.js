@@ -51,6 +51,7 @@ const MainNavigation = () => {
           tabBarActiveTintColor: "#64C5B7",
           headerShown: false,
           tabBarStyle: tabBarStyle,
+
           tabBarShowLabel: false,
         }}
       >

@@ -4,6 +4,9 @@ import { NavigationContainer } from "@react-navigation/native";
 import OnBoarding from "./src/screens/OnBoarding";
 import UserProfile from "./src/screens/UserProfile";
 import Home from "./src/screens/Home";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import AuthNavigation from "./src/navigation/AuthNavigation/AuthNavigation";
+import MainNavigation from "./src/navigation/MainNavigation";
 const queryClient = new QueryClient();
 
 import { Text, View } from "react-native";
