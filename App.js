@@ -4,6 +4,9 @@ import { NavigationContainer } from "@react-navigation/native";
 import OnBoarding from "./src/screens/OnBoarding";
 import UserProfile from "./src/screens/UserProfile";
 import Home from "./src/screens/Home";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import AuthNavigation from "./src/navigation/AuthNavigation/AuthNavigation";
+import MainNavigation from "./src/navigation/MainNavigation";
 const queryClient = new QueryClient();
 
 import { Text, View } from "react-native";
@@ -35,19 +38,6 @@ export default function App() {
         <NavigationContainer>
           {user ? <MainNavigation /> : <AuthNavigation />}
           {/* <Login /> */}
-        </NavigationContainer>
-        <NavigationContainer>
-          {user ? (
-            <View style={{ flex: 1 }}>
-              <Text>Home Page</Text>
-            </View>
-          ) : (
-            <Stack.Navigator>
-              {/* <Stack.Screen name="Services" component={Services} /> */}
-
-              <Stack.Screen name="OnBoarding" component={OnBoarding} />
-            </Stack.Navigator>
-          )}
         </NavigationContainer>
       </QueryClientProvider>
     </UserContext.Provider>

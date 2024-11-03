@@ -32,7 +32,7 @@ const MainNavigation = () => {
           headerShown: false,
           tabBarStyle: {
             position: "absolute",
-            bottom: 40,
+            bottom: 0,
             left: 20,
             right: 20,
             backgroundColor: "#FFFFFF",
