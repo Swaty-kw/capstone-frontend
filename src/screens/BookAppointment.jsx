@@ -9,17 +9,20 @@ import {
   Linking,
   Image,
 } from "react-native";
+import { fetchAppointments } from "../api/Services";
 import React, { useState, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { GOOGLE_PLACES_API_KEY } from "../api/config";
 import { BASE_URL } from "../api/index";
-import SelectDropdown from "react-native-select-dropdown";
+import { SelectList } from "react-native-dropdown-select-list";
 import { getUserPets } from "../api/pets";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import NAVIGATION from "../navigation";
+import { createAppointment } from "../api/appts";
 
 const BookAppointment = ({ route }) => {
-  const { clinicName, clinicLocation, clinicRating, clinicImage } =
+  const { clinicName, clinicLocation, clinicRating, clinicImage, clinicId } =
     route.params;
   const navigation = useNavigation();
   const [selectedDate, setSelectedDate] = useState(null);
@@ -45,6 +48,24 @@ const BookAppointment = ({ route }) => {
     BASE_URL: BASE_URL,
   });
 
+  const { mutate: bookAppointment } = useMutation({
+    mutationKey: ["createAppointment"],
+    mutationFn: () =>
+      createAppointment({
+        date: selectedDate,
+        time: selectedTime,
+        petId: selectedPet._id,
+        serviceId: clinicId,
+        notes: selectedService,
+      }),
+    onSuccess: () => {
+      console.log("first ssjsjsj");
+      navigation.navigate(NAVIGATION.SERVICE.MY_APPOINTMENTS);
+    },
+    onError: (error) => {
+      console.log("error", error);
+    },
+  });
   // Generate months for the next 2 years
   const generateMonths = () => {
     const months = [];
@@ -81,6 +102,8 @@ const BookAppointment = ({ route }) => {
     }
     return dates;
   };
+
+  
 
   // Generate available time slots based on selected date
   const generateTimeSlots = (selectedDate) => {
@@ -191,7 +214,7 @@ const BookAppointment = ({ route }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -330,147 +353,145 @@ const BookAppointment = ({ route }) => {
               </View>
             </>
           )}
-
-          <View style={styles.bottomPadding} />
-        </ScrollView>
-
-        {selectedTime && (
-          <>
-            <View style={styles.petSelectWrapper}>
-              <Text style={styles.availableText}>Select Pet</Text>
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                style={styles.petsScrollView}
-              >
-                {petsData?.pets?.map((pet) => (
-                  <TouchableOpacity
-                    key={pet._id}
-                    style={[
-                      styles.petCard,
-                      selectedPet?._id === pet._id && styles.selectedPetCard,
-                    ]}
-                    onPress={() => {
-                      setSelectedPet(pet);
-                      setSelectedService(null); // Reset service when changing pet
-                    }}
-                  >
-                    <Image
-                      source={{
-                        uri: `${BASE_URL}/${pet.image?.replace(/\\/g, "/")}`,
+          {selectedTime && (
+            <>
+              <View style={styles.petSelectWrapper}>
+                <Text style={styles.availableText}>Select Pet</Text>
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  style={styles.petsScrollView}
+                >
+                  {petsData?.pets?.map((pet) => (
+                    <TouchableOpacity
+                      key={pet._id}
+                      style={[
+                        styles.petCard,
+                        selectedPet?._id === pet._id && styles.selectedPetCard,
+                      ]}
+                      onPress={() => {
+                        setSelectedPet(pet);
+                        setSelectedService(null); // Reset service when changing pet
                       }}
-                      style={styles.petImage}
-                    />
-                    <Text
-                      style={[
-                        styles.petName,
-                        selectedPet?._id === pet._id && styles.selectedPetText,
-                      ]}
                     >
-                      {pet.name}
-                    </Text>
-                    <Text
-                      style={[
-                        styles.petBreed,
-                        selectedPet?._id === pet._id && styles.selectedPetText,
-                      ]}
-                    >
-                      {pet.breed}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
-            </View>
-
-            {selectedPet && (
-              <View style={styles.serviceSelectWrapper}>
-                <Text style={styles.availableText}>Services</Text>
-                <View style={styles.servicesGrid}>
-                  {route.params.clinicType === "Vet Clinic" ? (
-                    <>
-                      <TouchableOpacity
+                      <Image
+                        source={{
+                          uri: `${BASE_URL}/${pet.image?.replace(/\\/g, "/")}`,
+                        }}
+                        style={styles.petImage}
+                      />
+                      <Text
                         style={[
-                          styles.serviceCard,
-                          selectedService === "checkup" &&
-                            styles.selectedServiceCard,
+                          styles.petName,
+                          selectedPet?._id === pet._id &&
+                            styles.selectedPetText,
                         ]}
-                        onPress={() => setSelectedService("checkup")}
                       >
-                        <View style={styles.iconCircle}>
-                          <Ionicons
-                            name="medical-outline"
-                            size={24}
-                            color="#64C5B7"
-                          />
-                        </View>
-                        <Text style={styles.serviceText}>Check Up</Text>
-                      </TouchableOpacity>
-
-                      <TouchableOpacity
+                        {pet.name}
+                      </Text>
+                      <Text
                         style={[
-                          styles.serviceCard,
-                          selectedService === "vaccination" &&
-                            styles.selectedServiceCard,
+                          styles.petBreed,
+                          selectedPet?._id === pet._id &&
+                            styles.selectedPetText,
                         ]}
-                        onPress={() => setSelectedService("vaccination")}
                       >
-                        <View style={styles.iconCircle}>
-                          <Ionicons
-                            name="fitness-outline"
-                            size={24}
-                            color="#64C5B7"
-                          />
-                        </View>
-                        <Text style={styles.serviceText}>Vaccination</Text>
-                      </TouchableOpacity>
-                    </>
-                  ) : (
-                    <>
-                      <TouchableOpacity
-                        style={[
-                          styles.serviceCard,
-                          selectedService === "grooming" &&
-                            styles.selectedServiceCard,
-                        ]}
-                        onPress={() => setSelectedService("grooming")}
-                      >
-                        <View style={styles.iconCircle}>
-                          <Ionicons
-                            name="cut-outline"
-                            size={24}
-                            color="#64C5B7"
-                          />
-                        </View>
-                        <Text style={styles.serviceText}>Grooming</Text>
-                      </TouchableOpacity>
-
-                      <TouchableOpacity
-                        style={[
-                          styles.serviceCard,
-                          selectedService === "spa" &&
-                            styles.selectedServiceCard,
-                        ]}
-                        onPress={() => setSelectedService("spa")}
-                      >
-                        <View style={styles.iconCircle}>
-                          <Ionicons
-                            name="water-outline"
-                            size={24}
-                            color="#64C5B7"
-                          />
-                        </View>
-                        <Text style={styles.serviceText}>Spa</Text>
-                      </TouchableOpacity>
-                    </>
-                  )}
-                </View>
+                        {pet.breed}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
               </View>
-            )}
-          </>
-        )}
 
-        <View style={styles.bottomContainer}>
+              {selectedPet && (
+                <View style={styles.serviceSelectWrapper}>
+                  <Text style={styles.availableText}>Services</Text>
+                  <View style={styles.servicesGrid}>
+                    {route.params.clinicType === "Vet Clinic" ? (
+                      <>
+                        <TouchableOpacity
+                          style={[
+                            styles.serviceCard,
+                            selectedService === "checkup" &&
+                              styles.selectedServiceCard,
+                          ]}
+                          onPress={() => setSelectedService("checkup")}
+                        >
+                          <View style={styles.iconCircle}>
+                            <Ionicons
+                              name="medical-outline"
+                              size={24}
+                              color="#64C5B7"
+                            />
+                          </View>
+                          <Text style={styles.serviceText}>Check Up</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                          style={[
+                            styles.serviceCard,
+                            selectedService === "vaccination" &&
+                              styles.selectedServiceCard,
+                          ]}
+                          onPress={() => setSelectedService("vaccination")}
+                        >
+                          <View style={styles.iconCircle}>
+                            <Ionicons
+                              name="fitness-outline"
+                              size={24}
+                              color="#64C5B7"
+                            />
+                          </View>
+                          <Text style={styles.serviceText}>Vaccination</Text>
+                        </TouchableOpacity>
+                      </>
+                    ) : (
+                      <>
+                        <TouchableOpacity
+                          style={[
+                            styles.serviceCard,
+                            selectedService === "grooming" &&
+                              styles.selectedServiceCard,
+                          ]}
+                          onPress={() => setSelectedService("grooming")}
+                        >
+                          <View style={styles.iconCircle}>
+                            <Ionicons
+                              name="cut-outline"
+                              size={24}
+                              color="#64C5B7"
+                            />
+                          </View>
+                          <Text style={styles.serviceText}>Grooming</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                          style={[
+                            styles.serviceCard,
+                            selectedService === "spa" &&
+                              styles.selectedServiceCard,
+                          ]}
+                          onPress={() => setSelectedService("spa")}
+                        >
+                          <View style={styles.iconCircle}>
+                            <Ionicons
+                              name="water-outline"
+                              size={24}
+                              color="#64C5B7"
+                            />
+                          </View>
+                          <Text style={styles.serviceText}>Spa</Text>
+                        </TouchableOpacity>
+                      </>
+                    )}
+                  </View>
+                </View>
+              )}
+            </>
+          )}
+          {/* <View style={styles.bottomContainer}> */}
           <TouchableOpacity
+            onPress={bookAppointment}
             style={[
               styles.confirmButton,
               (!selectedDate ||
@@ -483,9 +504,11 @@ const BookAppointment = ({ route }) => {
               !selectedDate || !selectedTime || !selectedPet || !selectedService
             }
           >
-            <Text style={styles.confirmText}>Confirm</Text>
+            <Text style={styles.confirmText}>Book</Text>
           </TouchableOpacity>
-        </View>
+          {/* </View> */}
+          <View style={styles.bottomPadding} />
+        </ScrollView>
       </View>
 
       {/* Month Picker Modal */}
@@ -517,7 +540,7 @@ const BookAppointment = ({ route }) => {
           </View>
         </View>
       </Modal>
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -525,7 +548,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#FFFFFF",
-    padding: 13,
+    // paddingTop: 100,
   },
   header: {
     flexDirection: "row",
