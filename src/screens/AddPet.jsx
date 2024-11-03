@@ -48,7 +48,8 @@ const AddPet = () => {
 
   // Mutation
   const { mutate, isLoading } = useMutation({
-    mutationFn: addPet,
+    mutationKey: ["Add Pet"],
+    mutationFn: () => addPet(formData),
     onSuccess: () => {
       queryClient.invalidateQueries("pets");
       Alert.alert("Success", "Pet added successfully!", [
@@ -120,60 +121,53 @@ const AddPet = () => {
 
   const handleSubmit = async () => {
     // Validate required fields
-    if (!formData.name || !formData.species || !formData.breed) {
-      Alert.alert("Error", "Please fill in all required fields");
-      return;
-    }
-
-    try {
-      // Create FormData object
-      const formDataToSend = new FormData();
-
-      // Append image if exists
-      if (formData.image) {
-        const imageUri = formData.image;
-        const filename = imageUri.split("/").pop();
-        const match = /\.(\w+)$/.exec(filename);
-        const type = match ? `image/${match[1]}` : "image";
-
-        formDataToSend.append("image", {
-          uri: imageUri,
-          name: filename,
-          type,
-        });
-      }
-
-      // Append all other data
-      formDataToSend.append("name", formData.name);
-      formDataToSend.append("species", formData.species);
-      formDataToSend.append("breed", formData.breed);
-      formDataToSend.append("gender", formData.gender ? "Male" : "Female");
-      formDataToSend.append("allergies", formData.allergies || "");
-      formDataToSend.append("weight", `${formData.weight} Kg`);
-      formDataToSend.append("birthDate", formData.birthDate.toISOString());
-      formDataToSend.append("vaccinationClinic", formData.vaccinationClinic);
-      formDataToSend.append("careClinic", formData.careClinic);
-      formDataToSend.append(
-        "vaccinationDate",
-        formData.vaccinationDate.toISOString()
-      );
-      formDataToSend.append("careDate", formData.careDate.toISOString());
-
-      // Append medications as JSON string
-      const medications = formData.medications.filter(
-        (med) => med.name.trim() !== ""
-      );
-      formDataToSend.append("medications", JSON.stringify(medications));
-
-      // Log what we're sending
-      console.log("Sending data to backend:", formDataToSend);
-
-      // Send to backend
-      mutate(formDataToSend);
-    } catch (error) {
-      console.error("Error submitting form:", error);
-      Alert.alert("Error", "Failed to add pet. Please try again.");
-    }
+    // if (!formData.name || !formData.species || !formData.breed) {
+    //   Alert.alert("Error", "Please fill in all required fields");
+    //   return;
+    // }
+    // try {
+    //   // Create FormData object
+    //   const formDataToSend = new FormData();
+    //   // Append image if exists
+    //   if (formData.image) {
+    //     const imageUri = formData.image;
+    //     const filename = imageUri.split("/").pop();
+    //     const match = /\.(\w+)$/.exec(filename);
+    //     const type = match ? `image/${match[1]}` : "image";
+    //     formDataToSend.append("image", {
+    //       uri: imageUri,
+    //       name: filename,
+    //       type,
+    //     });
+    //   }
+    //   // Append all other data
+    //   formDataToSend.append("name", formData.name);
+    //   formDataToSend.append("species", formData.species);
+    //   formDataToSend.append("breed", formData.breed);
+    //   formDataToSend.append("gender", formData.gender ? "Male" : "Female");
+    //   formDataToSend.append("allergies", formData.allergies || "");
+    //   formDataToSend.append("weight", `${formData.weight} Kg`);
+    //   formDataToSend.append("birthDate", formData.birthDate.toISOString());
+    //   formDataToSend.append("vaccinationClinic", formData.vaccinationClinic);
+    //   formDataToSend.append("careClinic", formData.careClinic);
+    //   formDataToSend.append(
+    //     "vaccinationDate",
+    //     formData.vaccinationDate.toISOString()
+    //   );
+    //   formDataToSend.append("careDate", formData.careDate.toISOString());
+    //   // Append medications as JSON string
+    //   const medications = formData.medications.filter(
+    //     (med) => med.name.trim() !== ""
+    //   );
+    //   formDataToSend.append("medications", JSON.stringify(medications));
+    //   // Log what we're sending
+    //   console.log("Sending data to backend:", formDataToSend);
+    //   // Send to backend
+    //   mutate(formDataToSend);
+    // } catch (error) {
+    //   console.error("Error submitting form:", error);
+    //   Alert.alert("Error", "Failed to add pet. Please try again.");
+    // }
   };
 
   return (
@@ -333,7 +327,7 @@ const AddPet = () => {
               styles.submitButton,
               isLoading && styles.disabledButton,
             ]}
-            onPress={handleSubmit}
+            onPress={mutate}
             disabled={isLoading}
           >
             <Text style={[styles.buttonText, styles.submitButtonText]}>

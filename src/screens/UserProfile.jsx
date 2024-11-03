@@ -13,6 +13,7 @@ import NAVIGATION from "../navigation";
 import UserContext from "../context/UserContext";
 import { useQuery } from "@tanstack/react-query";
 import { getUserInfo, getUserPetsWithDetails } from "../api/user";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const Greeting = ({ name }) => (
   <Text style={styles.greeting}>Hey, {name}!</Text>
@@ -112,7 +113,7 @@ const UserProfile = () => {
   console.log("PROFILE", petsInfo);
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <ScrollView style={styles.content}>
         <Greeting name={userInfo?.username} />
         <UpcomingEvents appointments={petsInfo} />
@@ -122,7 +123,7 @@ const UserProfile = () => {
           <Text style={styles.logoutText}>Logout</Text>
         </TouchableOpacity>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
 
