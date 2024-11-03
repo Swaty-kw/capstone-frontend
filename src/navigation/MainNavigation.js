@@ -22,7 +22,27 @@ const TabIcon = ({ focused, color, icon }) => (
 
 const MainNavigation = () => {
   const [isDrPawVisible, setIsDrPawVisible] = useState(false);
-
+  const tabBarStyle = {
+    position: "absolute",
+    bottom: 40,
+    left: 20,
+    right: 20,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 50,
+    height: 60,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
+    borderTopWidth: 0,
+    paddingTop: 5,
+    paddingBottom: 5,
+    opacity: 1,
+  };
   return (
     <>
       <Tab.Navigator
@@ -30,27 +50,7 @@ const MainNavigation = () => {
           tabBarInactiveTintColor: "#91ACBF",
           tabBarActiveTintColor: "#64C5B7",
           headerShown: false,
-          tabBarStyle: {
-            position: "absolute",
-            bottom: 40,
-            left: 20,
-            right: 20,
-            backgroundColor: "#FFFFFF",
-            borderRadius: 50,
-            height: 60,
-            shadowColor: "#000",
-            shadowOffset: {
-              width: 0,
-              height: 2,
-            },
-            shadowOpacity: 0.1,
-            shadowRadius: 8,
-            elevation: 5,
-            borderTopWidth: 0,
-            paddingTop: 5,
-            paddingBottom: 5,
-            opacity: 1,
-          },
+          tabBarStyle: tabBarStyle,
           tabBarShowLabel: false,
         }}
       >
@@ -66,27 +66,29 @@ const MainNavigation = () => {
         <Tab.Screen
           name={NAVIGATION.SERVICE.INDEX}
           component={ServiceNavigation}
-          options={{
-            tabBarIcon: ({ color, focused }) => (
-              <TabIcon focused={focused} color={color} icon="calendar" />
-            ),
+          options={({ route, navigation }) => {
+            const state = navigation.getState();
+            return {
+              tabBarStyle:
+                state.routes[state?.index]?.state?.index > 0
+                  ? { display: "none" }
+                  : tabBarStyle,
+              tabBarIcon: ({ color, focused }) => (
+                <TabIcon focused={focused} color={color} icon="calendar" />
+              ),
+            };
           }}
         />
         <Tab.Screen
-          name="DrPaw"
-          component={View}
-          listeners={{
-            tabPress: (e) => {
-              e.preventDefault();
-              setIsDrPawVisible(true);
-            },
-          }}
+          name={NAVIGATION.SERVICE.CHOOSE_SERVICE}
+          component={ChooseService}
           options={{
             tabBarIcon: ({ color, focused }) => (
-              <TabIcon focused={focused} color={color} icon="chatbubble" />
+              <TabIcon focused={focused} color={color} icon="paw" />
             ),
           }}
         />
+
         <Tab.Screen
           name={NAVIGATION.PROFILE.INDEX}
           component={ProfileNavigation}

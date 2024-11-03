@@ -243,6 +243,7 @@ export default ChooseService = () => {
                           navigation.navigate(
                             NAVIGATION.SERVICE.BOOK_APPOINTMENT,
                             {
+                              clinicId: clinic._id,
                               clinicName: clinic.name,
                               clinicLocation: clinic.location?.address,
                               clinicRating:
