@@ -1,20 +1,28 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import {
   StyleSheet,
   Text,
   View,
   TouchableOpacity,
   ScrollView,
+  Image,
+  TextInput,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { deleteToken } from "../api/storage";
 import { useNavigation } from "@react-navigation/native";
 import NAVIGATION from "../navigation";
 import UserContext from "../context/UserContext";
-import { useQuery } from "@tanstack/react-query";
-import { getUserInfo, getUserPetsWithDetails } from "../api/user";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  getUserInfo,
+  getUserPetsWithDetails,
+  updateUserInfo,
+  updateUserProfileImage,
+} from "../api/user";
 import { SafeAreaView } from "react-native-safe-area-context";
-
+import * as ImagePicker from "expo-image-picker";
+import { BASE_URL } from "../api/index";
 const Greeting = ({ name }) => (
   <Text style={styles.greeting}>Hey, {name}!</Text>
 );
@@ -35,24 +43,58 @@ const UpcomingEvents = ({ appointments }) => (
   </View>
 );
 
-const PersonalInfo = ({ userInfo }) => (
-  <View style={styles.section}>
-    <Text style={styles.sectionTitle}>
-      <Ionicons name="person-outline" size={20} color="#91ACBF" />
-      Personal informations
-    </Text>
-    {[userInfo?.username, userInfo?.email, userInfo?.phone].map(
-      (info, index) => (
+const PersonalInfo = ({ userInfo, onSave }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedInfo, setEditedInfo] = useState({
+    username: userInfo?.username || "",
+    email: userInfo?.email || "",
+    phone: userInfo?.phone || "",
+  });
+
+  const handleEdit = () => {
+    setIsEditing(true);
+  };
+
+  const handleSave = () => {
+    onSave(editedInfo);
+    setIsEditing(false);
+  };
+
+  return (
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>
+        <Ionicons name="person-outline" size={20} color="#91ACBF" />
+        Personal informations
+      </Text>
+      {Object.entries(editedInfo).map(([key, value], index) => (
         <View key={index} style={styles.infoItem}>
-          <Text style={styles.infoText}>{info}</Text>
-          <TouchableOpacity>
-            <Ionicons name="pencil" size={20} color="#64C5B7" />
-          </TouchableOpacity>
+          {isEditing ? (
+            <TextInput
+              style={styles.infoText}
+              value={value}
+              onChangeText={(text) =>
+                setEditedInfo((prev) => ({ ...prev, [key]: text }))
+              }
+              placeholder={key}
+            />
+          ) : (
+            <Text style={styles.infoText}>{value}</Text>
+          )}
+          {!isEditing && (
+            <TouchableOpacity onPress={handleEdit}>
+              <Ionicons name="pencil" size={20} color="#64C5B7" />
+            </TouchableOpacity>
+          )}
         </View>
-      )
-    )}
-  </View>
-);
+      ))}
+      {isEditing && (
+        <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+          <Text style={styles.saveButtonText}>Save Changes</Text>
+        </TouchableOpacity>
+      )}
+    </View>
+  );
+};
 
 const PetInfo = ({ petsInfo }) => (
   <View style={styles.section}>
@@ -82,19 +124,119 @@ const BottomNavigation = () => (
   </View>
 );
 
+const UserImage = ({ imageUri, onImageSelect, userInfo }) => {
+  const pickImage = async () => {
+    try {
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== "granted") {
+        alert("Sorry, we need camera roll permissions to make this work!");
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 1,
+      });
+
+      if (!result.canceled) {
+        const localUri = result.assets[0].uri;
+        const filename = localUri.split("/").pop();
+
+        const match = /\.(\w+)$/.exec(filename);
+        const type = match ? `image/${match[1]}` : `image/jpeg`;
+
+        const imageFile = {
+          uri: localUri,
+          name: filename,
+          type: type,
+        };
+
+        onImageSelect(imageFile);
+      }
+    } catch (error) {
+      console.error("Error picking image:", error);
+      alert("Error selecting image. Please try again.");
+    }
+  };
+
+  const displayUri = imageUri?.uri || `${BASE_URL}/${userInfo?.image.replace(/\\/g, "/")}`;
+
+  return (
+    <TouchableOpacity onPress={pickImage} style={styles.imageContainer}>
+      {displayUri ? (
+        <Image source={{ uri: displayUri }} style={styles.profileImage} />
+      ) : (
+        <View style={styles.imagePlaceholder}>
+          <Ionicons name="person" size={40} color="#91ACBF" />
+        </View>
+      )}
+    </TouchableOpacity>
+  );
+};
+
 const UserProfile = () => {
   const navigation = useNavigation();
   const [user, setUser] = useContext(UserContext);
+  const [profileImage, setProfileImage] = useState(null);
+  const queryClient = useQueryClient();
 
   const { data: userInfo } = useQuery({
     queryKey: ["userInfo"],
     queryFn: getUserInfo,
+    onSuccess: (data) => {
+      setProfileImage(`${BASE_URL}/${data.image.replace(/\\/g, "/")}`);
+    },
   });
 
+  console.log("USERINFO", userInfo);
   const { data: petsInfo } = useQuery({
     queryKey: ["userPetsDetails"],
     queryFn: getUserPetsWithDetails,
   });
+
+  const updateProfileMutation = useMutation({
+    mutationFn: (userData) => updateUserInfo(userData),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["userInfo"]);
+    },
+  });
+
+  const updateImageMutation = useMutation({
+    mutationFn: (formData) => updateUserProfileImage(formData),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["userInfo"]);
+      alert("Profile image updated successfully!");
+    },
+    onError: (error) => {
+      console.error("Error updating image:", error);
+      alert("Failed to update profile image. Please try again.");
+      setProfileImage(null);
+    },
+  });
+
+  const handleImageSelect = async (imageFile) => {
+    setProfileImage(imageFile);
+    try {
+      const formData = new FormData();
+      formData.append("image", imageFile);
+      updateImageMutation.mutate(formData);
+    } catch (error) {
+      console.error("Error handling image upload:", error);
+      alert("Error uploading image. Please try again.");
+      setProfileImage(null);
+    }
+  };
+
+  const handleUpdateProfile = async (updatedInfo) => {
+    try {
+      updateProfileMutation.mutate(updatedInfo);
+    } catch (error) {
+      console.error("Error updating profile:", error);
+    }
+  };
 
   if (!user) {
     navigation.navigate(NAVIGATION.AUTH.LOGIN);
@@ -115,9 +257,17 @@ const UserProfile = () => {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.content}>
-        <Greeting name={userInfo?.username} />
+        <View style={styles.headerContainer}>
+          <UserImage
+            imageUri={`${BASE_URL}/${userInfo?.image.replace(/\\/g, "/")}`}
+            onImageSelect={handleImageSelect}
+            userInfo={userInfo}
+          
+          />
+          <Greeting name={userInfo?.username} />
+        </View>
         <UpcomingEvents appointments={petsInfo} />
-        <PersonalInfo userInfo={userInfo} />
+        <PersonalInfo userInfo={userInfo} onSave={handleUpdateProfile} />
         <PetInfo petsInfo={userInfo?.pets} />
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
           <Text style={styles.logoutText}>Logout</Text>
@@ -255,6 +405,41 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "400",
     fontFamily: "Telugu MN",
+  },
+  headerContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  imageContainer: {
+    marginRight: 10,
+  },
+  profileImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+  },
+  imagePlaceholder: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: "#91ACBF",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  saveButton: {
+    backgroundColor: "#64C5B7",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+    alignSelf: "center",
+    marginTop: 10,
+  },
+  saveButtonText: {
+    color: "#FFFFFF",
+    fontFamily: "Telugu MN",
+    fontSize: 16,
+    fontWeight: "500",
   },
 });
 
