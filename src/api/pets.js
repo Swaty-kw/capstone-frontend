@@ -1,4 +1,4 @@
-import instance from ".";
+import instance from "./index";
 
 const getUserPets = async () => {
   try {
@@ -26,7 +26,7 @@ const getPetAppointments = async () => {
 const addPet = async (petInfo) => {
   try {
     const formData = new FormData();
-    for (key in petInfo) {
+    for (let key in petInfo) {
       if (key != "image") formData.append(key, petInfo[key]);
     }
     formData.append("image", {
@@ -35,10 +35,13 @@ const addPet = async (petInfo) => {
       uri: petInfo.image,
     });
 
-    const { data } = await instance.post("petdetails", formData);
+    console.log("HERE");
+
+    const { data } = await instance.post("/petdetails/", formData);
+    console.log("Added pet:", data);
     return data;
   } catch (error) {
-    console.log(error);
+    console.log("error", error);
   }
 };
 

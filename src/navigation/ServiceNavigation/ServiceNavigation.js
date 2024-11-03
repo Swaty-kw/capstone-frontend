@@ -22,7 +22,7 @@ const ServiceNavigation = () => {
       <Stack.Screen
         name={NAVIGATION.SERVICE.BOOK_APPOINTMENT}
         component={BookAppointment}
-        options={{ headerShown: false }}
+        // options={{ headerShown: false }}
       />
       <Stack.Screen name={NAVIGATION.SERVICE.REVIEW} component={Review} />
     </Stack.Navigator>

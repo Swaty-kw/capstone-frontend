@@ -13,7 +13,7 @@ const NAVIGATION = {
   },
   PROFILE: {
     INDEX: "Profile",
-    PROFILE: "Profile",
+    PROFILE: "MyProfile",
   },
   SERVICE: {
     INDEX: "Service",

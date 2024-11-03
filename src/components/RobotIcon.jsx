@@ -1,5 +1,5 @@
 import React from "react";
-import Svg, { Rect, Circle } from "react-native-svg";
+import { Rect, Circle, Svg } from "react-native-svg";
 
 const RobotIcon = ({ size = 24, color = "#64C5B7" }) => (
   <Svg width={size} height={size} viewBox="0 0 24 24">
