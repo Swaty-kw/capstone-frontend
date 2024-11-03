@@ -9,12 +9,13 @@ import {
   Linking,
   Image,
 } from "react-native";
+import { fetchAppointments } from "../api/Services";
 import React, { useState, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { GOOGLE_PLACES_API_KEY } from "../api/config";
 import { BASE_URL } from "../api/index";
-import SelectDropdown from "react-native-select-dropdown";
+import { SelectList } from "react-native-dropdown-select-list";
 import { getUserPets } from "../api/pets";
 import { useQuery } from "@tanstack/react-query";
 
@@ -81,6 +82,8 @@ const BookAppointment = ({ route }) => {
     }
     return dates;
   };
+
+  
 
   // Generate available time slots based on selected date
   const generateTimeSlots = (selectedDate) => {

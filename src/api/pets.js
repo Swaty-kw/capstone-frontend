@@ -12,6 +12,17 @@ const getUserPets = async () => {
   }
 };
 
+const getPetAppointments = async () => {
+  try {
+    const { data } = await instance.get("/petdetails");
+    console.log("ayyy", data);
+    return data;
+  } catch (error) {
+    console.log(error);
+    return [];
+  }
+};
+
 const addPet = async (petInfo) => {
   try {
     const formData = new FormData();
@@ -31,4 +42,4 @@ const addPet = async (petInfo) => {
   }
 };
 
-export { getUserPets, addPet };
+export { getUserPets, addPet, getPetAppointments };
