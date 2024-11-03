@@ -7,6 +7,7 @@ import Home from "./src/screens/Home";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import AuthNavigation from "./src/navigation/AuthNavigation/AuthNavigation";
 import MainNavigation from "./src/navigation/MainNavigation";
+
 const queryClient = new QueryClient();
 
 import { Text, View } from "react-native";
