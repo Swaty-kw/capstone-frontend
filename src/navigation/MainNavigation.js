@@ -7,6 +7,7 @@ import ProfileNavigation from "./ProfileNavigation/ProfileNavigation";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
 import AiVet from "../screens/AiVet";
+import ChooseService from "../screens/ChooseService";
 
 const Tab = createBottomTabNavigator();
 
@@ -80,6 +81,7 @@ const MainNavigation = () => {
             };
           }}
         />
+
         <Tab.Screen
           name={NAVIGATION.SERVICE.CHOOSE_SERVICE}
           component={ChooseService}

@@ -28,21 +28,21 @@ const Register = () => {
 
   const { mutate } = useMutation({
     mutationKey: ["register"],
-    mutationFn: register,
-    onSuccess: (data) => {
-      setUser(data);
-      alert("Successfully registered!");
-      navigation.reset({
-        index: 0,
-        routes: [{ name: NAVIGATION.HOME.HOME }],
-      });
+    mutationFn: () =>
+      register({
+        email: email,
+        username: username,
+        password: password,
+        phone: phone,
+      }),
+    onSuccess: () => {
+      setUser(true);
+      alert("successfuly registerd!");
+
+      // Direct to main navigation
     },
     onError: (error) => {
-      alert(
-        error?.response?.data?.message ||
-          "Registration failed. Please try again."
-      );
-      console.log("Error during registration:", error);
+      console.log("Error fetching data");
     },
   });
 
@@ -69,8 +69,6 @@ const Register = () => {
             placeholder="Email"
             style={styles.input}
             borderColor="#F37558"
-            value={email}
-            onChangeText={setEmail}
           />
           <TextField
             color="#F37558"
@@ -78,27 +76,20 @@ const Register = () => {
             placeholder="Username"
             style={styles.input}
             borderColor="#F37558"
-            value={username}
-            onChangeText={setUsername}
-          />
-          <TextField
-            color="#F37558"
-            backgroundColor="white"
-            placeholder="phone"
-            style={styles.input}
-            borderColor="#F37558"
-            value={phone}
-            onChangeText={setPhone}
           />
           <TextField
             color="#F37558"
             backgroundColor="white"
             placeholder="Password"
-            secureTextEntry={true}
             style={styles.input}
             borderColor="#F37558"
-            value={password}
-            onChangeText={setPassword}
+          />
+          <TextField
+            color="#F37558"
+            backgroundColor="white"
+            placeholder="Confirm password"
+            style={styles.input}
+            borderColor="#F37558"
           />
           <View style={{ flexDirection: "row", justifyContent: "center" }}>
             <Text style={{ color: "#F37558" }}>Already have an account ?</Text>
@@ -108,24 +99,7 @@ const Register = () => {
               <Text style={styles.signInText}> Sign in</Text>
             </TouchableOpacity>
           </View>
-          <TouchableOpacity
-            style={styles.registerButton}
-            onPress={() => {
-              if (!email || !username || !password || !phone) {
-                alert("Please fill in all fields");
-                return;
-              }
-
-              mutate({
-                email: email,
-                username: username,
-                password: password,
-                phone: phone,
-              });
-            }}
-          >
-            <Text style={styles.registerButtonText}>Register</Text>
-          </TouchableOpacity>
+          <Submitbutton title="Register" color="#F37558" />
         </View>
       </View>
     </SafeAreaView>
@@ -175,7 +149,7 @@ const styles = StyleSheet.create({
     color: "white",
     textAlign: "center",
     marginBottom: 20,
-    marginTop: 60,
+    marginTop: 40,
   },
   input: {
     marginBottom: 15,
@@ -184,18 +158,6 @@ const styles = StyleSheet.create({
     color: "#F37558",
     fontWeight: "bold",
     textDecorationLine: "underline",
-  },
-  registerButton: {
-    backgroundColor: "#F37558",
-    padding: 15,
-    borderRadius: 10,
-    alignItems: "center",
-    marginTop: 15,
-  },
-  registerButtonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "bold",
   },
 });
 

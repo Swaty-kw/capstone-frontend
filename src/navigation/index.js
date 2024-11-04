@@ -10,6 +10,7 @@ const NAVIGATION = {
     INDEX: "Auth",
     LOGIN: "Login",
     REGISTER: "Register",
+    ONBOARDING: "OnBoarding",
   },
   PROFILE: {
     INDEX: "Profile",

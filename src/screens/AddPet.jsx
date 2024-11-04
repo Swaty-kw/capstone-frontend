@@ -172,6 +172,16 @@ const AddPet = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      <View style={styles.header}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Ionicons name="chevron-back" size={24} color="#91ACBF" />
+        </TouchableOpacity>
+        <Text style={styles.title}>Add Pet</Text>
+        <View style={{ width: 24 }} />
+      </View>
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
@@ -179,34 +189,32 @@ const AddPet = () => {
         bounces={true}
       >
         <View style={styles.container}>
-          <Text style={styles.title}>Add Pet</Text>
-
           {/* Basic Information */}
           <TextInput
             style={styles.input}
             placeholder="Name"
-            placeholderTextColor="#8FA5B3"
+            placeholderTextColor="#64C5B7"
             value={formData.name}
             onChangeText={(value) => handleInputChange("name", value)}
           />
           <TextInput
             style={styles.input}
             placeholder="Species"
-            placeholderTextColor="#8FA5B3"
+            placeholderTextColor="#64C5B7"
             value={formData.species}
             onChangeText={(value) => handleInputChange("species", value)}
           />
           <TextInput
             style={styles.input}
             placeholder="Breed"
-            placeholderTextColor="#8FA5B3"
+            placeholderTextColor="#64C5B7"
             value={formData.breed}
             onChangeText={(value) => handleInputChange("breed", value)}
           />
           <TextInput
             style={styles.input}
             placeholder="Allergies"
-            placeholderTextColor="#8FA5B3"
+            placeholderTextColor="#64C5B7"
             value={formData.allergies}
             onChangeText={(value) => handleInputChange("allergies", value)}
           />
@@ -217,7 +225,7 @@ const AddPet = () => {
               <TextInput
                 style={[styles.input, styles.medicationInput]}
                 placeholder="Medication Name"
-                placeholderTextColor="#8FA5B3"
+                placeholderTextColor="#64C5B7"
                 value={med.name}
                 onChangeText={(value) =>
                   handleMedicationChange(index, "name", value)
@@ -230,9 +238,9 @@ const AddPet = () => {
           <View style={styles.switchContainer}>
             <Text style={styles.switchLabel}>Female</Text>
             <Switch
-              trackColor={{ false: "#DDF1ED", true: "#6C88BE" }}
-              thumbColor={formData.gender ? "#EEE5DF" : "#EEE5DF"}
-              ios_backgroundColor="#E3EEEE"
+              trackColor={{ false: "#64C5B7", true: "#91ACBF" }}
+              thumbColor={formData.gender ? "white" : "white"}
+              ios_backgroundColor="white"
               onValueChange={(value) => handleInputChange("gender", value)}
               value={formData.gender}
               style={{ transform: [{ scaleX: 1.2 }, { scaleY: 1.2 }] }}
@@ -272,7 +280,7 @@ const AddPet = () => {
                 }
                 hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               >
-                <Ionicons name="calendar-outline" size={24} color="#6C88BE" />
+                <Ionicons name="calendar-outline" size={24} color="#91ACBF" />
               </TouchableOpacity>
             </View>
           </View>
@@ -306,13 +314,13 @@ const AddPet = () => {
                       <MaterialCommunityIcons
                         name="pencil-circle"
                         size={28}
-                        color="#FFFFFF"
+                        color="#64C5B7"
                       />
                     </View>
                   </>
                 ) : (
                   <View style={styles.placeholderContainer}>
-                    <Ionicons name="image-outline" size={40} color="#6C88BE" />
+                    <Ionicons name="image-outline" size={40} color="#64C5B7" />
                     <Text style={styles.placeholderText}>Add Pet Photo</Text>
                   </View>
                 )}
@@ -348,12 +356,14 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: "600",
-    color: "#6C88BE",
+    alignContent: "center",
+    justifyContent: "center",
+    color: "#91ACBF",
     marginBottom: 24,
     marginTop: 10,
   },
   input: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "white",
     padding: 16,
     borderRadius: 12,
     marginBottom: 16,
@@ -375,14 +385,14 @@ const styles = StyleSheet.create({
   },
   switchLabel: {
     fontSize: 16,
-    color: "#455A64",
+    color: "#64C5B7",
     marginHorizontal: 16,
   },
   weightContainer: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "white",
     padding: 16,
     borderRadius: 12,
     marginBottom: 16,
@@ -390,7 +400,7 @@ const styles = StyleSheet.create({
     borderColor: "#DDF1ED",
   },
   weightButton: {
-    backgroundColor: "#6C88BE",
+    backgroundColor: "#91ACBF",
     width: 40,
     height: 40,
     borderRadius: 20,
@@ -404,7 +414,7 @@ const styles = StyleSheet.create({
   },
   weightText: {
     fontSize: 18,
-    color: "#455A64",
+    color: "#64C5B7",
     marginHorizontal: 20,
     minWidth: 80,
     textAlign: "center",
@@ -419,17 +429,17 @@ const styles = StyleSheet.create({
     borderColor: "#DDF1ED",
   },
   buttonText: {
-    color: "#6C88BE",
+    color: "#64C5B7",
     fontSize: 16,
     fontWeight: "600",
   },
   submitButton: {
-    backgroundColor: "#DDF1ED",
+    backgroundColor: "#91ACBF",
     marginTop: 8,
     marginBottom: 32,
   },
   submitButtonText: {
-    color: "#6C88BE",
+    color: "white",
   },
   medicationContainer: {
     flexDirection: "row",
@@ -463,7 +473,7 @@ const styles = StyleSheet.create({
   },
   safeArea: {
     flex: 1,
-    backgroundColor: "#EEE5DF",
+    backgroundColor: "white",
   },
   scrollView: {
     flex: 1,
@@ -511,7 +521,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   placeholderText: {
-    color: "#6C88BE",
+    color: "#64C5B7",
     fontSize: 14,
     marginTop: 8,
     fontWeight: "500",
@@ -526,7 +536,7 @@ const styles = StyleSheet.create({
   },
   dateLabel: {
     fontSize: 16,
-    color: "#8FA5B3",
+    color: "#64C5B7",
     marginBottom: 8,
   },
   dateDisplay: {
@@ -536,8 +546,15 @@ const styles = StyleSheet.create({
   },
   dateText: {
     fontSize: 16,
-    color: "#455A64",
+    color: "#64C5B7",
   },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  flexDirection: "row",
+  alignItems: "center",
 });
 
 export default AddPet;

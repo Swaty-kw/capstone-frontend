@@ -7,8 +7,10 @@ import {
 } from "react-native";
 import { Video } from "expo-av";
 import React from "react";
+import { useNavigation } from "@react-navigation/native";
 
 const CarouselItem = ({ item, onComplete, onNext, index }) => {
+  const navigation = useNavigation();
   const { width } = Dimensions.get("window");
 
   const handleVideoFinish = (status) => {
@@ -75,6 +77,14 @@ const CarouselItem = ({ item, onComplete, onNext, index }) => {
     }
   };
 
+  const handleButtonPress = () => {
+    if (index === 2) {
+      navigation.navigate("Register");
+    } else {
+      onNext();
+    }
+  };
+
   return (
     <View style={[styles.container, { width }]}>
       <View style={styles.videoContainer}>
@@ -96,7 +106,7 @@ const CarouselItem = ({ item, onComplete, onNext, index }) => {
         </Text>
         <TouchableOpacity
           style={[styles.nextButton, getButtonStyle(index)]}
-          onPress={onNext}
+          onPress={handleButtonPress}
         >
           <Text style={styles.buttonText}>
             {index === 2 ? "Let's go!" : "Next"}

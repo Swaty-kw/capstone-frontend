@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -29,14 +29,13 @@ const Greeting = ({ name }) => (
 
 const UpcomingEvents = ({ appointments }) => (
   <View style={styles.upcomingEvents}>
-    <Text style={styles.upcomingTitle}>Coming up!</Text>
     <View style={styles.eventsContainer}>
       {appointments?.Appts?.map((appointment, index) => (
         <View key={index} style={styles.eventCardTeal}>
           <Text style={styles.eventText}>
             Upcoming appointment for {appointment.name} on:
           </Text>
-          <Text style={styles.eventDate}>{appointment.date}</Text>
+          <Text style={styles.eventDate}>{appointment.date.split("T")[0]}</Text>
         </View>
       ))}
     </View>
@@ -46,10 +45,20 @@ const UpcomingEvents = ({ appointments }) => (
 const PersonalInfo = ({ userInfo, onSave }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedInfo, setEditedInfo] = useState({
-    username: userInfo?.username || "",
-    email: userInfo?.email || "",
-    phone: userInfo?.phone || "",
+    username: "",
+    email: "",
+    phone: "",
   });
+
+  useEffect(() => {
+    if (userInfo) {
+      setEditedInfo({
+        username: userInfo.username || "",
+        email: userInfo.email || "",
+        phone: userInfo.phone || "",
+      });
+    }
+  }, [userInfo]);
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -100,10 +109,11 @@ const PetInfo = ({ petsInfo }) => (
   <View style={styles.section}>
     <Text style={styles.petSectionTitle}>
       <Ionicons name="gift-outline" size={20} color="#F26445" /> Your pet
+      Dashboard
     </Text>
     <View style={styles.petInfoContainer}>
       <Text style={styles.petInfoTitle}>Current favourite service</Text>
-      <Text style={styles.petInfoText}>Pet grooming at petzone</Text>
+      <Text style={styles.petInfoText}>Pet grooming at PetPoint</Text>
       <Text style={styles.petInfoTitle}>Number of pets</Text>
       <Text style={styles.petInfoText}>{petsInfo?.length || 0}</Text>
     </View>
@@ -125,6 +135,20 @@ const BottomNavigation = () => (
 );
 
 const UserImage = ({ imageUri, onImageSelect, userInfo }) => {
+  console.log("UserImage Props:", {
+    imageUri,
+    userInfo: userInfo?.image,
+    BASE_URL,
+  });
+
+  const displayImage =
+    imageUri ||
+    (userInfo?.image
+      ? `${BASE_URL}/${userInfo.image.replace(/\\/g, "/")}`
+      : null);
+
+  console.log("Display Image URL:", displayImage);
+
   const pickImage = async () => {
     try {
       const { status } =
@@ -143,18 +167,7 @@ const UserImage = ({ imageUri, onImageSelect, userInfo }) => {
 
       if (!result.canceled) {
         const localUri = result.assets[0].uri;
-        const filename = localUri.split("/").pop();
-
-        const match = /\.(\w+)$/.exec(filename);
-        const type = match ? `image/${match[1]}` : `image/jpeg`;
-
-        const imageFile = {
-          uri: localUri,
-          name: filename,
-          type: type,
-        };
-
-        onImageSelect(imageFile);
+        onImageSelect(localUri);
       }
     } catch (error) {
       console.error("Error picking image:", error);
@@ -162,15 +175,29 @@ const UserImage = ({ imageUri, onImageSelect, userInfo }) => {
     }
   };
 
-  const displayUri = imageUri?.uri || `${BASE_URL}/${userInfo?.image.replace(/\\/g, "/")}`;
-
   return (
     <TouchableOpacity onPress={pickImage} style={styles.imageContainer}>
-      {displayUri ? (
-        <Image source={{ uri: displayUri }} style={styles.profileImage} />
+      {displayImage ? (
+        <View>
+          <Image
+            source={{ uri: displayImage }}
+            style={styles.profileImage}
+            onError={(error) =>
+              console.log("Image Error:", error.nativeEvent.error)
+            }
+          />
+          <View style={styles.editIconContainer}>
+            <Ionicons name="pencil" size={12} color="#FFFFFF" />
+          </View>
+        </View>
       ) : (
-        <View style={styles.imagePlaceholder}>
-          <Ionicons name="person" size={40} color="#91ACBF" />
+        <View>
+          <View style={styles.imagePlaceholder}>
+            <Ionicons name="person" size={30} color="#91ACBF" />
+          </View>
+          <View style={styles.editIconContainer}>
+            <Ionicons name="pencil" size={12} color="#FFFFFF" />
+          </View>
         </View>
       )}
     </TouchableOpacity>
@@ -183,11 +210,18 @@ const UserProfile = () => {
   const [profileImage, setProfileImage] = useState(null);
   const queryClient = useQueryClient();
 
+  console.log("UserInfo from API:", userInfo);
+
   const { data: userInfo } = useQuery({
     queryKey: ["userInfo"],
     queryFn: getUserInfo,
     onSuccess: (data) => {
-      setProfileImage(`${BASE_URL}/${data.image.replace(/\\/g, "/")}`);
+      console.log("User Info Success:", data);
+      if (data?.image) {
+        const imageUrl = `${BASE_URL}/${data.image.replace(/\\/g, "/")}`;
+        console.log("Setting Profile Image:", imageUrl);
+        setProfileImage(imageUrl);
+      }
     },
   });
 
@@ -256,22 +290,23 @@ const UserProfile = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.content}>
-        <View style={styles.headerContainer}>
-          <UserImage
-            imageUri={`${BASE_URL}/${userInfo?.image.replace(/\\/g, "/")}`}
-            onImageSelect={handleImageSelect}
-            userInfo={userInfo}
-          
-          />
-          <Greeting name={userInfo?.username} />
-        </View>
-        <UpcomingEvents appointments={petsInfo} />
-        <PersonalInfo userInfo={userInfo} onSave={handleUpdateProfile} />
-        <PetInfo petsInfo={userInfo?.pets} />
-        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <Text style={styles.logoutText}>Logout</Text>
-        </TouchableOpacity>
+      <ScrollView>
+        <ScrollView style={styles.content}>
+          <View style={styles.headerContainer}>
+            <UserImage
+              imageUri={`${BASE_URL}/${userInfo?.image.replace(/\\/g, "/")}`}
+              onImageSelect={handleImageSelect}
+              userInfo={userInfo}
+            />
+            <Greeting name={userInfo?.username} />
+          </View>
+          <UpcomingEvents appointments={petsInfo} />
+          <PersonalInfo userInfo={userInfo} onSave={handleUpdateProfile} />
+          <PetInfo petsInfo={userInfo?.pets} />
+          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+            <Text style={styles.logoutText}>Logout</Text>
+          </TouchableOpacity>
+        </ScrollView>
       </ScrollView>
     </SafeAreaView>
   );
@@ -280,11 +315,13 @@ const UserProfile = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF", // Changed background color to white
+    backgroundColor: "#FFFFFF",
+    paddingTop: 0,
   },
   content: {
     flex: 1,
-    padding: 20,
+    paddingHorizontal: 20,
+    paddingTop: 0,
   },
   greeting: {
     fontFamily: "Telugu MN",
@@ -292,6 +329,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#64C5B7",
     marginBottom: 20,
+    marginTop: 20,
   },
   upcomingEvents: {
     marginBottom: 20,
@@ -307,7 +345,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   eventCardTeal: {
-    backgroundColor: "rgba(100, 197, 183, 0.3)", // Changed opacity to 30%
+    backgroundColor: "rgba(100, 197, 183, 0.3)",
     borderRadius: 10,
     padding: 10,
     width: "48%",
@@ -317,25 +355,25 @@ const styles = StyleSheet.create({
   eventText: {
     fontFamily: "Telugu MN",
     fontSize: 14,
-    color: "#4F9F9B", // Changed to a medium shade of teal
+    color: "#4F9F9B",
   },
   eventDate: {
     fontFamily: "Telugu MN",
     fontSize: 16,
     fontWeight: "bold",
-    color: "#4F9F9B", // Changed to a medium shade of teal
+    color: "#4F9F9B",
     alignSelf: "flex-end",
   },
   section: {
     marginBottom: 20,
   },
   sectionTitle: {
-    flexDirection: "row", // Added to align icon and text horizontally
-    alignItems: "center", // Added to vertically center align icon and text
+    flexDirection: "row",
+    alignItems: "center",
     fontFamily: "Telugu MN",
     fontSize: 18,
     fontWeight: "bold",
-    color: "#91ACBF", // Updated header color to match icon
+    color: "#91ACBF",
     marginBottom: 10,
   },
   infoItem: {
@@ -346,13 +384,13 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 15,
     marginBottom: 10,
-    borderWidth: 1, // Added border width
-    borderColor: "#91ACBF", // Added border color
+    borderWidth: 1,
+    borderColor: "#91ACBF",
   },
   infoText: {
     fontFamily: "Telugu MN",
     fontSize: 16,
-    color: "#91ACBF", // Changed text color to #91ACBF
+    color: "#91ACBF",
   },
   petInfoContainer: {
     backgroundColor: "#FFE4E1",
@@ -388,7 +426,7 @@ const styles = StyleSheet.create({
     fontFamily: "Telugu MN",
     fontSize: 18,
     fontWeight: "bold",
-    color: "#F26445", // Changed text color to #F26445
+    color: "#F26445",
     marginBottom: 10,
   },
   logoutButton: {
@@ -410,20 +448,23 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 20,
+    paddingHorizontal: 20,
+    paddingTop: 0,
   },
   imageContainer: {
-    marginRight: 10,
+    marginRight: 20,
   },
   profileImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: "#F0F0F0",
   },
   imagePlaceholder: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: "#91ACBF",
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: "#E8EEF1",
     justifyContent: "center",
     alignItems: "center",
   },
