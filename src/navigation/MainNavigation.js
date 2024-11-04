@@ -8,7 +8,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
 import AiVet from "../screens/AiVet";
 import ChooseService from "../screens/ChooseService";
-
+import MyAppointmentNavigation from "./MyAppointmentsNavigation/MyAppointmentNavigation";
 const Tab = createBottomTabNavigator();
 
 const TabIcon = ({ focused, color, icon }) => (
@@ -66,8 +66,8 @@ const MainNavigation = () => {
           }}
         />
         <Tab.Screen
-          name={NAVIGATION.SERVICE.INDEX}
-          component={ServiceNavigation}
+          name={NAVIGATION.MY_APPOINTMENTS.INDEX}
+          component={MyAppointmentNavigation}
           options={({ route, navigation }) => {
             const state = navigation.getState();
             return {
@@ -84,7 +84,7 @@ const MainNavigation = () => {
 
         <Tab.Screen
           name={NAVIGATION.SERVICE.CHOOSE_SERVICE}
-          component={ChooseService}
+          component={ServiceNavigation}
           options={{
             tabBarIcon: ({ color, focused }) => (
               <TabIcon focused={focused} color={color} icon="paw" />

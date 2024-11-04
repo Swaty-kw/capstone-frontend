@@ -18,11 +18,14 @@ const NAVIGATION = {
   },
   SERVICE: {
     INDEX: "Service",
-    MY_APPOINTMENTS: "My Appointments",
     BOOK_APPOINTMENT: "Book Appointment",
     REVIEW: "Review",
     CHOOSE_SERVICE: "Choose Service",
   },
+  MY_APPOINTMENTS:{
+    INDEX: "Appointments",
+    MY_APPOINTMENTS: "My Appointments",
+  }
 };
 
 export default NAVIGATION;
