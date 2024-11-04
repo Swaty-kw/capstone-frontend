@@ -80,14 +80,15 @@ const Register = () => {
           <TextField
             color="#F37558"
             backgroundColor="white"
-            placeholder="Password"
+            placeholder="Phone"
             style={styles.input}
             borderColor="#F37558"
           />
           <TextField
             color="#F37558"
             backgroundColor="white"
-            placeholder="Confirm password"
+            placeholder="Password"
+            secureTextEntry={true}
             style={styles.input}
             borderColor="#F37558"
           />
