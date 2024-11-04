@@ -12,9 +12,10 @@ const PetCard = ({ pet }) => {
     navigation.navigate(NAVIGATION.HOME.PET_DETAILS, { pet }); // Simplified navigation call
   };
 
+  console.log("PET", pet);
   console.log("IMAGEEEE", pet?.image?.replace("\\", "/"));
   return (
-    <View style={styles.card}>
+    <TouchableOpacity onPress={handleMorePress} style={styles.card}>
       <View style={styles.header}>
         <View style={styles.imageContainer}>
           <Image
@@ -31,9 +32,10 @@ const PetCard = ({ pet }) => {
 
       <View style={styles.infoContainer}>
         <View style={styles.infoBox}>
-          {pet.medications ? (
+          <Text style={styles.icon}>💊</Text>
+          {pet.medication ? (
             <>
-              <Text style={styles.medicationText}>{pet.medications}</Text>
+              <Text style={styles.medicationText}>{pet.medication}</Text>
               <Text style={styles.medicationText}>Twice daily</Text>
             </>
           ) : (
@@ -43,23 +45,28 @@ const PetCard = ({ pet }) => {
           )}
         </View>
 
-        <View style={[styles.infoBox, styles.vaccineBox]}>
-          <Text style={styles.vaccineText}>Upcoming{"\n"}vaccination on:</Text>
-          <Text style={styles.dateText}>{pet.nextVaccination}</Text>
+        <View style={styles.infoBox}>
+          <Text style={styles.icon}>⚠️</Text>
+          {pet.allergies ? (
+            <>
+              <Text style={styles.medicationText}>{pet.allergies}</Text>
+            </>
+          ) : (
+            <Text style={styles.medicationText}>No allergies</Text>
+          )}
         </View>
 
         <View style={[styles.infoBox, styles.appointmentBox]}>
-          <Text style={styles.appointmentText}>
-            Upcoming{"\n"}appointment on:
+          <Text style={styles.icon}>📅</Text>
+          <Text style={styles.appointmentText}>Upcoming{"\n"}appointment</Text>
+          <Text style={styles.appointmentDate}>
+            {pet.Appts.length > 0
+              ? pet.Appts[0].date.split("T")[0]
+              : "No upcoming appointments"}
           </Text>
-          <Text style={styles.appointmentDate}>{pet.nextAppointment}</Text>
         </View>
       </View>
-
-      <TouchableOpacity style={styles.moreButton} onPress={handleMorePress}>
-        <Text style={styles.moreButtonText}>More</Text>
-      </TouchableOpacity>
-    </View>
+    </TouchableOpacity>
   );
 };
 
@@ -74,6 +81,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 8,
     elevation: 3,
+    activeOpacity: 0.7,
   },
   header: {
     flexDirection: "row",
@@ -114,7 +122,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#E8EFF1",
     padding: 12,
     borderRadius: 15,
-    height: 85,
+    height: 150,
     justifyContent: "center",
   },
   vaccineBox: {
@@ -155,19 +163,10 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontWeight: "500",
   },
-  moreButton: {
-    backgroundColor: "#64C5B7",
-    paddingVertical: 8,
-    paddingHorizontal: 20,
-    borderRadius: 20,
-    alignItems: "center",
-    width: "30%",
-    alignSelf: "center",
-  },
-  moreButtonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "500",
+  icon: {
+    fontSize: 20,
+    textAlign: "center",
+    marginBottom: 4,
   },
 });
 

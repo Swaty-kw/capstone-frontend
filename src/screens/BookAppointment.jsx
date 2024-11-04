@@ -24,6 +24,8 @@ import { createAppointment } from "../api/appts";
 const BookAppointment = ({ route }) => {
   const { clinicName, clinicLocation, clinicRating, clinicImage, clinicId } =
     route.params;
+
+  console.log("ROUTE PARAMS", route.params);
   const navigation = useNavigation();
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);
@@ -50,14 +52,42 @@ const BookAppointment = ({ route }) => {
 
   const { mutate: bookAppointment } = useMutation({
     mutationKey: ["createAppointment"],
-    mutationFn: () =>
+    mutationFn: () => {
+      const newDate = selectedDate.toISOString().split("T")[0].split("-");
+      console.log("NEW DATE", newDate);
+      const newTime = selectedTime.split(":");
+      const period = newTime[1].slice(3);
+      newTime[1] = newTime[1].slice(0, 2);
+      console.log("PERIOD", period);
+      console.log("NEW TIME", newTime);
+
+      // console.log("BOOKING APPOINTMENT", {
+      //   date: new Date(
+      //     parseInt(newDate[0]),
+      //     parseInt(newDate[1]) - 1,
+      //     parseInt(newDate[2]) + 1,
+      //     period === "AM" ? parseInt(newTime[0]) : parseInt(newTime[0]) + 12,
+      //     parseInt(newTime[1])
+      //   ),
+      //   time: selectedTime,
+      //   petId: selectedPet._id,
+      //   serviceId: clinicId,
+      //   notes: selectedService,
+      // });
       createAppointment({
-        date: selectedDate,
+        date: new Date(
+          parseInt(newDate[0]),
+          parseInt(newDate[1]) - 1,
+          parseInt(newDate[2]) + 1,
+          period === "AM" ? parseInt(newTime[0]) : parseInt(newTime[0]) + 12,
+          parseInt(newTime[1])
+        ),
         time: selectedTime,
         petId: selectedPet._id,
         serviceId: clinicId,
         notes: selectedService,
-      }),
+      });
+    },
     onSuccess: () => {
       console.log("first ssjsjsj");
       navigation.navigate(NAVIGATION.SERVICE.MY_APPOINTMENTS);
@@ -102,8 +132,6 @@ const BookAppointment = ({ route }) => {
     }
     return dates;
   };
-
-  
 
   // Generate available time slots based on selected date
   const generateTimeSlots = (selectedDate) => {
@@ -214,13 +242,14 @@ const BookAppointment = ({ route }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="chevron-back" size={24} color="#64C5B7" />
+          <Ionicons name="chevron-back" size={24} color="#91ACBF" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Book an appointment</Text>
+        <Text style={styles.headerTitle}>Services List</Text>
+        <View style={{ width: 24 }} />
       </View>
 
       {/* Clinic Info */}
@@ -300,7 +329,10 @@ const BookAppointment = ({ route }) => {
                       selectedDate.getDate() === item.date &&
                       styles.selectedDate,
                   ]}
-                  onPress={() => handleDateSelect(item)}
+                  onPress={() => {
+                    console.log("ITEM", item);
+                    handleDateSelect(item);
+                  }}
                 >
                   <Text
                     style={[
@@ -424,7 +456,15 @@ const BookAppointment = ({ route }) => {
                               color="#64C5B7"
                             />
                           </View>
-                          <Text style={styles.serviceText}>Check Up</Text>
+                          <Text
+                            style={[
+                              styles.serviceText,
+                              selectedService === "checkup" &&
+                                styles.selectedServiceText,
+                            ]}
+                          >
+                            Check Up
+                          </Text>
                         </TouchableOpacity>
 
                         <TouchableOpacity
@@ -442,7 +482,15 @@ const BookAppointment = ({ route }) => {
                               color="#64C5B7"
                             />
                           </View>
-                          <Text style={styles.serviceText}>Vaccination</Text>
+                          <Text
+                            style={[
+                              styles.serviceText,
+                              selectedService === "vaccination" &&
+                                styles.selectedServiceText,
+                            ]}
+                          >
+                            Vaccination
+                          </Text>
                         </TouchableOpacity>
                       </>
                     ) : (
@@ -462,7 +510,15 @@ const BookAppointment = ({ route }) => {
                               color="#64C5B7"
                             />
                           </View>
-                          <Text style={styles.serviceText}>Grooming</Text>
+                          <Text
+                            style={[
+                              styles.serviceText,
+                              selectedService === "grooming" &&
+                                styles.selectedServiceText,
+                            ]}
+                          >
+                            Grooming
+                          </Text>
                         </TouchableOpacity>
 
                         <TouchableOpacity
@@ -480,7 +536,15 @@ const BookAppointment = ({ route }) => {
                               color="#64C5B7"
                             />
                           </View>
-                          <Text style={styles.serviceText}>Spa</Text>
+                          <Text
+                            style={[
+                              styles.serviceText,
+                              selectedService === "spa" &&
+                                styles.selectedServiceText,
+                            ]}
+                          >
+                            Spa
+                          </Text>
                         </TouchableOpacity>
                       </>
                     )}
@@ -540,7 +604,7 @@ const BookAppointment = ({ route }) => {
           </View>
         </View>
       </Modal>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -548,19 +612,19 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#FFFFFF",
-    // paddingTop: 100,
+    paddingTop: 100,
   },
   header: {
     flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 20,
-    paddingTop: 10,
-    gap: 8,
+    paddingTop: 20,
+    marginBottom: 10,
   },
   headerTitle: {
-    fontSize: 20,
-    color: "#64C5B7",
-    fontWeight: "400",
+    fontSize: 24,
+    color: "#91ACBF",
+    fontWeight: "500",
   },
   clinicContainer: {
     flexDirection: "row",
@@ -869,8 +933,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
   },
   serviceText: {
+    fontSize: 14,
     color: "#FFFFFF",
-    fontSize: 16,
+    marginBottom: 4,
     fontWeight: "500",
   },
   selectedServiceText: {
@@ -889,31 +954,31 @@ const styles = StyleSheet.create({
   },
   servicesGrid: {
     flexDirection: "row",
-    flexWrap: "wrap",
+    paddingHorizontal: 20,
     gap: 15,
-    justifyContent: "center",
     marginTop: 10,
   },
   serviceCard: {
-    width: "45%",
-    aspectRatio: 1,
+    width: 100,
+    marginHorizontal: 8,
+    alignItems: "center",
     backgroundColor: "rgba(255, 255, 255, 0.15)",
     borderRadius: 15,
-    padding: 15,
-    alignItems: "center",
-    justifyContent: "center",
+    padding: 12,
+    borderWidth: 1,
+    borderColor: "transparent",
   },
   selectedServiceCard: {
     backgroundColor: "#FFFFFF",
   },
   iconCircle: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     backgroundColor: "#FFFFFF",
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 10,
+    marginBottom: 8,
   },
   section: {
     marginBottom: 20,

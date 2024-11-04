@@ -155,8 +155,8 @@ const styles = StyleSheet.create({
   },
   signInText: {
     color: "white",
-    fontSize: 20,
-    fontWeight: "300",
+    fontSize: 30,
+    fontWeight: "400",
   },
   signUpText: {
     color: "#64C5B7",

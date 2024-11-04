@@ -6,9 +6,11 @@ import {
   StyleSheet,
   SafeAreaView,
   ScrollView,
+  TouchableOpacity,
 } from "react-native";
 import { BASE_URL } from "../api";
-
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { useNavigation } from "@react-navigation/native";
 // Add this function at the top of your file, outside the component
 const calculateAge = (birthdate) => {
   if (!birthdate) return "";
@@ -31,6 +33,7 @@ const calculateAge = (birthdate) => {
 };
 
 const PetDetails = ({ route }) => {
+  const navigation = useNavigation();
   const { pet } = route.params;
 
   console.log("Pet Image:", pet.image);
@@ -49,6 +52,16 @@ const PetDetails = ({ route }) => {
         <View style={styles.content}>
           {/* Header */}
           <View style={styles.header}>
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() => navigation.goBack()}
+            >
+              <Ionicons name="chevron-back" size={24} color="#91ACBF" />
+            </TouchableOpacity>
+            <Text style={styles.headerTitle}>Pet Details</Text>
+            <View style={{ width: 24 }} />
+          </View>
+          <View style={styles.header}>
             <View style={styles.imageWrapper}>
               <View style={styles.imageContainer}>
                 <Image
@@ -58,6 +71,7 @@ const PetDetails = ({ route }) => {
                 />
               </View>
             </View>
+
             <View style={styles.titleContainer}>
               <Text style={styles.name}>{pet.name}</Text>
               <Text style={styles.breed}>{pet.breed}</Text>
@@ -76,16 +90,15 @@ const PetDetails = ({ route }) => {
               </View>
               <View style={[styles.card, styles.vaccinationCard]}>
                 <Text style={styles.cardLabel}>
-                  Vaccination{"\n"}for {pet.name}
+                  Upcoming Appointment{"\n"}for {pet.name}
                 </Text>
-                {pet.vaccinationClinic && (
-                  <>
-                    <Text style={styles.clinicName}>
-                      {pet.vaccinationClinic}
-                    </Text>
-                    <Text style={styles.date}>{pet.vaccinationDate}</Text>
-                  </>
-                )}
+                <View style={[styles.infoBox, styles.appointmentBox]}>
+                  <Text style={styles.cardLabel}>
+                    {pet.Appts.length > 0
+                      ? pet.Appts[0].date.split("T")[0]
+                      : "No upcoming appointments"}
+                  </Text>
+                </View>
               </View>
             </View>
 
@@ -96,9 +109,10 @@ const PetDetails = ({ route }) => {
                 <Text style={[styles.cardValue, styles.ageValue]}>{age}</Text>
               </View>
               <View style={[styles.card, styles.beakCard]}>
-                <Text style={styles.cardLabel}>Beak and nails{"\n"}care</Text>
-                <Text style={styles.clinicName}>{pet.serviceClinic}</Text>
-                <Text style={styles.date}>{pet.serviceDate}</Text>
+                <Text style={styles.cardLabel}>Allergies</Text>
+                <Text style={[styles.cardValue, styles.beakValue]}>
+                  {pet.allergies || "No allergies"}
+                </Text>
               </View>
             </View>
 
@@ -129,25 +143,36 @@ const PetDetails = ({ route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F8FAFA",
+    backgroundColor: "#FFFFFF",
     padding: 20,
   },
   content: {
     flex: 1,
     paddingTop: 10,
   },
+  headerTitle: {
+    fontSize: 24,
+    color: "#91ACBF",
+    fontWeight: "500",
+    textAlign: "center",
+  },
   header: {
     flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 24,
+    paddingHorizontal: 20,
+    paddingTop: 10,
+    paddingBottom: 10,
   },
   imageWrapper: {
-    width: 100,
-    height: 100,
+    width: 80,
+    height: 80,
     borderRadius: 40,
     backgroundColor: "#E8F6F5",
     padding: 2,
     marginRight: 16,
+    alignItems: "center",
+    justifyContent: "center",
   },
   imageContainer: {
     width: "100%",
@@ -156,35 +181,36 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   petImage: {
-    marginTop: 10,
     width: "100%",
     height: "100%",
+    resizeMode: "cover",
   },
   titleContainer: {
     flex: 1,
   },
   name: {
-    fontSize: 32,
+    fontSize: 28,
     color: "#4EBFAC",
-    fontWeight: "600",
+    fontWeight: "500",
     marginBottom: 4,
   },
   breed: {
     fontSize: 16,
-    color: "#4EBFAC",
+    color: "#91ACBF",
   },
   grid: {
-    gap: 12,
+    gap: 10,
   },
   row: {
     flexDirection: "row",
-    gap: 12,
+    gap: 10,
+    marginBottom: 10,
   },
   card: {
     flex: 1,
-    borderRadius: 20,
+    borderRadius: 15,
     padding: 16,
-    minHeight: 90,
+    minHeight: 80,
   },
   genderCard: {
     backgroundColor: "#E8F6F5",
@@ -200,51 +226,46 @@ const styles = StyleSheet.create({
   },
   weightCard: {
     backgroundColor: "#F0F4F8",
-    width: "48%",
   },
   cardLabel: {
-    fontSize: 15,
-    color: "#8FA5B3",
-    marginBottom: 12,
-    lineHeight: 20,
+    fontSize: 20,
+    color: "#91ACBF",
+    marginBottom: 8,
   },
   cardValue: {
-    fontSize: 22,
-    color: "#455A64",
-    fontWeight: "600",
-    letterSpacing: 0.3,
+    fontSize: 16,
+    color: "#91ACBF",
+    fontWeight: "1000",
   },
   clinicName: {
-    fontSize: 13,
+    fontSize: 12,
     color: "#455A64",
     marginBottom: 4,
-    letterSpacing: 0.2,
   },
   date: {
-    fontSize: 13,
-    color: "#8FA5B3",
+    fontSize: 12,
+    color: "#91ACBF",
     position: "absolute",
-    bottom: 20,
-    right: 20,
+    bottom: 16,
+    right: 16,
   },
   medicationCard: {
     backgroundColor: "#FFE8E8",
-    borderRadius: 24,
+    borderRadius: 20,
     padding: 20,
-    height: 130,
+    minHeight: 100,
+    marginTop: 10,
   },
   medicationTitle: {
-    fontSize: 22,
+    fontSize: 18,
     color: "#F26445",
-    fontWeight: "600",
-    marginBottom: 12,
-    letterSpacing: 0.3,
+    fontWeight: "500",
+    marginBottom: 8,
   },
   medicationText: {
-    fontSize: 17,
+    fontSize: 14,
     color: "#F26445",
     opacity: 0.8,
-    letterSpacing: 0.2,
   },
 });
 

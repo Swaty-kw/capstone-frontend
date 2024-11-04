@@ -46,7 +46,7 @@ const PetCard = ({ pet }) => {
         <View style={styles.infoBox}>
           {pet.medications ? (
             <>
-              <Text style={styles.medicationText}>{pet.medications}</Text>
+              <Text style={styles.medicationText}>{pet.medication}</Text>
               <Text style={styles.medicationText}>Twice daily</Text>
             </>
           ) : (

@@ -4,6 +4,9 @@ import {
   StyleSheet,
   ActivityIndicator,
   RefreshControl,
+  SafeAreaView,
+  TouchableOpacity,
+  Text,
 } from "react-native";
 import React, { useState } from "react";
 import PetCard from "../components/PetCard";
@@ -11,7 +14,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getUserPets } from "../api/pets";
 import AddButton from "../components/AddButton";
 import { BASE_URL } from "../api";
-
+import Ionicons from "@expo/vector-icons/Ionicons";
 const Home = () => {
   const [refreshing, setRefreshing] = useState(false);
 
@@ -50,39 +53,45 @@ const Home = () => {
   }
 
   return (
-    <View style={styles.container}>
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            colors={["#64C5B7"]}
-            tintColor="#64C5B7"
-          />
-        }
-      >
-        {formattedPets?.map((pet) => (
-          <PetCard
-            key={pet._id}
-            pet={{
-              ...pet,
-              image: pet.image?.replace(/\\/g, "/"),
-            }}
-          />
-        ))}
-        <View style={{ width: "auto" }}>
-          <AddButton />
+    <SafeAreaView style={styles.container}>
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Home</Text>
+          <View style={{ width: 24 }} />
         </View>
-      </ScrollView>
-    </View>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={["#64C5B7"]}
+              tintColor="#64C5B7"
+            />
+          }
+        >
+          {formattedPets?.map((pet) => (
+            <PetCard
+              key={pet._id}
+              pet={{
+                ...pet,
+                image: pet.image?.replace(/\\/g, "/"),
+              }}
+            />
+          ))}
+          <View style={{ width: "auto" }}>
+            <AddButton />
+          </View>
+        </ScrollView>
+      </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F8F8F8",
+    backgroundColor: "white",
   },
   scrollContent: {
     padding: 10,
@@ -92,6 +101,21 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#F8F8F8",
+  },
+  header: {
+    flexDirection: "row",
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    justifyContent: "space-between",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 10,
+  },
+  headerTitle: {
+    fontFamily: "Poppins-Medium",
+    fontWeight: "500",
+    fontSize: 24,
+    color: "#91ACBF",
   },
 });
 
