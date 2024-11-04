@@ -3,6 +3,9 @@ import React from "react";
 import { useNavigation } from "@react-navigation/native"; // Add this import
 import NAVIGATION from "../navigation/index"; // Import navigation constants
 import { BASE_URL } from "../api";
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 const PetCard = ({ pet }) => {
   const navigation = useNavigation(); // Add this hook
@@ -32,7 +35,12 @@ const PetCard = ({ pet }) => {
 
       <View style={styles.infoContainer}>
         <View style={styles.infoBox}>
-          <Text style={styles.icon}>💊</Text>
+          <FontAwesome6
+            name="briefcase-medical"
+            size={24}
+            color="#64C5B7"
+            style={styles.icon}
+          />
           {pet.medication ? (
             <>
               <Text style={styles.medicationText}>{pet.medication}</Text>
@@ -46,7 +54,12 @@ const PetCard = ({ pet }) => {
         </View>
 
         <View style={styles.infoBox}>
-          <Text style={styles.icon}>⚠️</Text>
+          <MaterialCommunityIcons
+            name="paw-off"
+            size={24}
+            color="#64C5B7"
+            style={styles.icon}
+          />
           {pet.allergies ? (
             <>
               <Text style={styles.medicationText}>{pet.allergies}</Text>
@@ -57,7 +70,12 @@ const PetCard = ({ pet }) => {
         </View>
 
         <View style={[styles.infoBox, styles.appointmentBox]}>
-          <Text style={styles.icon}>📅</Text>
+          <FontAwesome
+            name="calendar"
+            size={24}
+            color="#64C5B7"
+            style={styles.icon}
+          />
           <Text style={styles.appointmentText}>Upcoming{"\n"}appointment</Text>
           <Text style={styles.appointmentDate}>
             {pet.Appts.length > 0
@@ -129,39 +147,43 @@ const styles = StyleSheet.create({
     backgroundColor: "#E8F6F5",
   },
   appointmentBox: {
-    backgroundColor: "#FFE8E8",
+    backgroundColor: "#E8EFF1",
   },
   medicationText: {
     fontSize: 12,
     color: "#91ACBF",
     textAlign: "center",
     lineHeight: 20,
+    fontWeight: "bold",
   },
   vaccineText: {
     fontSize: 12,
-    color: "#64C5B7",
+    color: "#91ACBF",
     textAlign: "center",
     lineHeight: 20,
     marginBottom: 4,
+    fontWeight: "bold",
   },
   appointmentText: {
     fontSize: 12,
-    color: "#F26445",
+    color: "#91ACBF",
     textAlign: "center",
     lineHeight: 20,
     marginBottom: 4,
+    fontWeight: "bold",
   },
   dateText: {
     fontSize: 12,
-    color: "#64C5B7",
+    color: "#91ACBF",
     textAlign: "center",
-    fontWeight: "500",
+    fontWeight: "bold",
   },
   appointmentDate: {
     fontSize: 12,
-    color: "#F26445",
+    color: "#91ACBF",
     textAlign: "center",
-    fontWeight: "500",
+    fontWeight: "bold",
+    fontStyle: "bold",
   },
   icon: {
     fontSize: 20,

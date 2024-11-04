@@ -143,7 +143,7 @@ const PetDetails = ({ route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "white",
     padding: 20,
   },
   content: {
@@ -214,18 +214,24 @@ const styles = StyleSheet.create({
   },
   genderCard: {
     backgroundColor: "#E8F6F5",
+    marginLeft: 20,
   },
   vaccinationCard: {
     backgroundColor: "#E8F6F5",
+    marginRight: 20,
   },
   ageCard: {
     backgroundColor: "#F0F4F8",
+    marginLeft: 20,
   },
   beakCard: {
     backgroundColor: "#E8F6F5",
+    marginRight: 20,
   },
   weightCard: {
     backgroundColor: "#F0F4F8",
+    marginRight: 20,
+    marginLeft: 20,
   },
   cardLabel: {
     fontSize: 20,
@@ -255,6 +261,8 @@ const styles = StyleSheet.create({
     padding: 20,
     minHeight: 100,
     marginTop: 10,
+    marginLeft: 20,
+    marginRight: 20,
   },
   medicationTitle: {
     fontSize: 18,

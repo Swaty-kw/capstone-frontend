@@ -211,6 +211,7 @@ const AppointmentCard = ({
           {formatAppointment(date, time)}
         </Text>
         <Text style={styles.petName}>{pet}</Text>
+        <Text style={styles.clinicName}>{clinicName}</Text>
       </View>
     </View>
   );
@@ -370,7 +371,7 @@ const MyAppointments = () => {
           <Text>Loading appointments...</Text>
         ) : activeTab === "upcoming" ? (
           upcomingApptsFlat.length > 0 ? (
-            upcomingApptsFlat.map((appt, index) => {
+            upcomingApptsFlat.reverse().map((appt, index) => {
               return (
                 <AppointmentCard
                   key={`${appt.petId}-${index}`}
@@ -380,7 +381,7 @@ const MyAppointments = () => {
                   pet={appt.petName}
                   petImage={appt.petImage}
                   serviceType={appt.notes}
-                  clinicName={appt.clinicName} // This was saved during booking
+                  clinicName={appt.service.name} // This was saved during booking
                 />
               );
             })
@@ -403,7 +404,7 @@ const MyAppointments = () => {
                   pet={appt.petName}
                   petImage={appt.petImage}
                   serviceType={appt.notes}
-                  clinicName={appt.clinicName} // This was saved during booking
+                  clinicName={appt.service.name} // This was saved during booking
                 />
               );
             })
@@ -480,13 +481,14 @@ const styles = StyleSheet.create({
     padding: 15,
     marginBottom: 15,
     flexDirection: "row",
+    height: 200,
   },
   leftColumn: {
     width: "40%",
   },
   appointmentImage: {
-    width: 60,
-    height: 60,
+    width: 100,
+    height: 100,
     backgroundColor: "#E8EFF1",
     borderRadius: 12,
     marginBottom: 10,
@@ -499,6 +501,7 @@ const styles = StyleSheet.create({
   reminderContainer: {
     flexDirection: "row",
     alignItems: "center",
+    marginTop: 30,
   },
   reminderSwitch: {
     transform: [{ scale: 0.8 }],
@@ -509,7 +512,7 @@ const styles = StyleSheet.create({
     marginRight: 5,
   },
   rescheduleButton: {
-    backgroundColor: "#E8F6F5",
+    backgroundColor: "black",
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 15,
@@ -524,19 +527,20 @@ const styles = StyleSheet.create({
     marginRight: 15,
   },
   appointmentDate: {
-    fontSize: 16,
+    fontSize: 14,
     color: "#91ACBF",
     marginBottom: 5,
+    fontWeight: "bold",
   },
   petName: {
-    fontSize: 14,
+    fontSize: 16,
     color: "#64C5B7",
     marginBottom: 5,
   },
   serviceDetails: {
+    fontSize: 16,
     flexDirection: "row",
     alignItems: "center",
-    gap: 4,
   },
   serviceName: {
     fontSize: 14,
@@ -547,6 +551,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#91ACBF",
     opacity: 0.8,
+    fontWeight: "bold",
   },
   emptyStateContainer: {
     flex: 1,

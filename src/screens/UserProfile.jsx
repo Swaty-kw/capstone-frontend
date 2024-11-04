@@ -293,11 +293,11 @@ const UserProfile = () => {
       <ScrollView>
         <ScrollView style={styles.content}>
           <View style={styles.headerContainer}>
-            <UserImage
+            {/* <UserImage
               imageUri={`${BASE_URL}/${userInfo?.image.replace(/\\/g, "/")}`}
               onImageSelect={handleImageSelect}
               userInfo={userInfo}
-            />
+            /> */}
             <Greeting name={userInfo?.username} />
           </View>
           <UpcomingEvents appointments={petsInfo} />
