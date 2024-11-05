@@ -14,6 +14,7 @@ const TextField = ({
   placeholder,
   placeholderTextColor,
   secureTextEntry,
+  value,
   borderColor,
   onChangeText,
 }) => {
@@ -27,6 +28,7 @@ const TextField = ({
           secureTextEntry={secureTextEntry}
           placeholderTextColor={color}
           backgroundColor={"white"}
+          value={value}
           style={{
             color: color,
             height: 50,

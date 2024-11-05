@@ -13,10 +13,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 const Login = () => {
   const navigation = useNavigation();
 
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("Amna");
+  const [password, setPassword] = useState("12345");
   const [user, setUser] = useContext(UserContext);
-
   const { mutate } = useMutation({
     mutationKey: ["register"],
     mutationFn: () =>

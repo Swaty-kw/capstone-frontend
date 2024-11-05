@@ -16,11 +16,15 @@ import BottomNavBar from "../components/BottomNavBar";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { BASE_URL } from "../api/index";
 import { GOOGLE_PLACES_API_KEY } from "../api/config";
+import { useNavigation } from "@react-navigation/native";
+import { SafeAreaView } from "react-native";
 
 const Review = ({ route }) => {
   const { clinicName, clinicLocation, clinicRating, coordinates, clinicImage } =
     route.params;
   const [googleReviews, setGoogleReviews] = useState(null);
+  const navigation = useNavigation();
+
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [allReviews, setAllReviews] = useState([]);
@@ -272,8 +276,25 @@ const Review = ({ route }) => {
     });
   }, []);
 
+  if (loading) {
+    return (
+      <View
+        style={{ flex: 1, justifyContent: "center", alignContent: "center" }}
+      >
+        <ActivityIndicator size="large" color="#64C5B7" />
+      </View>
+    );
+  }
+
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Ionicons name="chevron-back" size={24} color="#91ACBF" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Reviews</Text>
+        <View style={{ width: 24 }} />
+      </View>
       {/* Clinic Info Section */}
       <View style={styles.clinicSection}>
         <View style={styles.clinicImageContainer}>
@@ -306,7 +327,7 @@ const Review = ({ route }) => {
         {/* Left side - Rating */}
         <View style={styles.ratingSection}>
           <Text style={styles.ratingNumber}>
-            {googleReviews?.rating?.toFixed(1) || "N/A"}
+            {googleReviews?.rating?.toFixed(1) || "0.0"}
           </Text>
           <StarRating rating={googleReviews?.rating || 0} />
           <Text style={styles.totalReviews}>
@@ -432,7 +453,7 @@ const Review = ({ route }) => {
           </TouchableOpacity>
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -440,6 +461,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#FFFFFF",
+    paddingTop: 100,
   },
   clinicSection: {
     flexDirection: "row",
@@ -751,6 +773,18 @@ const styles = StyleSheet.create({
   contactText: {
     color: "#64C5B7",
     fontSize: 14,
+    fontWeight: "500",
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 20,
+    marginBottom: 10,
+  },
+  headerTitle: {
+    fontSize: 24,
+    color: "#91ACBF",
     fontWeight: "500",
   },
 });

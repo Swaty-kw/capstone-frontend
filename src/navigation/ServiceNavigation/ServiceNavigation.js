@@ -10,7 +10,6 @@ const Stack = createNativeStackNavigator();
 const ServiceNavigation = () => {
   return (
     <Stack.Navigator>
-
       <Stack.Screen
         name={NAVIGATION.SERVICE.CHOOSE_SERVICE}
         component={ChooseService}
@@ -21,7 +20,11 @@ const ServiceNavigation = () => {
         component={BookAppointment}
         options={{ headerShown: false }}
       />
-      <Stack.Screen name={NAVIGATION.SERVICE.REVIEW} component={Review} />
+      <Stack.Screen
+        name={NAVIGATION.SERVICE.REVIEW}
+        component={Review}
+        options={{ headerShown: false }}
+      />
     </Stack.Navigator>
   );
 };

@@ -101,6 +101,7 @@ const Carousel = React.forwardRef((props, ref) => {
             <CarouselItem
               item={item}
               index={index}
+              currentIndex={currentIndex}
               onNext={() => {
                 try {
                   if (index < data.length - 1) {

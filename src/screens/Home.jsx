@@ -79,7 +79,7 @@ const Home = () => {
               }}
             />
           ))}
-          <View style={{ width: "auto" }}>
+          <View style={{ width: "auto", marginBottom: 100 }}>
             <AddButton />
           </View>
         </ScrollView>

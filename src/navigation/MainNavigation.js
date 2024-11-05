@@ -83,7 +83,7 @@ const MainNavigation = () => {
         />
 
         <Tab.Screen
-          name={NAVIGATION.SERVICE.CHOOSE_SERVICE}
+          name={NAVIGATION.SERVICE.INDEX}
           component={ServiceNavigation}
           options={{
             tabBarIcon: ({ color, focused }) => (

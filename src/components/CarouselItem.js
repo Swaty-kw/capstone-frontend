@@ -9,7 +9,7 @@ import { Video } from "expo-av";
 import React from "react";
 import { useNavigation } from "@react-navigation/native";
 
-const CarouselItem = ({ item, onComplete, onNext, index }) => {
+const CarouselItem = ({ item, onComplete, onNext, index, currentIndex }) => {
   const navigation = useNavigation();
   const { width } = Dimensions.get("window");
 
@@ -84,7 +84,7 @@ const CarouselItem = ({ item, onComplete, onNext, index }) => {
       onNext();
     }
   };
-
+  console.log(index);
   return (
     <View style={[styles.container, { width }]}>
       <View style={styles.videoContainer}>
@@ -94,7 +94,7 @@ const CarouselItem = ({ item, onComplete, onNext, index }) => {
           useNativeControls
           resizeMode="cover"
           isLooping={false}
-          shouldPlay
+          shouldPlay={index === currentIndex}
           backgroundColor="transparent"
           onPlaybackStatusUpdate={handleVideoFinish}
         />
